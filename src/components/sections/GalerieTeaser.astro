@@ -1,0 +1,420 @@
+---
+/**
+ * Gallery teaser + video.
+ *
+ * NO YouTube iframe anywhere — not on load and not on click. The poster is a
+ * plain image inside a link that opens the video on YouTube in a new tab. A
+ * single embed is roughly 500 kB and several third-party connections, five times
+ * this page's whole budget, for a video most visitors never play
+ * (docs/03-tech.md §5). Opening YouTube properly also gives the guest the real
+ * player — captions, quality, full screen, watch later — instead of a stripped
+ * one bolted into a section that is not about video.
+ *
+ * The bento: the flat strip of six squares became a grid with a 2 × 2 opener, so
+ * the room the cottage is actually let for gets the tile it deserves rather than
+ * one sixth of a row. Every tile opens a lightbox, but each is still a real
+ * <a href="/galerie">, so with JavaScript off a click goes to the gallery page.
+ */
+import { Image, getImage } from 'astro:assets';
+
+import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
+import jidelna from '@img/DSC_5123-scaled-1-1.jpg';
+import virivka from '@img/DSC_4684-scaled-1.jpg';
+import houpacky from '@img/DSC_5166-scaled-1-1.jpg';
+import sauna from '@img/DSC_5204-scaled-1.jpg';
+import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+
+import Icon from '../Icon.astro';
+
+/**
+ * TODO(client): the whole site runs on nine photographs and every one of them is
+ * empty of people. A gallery of six is the most this asset set supports without
+ * repetition. docs/01-content.md §10.
+ */
+const fotky = [
+  { src: obyvak, alt: 'Obývací pokoj s krbem a dlouhým jídelním stolem pod dřevěným trámovým stropem' },
+  { src: jidelna, alt: 'Jídelní stůl se sušenou kyticí, v pozadí zelená kožená sedačka a okna do zahrady' },
+  { src: virivka, alt: 'Dřevěná vířivka na terase obklopená lesem' },
+  { src: houpacky, alt: 'Dřevěná houpačka se dvěma sedátky a zelenou skluzavkou na zatravněné zahradě' },
+  { src: sauna, alt: 'Otevřené dveře do venkovní finské sauny s dřevěnými lavicemi' },
+  { src: terasa, alt: 'Krytá terasa s venkovním zděným krbem a posezením pro celou skupinu' },
+];
+
+/*
+ * The large variant the lightbox loads. Generated at build time and referenced
+ * from `data-lightbox`; nothing fetches it until a tile is actually opened, so
+ * it costs bytes on disk and none on load.
+ */
+const velke = await Promise.all(
+  fotky.map((f) =>
+    getImage({ src: f.src, width: 1600, format: 'webp', quality: 72 }),
+  ),
+);
+
+const VIDEO_ID = '-U_w_kwtzjI';
+---
+
+<section class="section galerie" aria-labelledby="galerie-nadpis">
+  <div class="wrap">
+    <div class="galerie-head" data-reveal="up">
+      <div>
+        <h2 id="galerie-nadpis">Prohlédněte si vybavení chalupy</h2>
+      </div>
+      <p class="more">
+        <a href="/galerie" class="link-more">
+          <span>Celá galerie</span>
+        </a>
+      </p>
+    </div>
+
+    {/* 55 ms apart — six tiles land in a third of a second. */}
+    <ul class="galerie-bento" data-reveal-group="55">
+      {
+        fotky.map((f, i) => (
+          <li class="galerie-tile" data-reveal="scale">
+            {/*
+              A real link first, a lightbox trigger second. `photo-frame` supplies
+              the site-wide image hover from global.css.
+            */}
+            <a
+              href="/galerie"
+              class="galerie-item photo-frame"
+              data-lightbox={velke[i].src}
+              aria-label={`Zvětšit fotografii: ${f.alt}`}
+            >
+              <Image
+                src={f.src}
+                alt={f.alt}
+                widths={[280, 420, 560, 840]}
+                sizes="(min-width: 48rem) 33vw, 50vw"
+                width={840}
+                height={630}
+                format="webp"
+                quality={62}
+                loading="lazy"
+              />
+              <span class="galerie-overlay" aria-hidden="true">
+                <span class="galerie-expand">
+                  <Icon name="zvetsit" size={20} strokeWidth={1.6} />
+                </span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="video-block">
+      <div class="video-copy" data-reveal="up">
+        <p class="lead">
+          Prohlédněte si vybavení chalupy a veškeré možnosti vyžití, které vám nabízí.
+        </p>
+      </div>
+
+      {/*
+        No iframe — not on load, and no longer on click either. The poster is a
+        plain lazy image inside a link that opens the video on YouTube in a new
+        tab, which is what the client asked for and is strictly better here: the
+        third-party weight stays at zero (an embed is ~500 kB and several extra
+        connections, five times this whole page's budget — docs/03-tech.md §5),
+        and it needs no JavaScript, so it works with scripting off.
+
+        The link's accessible name is the poster's alt plus the visible label,
+        with the new-window warning appended for screen readers.
+      */}
+      <a
+        class="video-frame photo-frame"
+        href={`https://www.youtube.com/watch?v=${VIDEO_ID}&autoplay=1`}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-reveal="up"
+        data-reveal-delay="80"
+      >
+        <Image
+          src={obyvak}
+          alt="Náhled videa o chalupě Heřmanka"
+          widths={[420, 640, 900]}
+          sizes="(min-width: 64rem) 42vw, 100vw"
+          width={1920}
+          height={1282}
+          format="webp"
+          layout="none"
+          quality={70}
+          loading="lazy"
+        />
+        <span class="video-play">
+          <span class="video-play-ring">
+            <Icon name="prehrat" size={24} strokeWidth={1.5} />
+          </span>
+          <span>
+            Přehrát video
+            <span class="sr-only"> na YouTube (otevře se v novém okně)</span>
+          </span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .galerie-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    color: var(--color-mosaz-tmava);
+  }
+
+  .more {
+    margin: 0;
+  }
+
+  /* ---- Bento ----------------------------------------------------------
+   * Two columns with a full-width opener on a phone; three columns with a
+   * 2 × 2 opener from tablet up. Six tiles, nine cells, no holes.
+   */
+  .galerie-bento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .galerie-tile:first-child {
+    grid-column: span 2;
+  }
+
+  @media (width >= 48rem) {
+    .galerie-bento {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .galerie-tile:first-child {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+  }
+
+  .galerie-item {
+    position: relative;
+    display: block;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background-color: var(--color-kamen);
+  }
+
+  /* The opener is two cells tall, so its own aspect ratio must not fight the
+     grid — let the row height decide. */
+  @media (width >= 48rem) {
+    .galerie-tile:first-child .galerie-item {
+      aspect-ratio: auto;
+    }
+  }
+
+  .galerie-item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---- Hover overlay --------------------------------------------------- */
+
+  .galerie-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to top, rgb(22 36 28 / 0.55), rgb(22 36 28 / 0.15));
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  .galerie-expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid rgb(251 250 248 / 0.7);
+    border-radius: var(--radius-pill);
+    color: var(--color-omitka);
+    transform: scale(0.75);
+    transition: transform 380ms var(--ease-spring);
+  }
+
+  /*
+   * Focus-within, not just hover: the tile is a link, so it is reachable by
+   * keyboard and the affordance has to show up there too.
+   */
+  .galerie-item:hover .galerie-overlay,
+  .galerie-item:focus-visible .galerie-overlay {
+    opacity: 1;
+  }
+
+  .galerie-item:hover .galerie-expand,
+  .galerie-item:focus-visible .galerie-expand {
+    transform: scale(1);
+  }
+
+  /* ---- Video ----------------------------------------------------------
+   *
+   * Copy on the left, a deliberately modest player on the right. It used to be a
+   * 56rem-wide block centred under the bento, which made a video nobody has asked
+   * for yet the biggest thing in the section.
+   */
+  .video-block {
+    display: grid;
+    gap: 2rem;
+    margin-top: 4rem;
+  }
+
+  @media (width >= 64rem) {
+    .video-block {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+      gap: 4rem;
+      align-items: center;
+      margin-top: 5rem;
+    }
+  }
+
+  /*
+   * Promoted from lead copy to a pull quote: display face, semibold, and two
+   * steps up the scale. It is the only sentence in the section that says what
+   * the gallery is FOR, so it should not have been sitting at the same weight as
+   * a caption.
+   *
+   * Still a <p>, not a heading — the section already has its h2, and a second
+   * one here would put a heading in the outline for a sentence that structures
+   * nothing. Size is doing the work, not semantics.
+   */
+  .video-copy .lead {
+    font-family: var(--font-display);
+    font-size: var(--text-title-s);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.28;
+    /* --les on --omitka = 15.45:1 */
+    color: var(--color-les);
+    text-wrap: balance;
+  }
+
+  @media (width >= 64rem) {
+    .video-copy .lead {
+      font-size: var(--text-title-m);
+    }
+  }
+
+  .video-frame {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--color-les);
+  }
+
+  .video-frame :global(img) {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+  }
+
+  .video-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    background-color: rgb(22 36 28 / 0.42);
+    color: var(--color-omitka);
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    transition: background-color 300ms var(--ease-out);
+  }
+
+  .video-frame:hover .video-play,
+  .video-frame:focus-visible .video-play {
+    background-color: rgb(22 36 28 / 0.26);
+  }
+
+  .video-play-ring {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.75rem;
+    height: 3.75rem;
+    border: 2px solid var(--color-omitka);
+    border-radius: var(--radius-pill);
+    /*
+     * ⚠ No padding here — it was `padding-left: 4px`, and that was the whole
+     * reason the triangle sat off-centre.
+     *
+     * Two things stack up. The `prehrat` path is already drawn for optical
+     * centring: its vertices are (8, 5.2), (8, 18.8) and (19, 12), so its
+     * centroid — which is what the eye reads as the centre of a triangle — is at
+     * x 11.67 against a viewBox centre of 12. Near enough exact. Its *bounding
+     * box* centre is 13.5, and correcting toward that is the mistake: it pushes
+     * the glyph 1.5 units right of where it already belonged.
+     *
+     * Then `box-sizing: border-box` (Tailwind preflight) meant the 4px of
+     * padding shrank the content box rather than the element, moving the
+     * centred child a further 2px right. Net ~3.5px off in a 60px circle, which
+     * is exactly as visible as it sounds.
+     */
+    transition:
+      transform 380ms var(--ease-spring),
+      background-color 300ms var(--ease-out),
+      border-color 300ms var(--ease-out);
+  }
+
+  .video-frame:hover .video-play-ring,
+  .video-frame:focus-visible .video-play-ring {
+    transform: scale(1.08);
+    background-color: var(--color-mosaz);
+    border-color: var(--color-mosaz);
+  }
+
+  /* A single expanding ring, on a pseudo-element so it never affects layout. */
+  @media (prefers-reduced-motion: no-preference) {
+    .video-play-ring::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border: 2px solid var(--color-omitka);
+      border-radius: inherit;
+      animation-name: play-pulse;
+      animation-duration: 2.8s;
+      animation-timing-function: var(--ease-out);
+      animation-iteration-count: infinite;
+    }
+  }
+
+  @keyframes play-pulse {
+    0% {
+      opacity: 0.65;
+      transform: scale(1);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1.45);
+    }
+  }
+
+</style>

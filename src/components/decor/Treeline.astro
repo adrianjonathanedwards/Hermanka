@@ -1,0 +1,131 @@
+---
+/**
+ * Footer treeline — a full-width spruce wood in --les, five depth ranks.
+ *
+ * Drawn to match the client's existing brand mark (visible on the aerial maps in
+ * /img): a narrow spike leader, then three or four BOLDLY NOTCHED tiers, each one
+ * running out-and-down to a point before the outline cuts back up and in. Not
+ * smooth triangles — the deep notch is the whole signature, and a first attempt
+ * with shallow 10% notches read as generic vector clip-art at these scales.
+ * docs/02-design-system.md §4.
+ *
+ * The brand mark itself is white OUTLINE line work. This is filled silhouette,
+ * which is what the placement needs — it is the mass the footer rises out of, not
+ * an ornament laid over a photograph. The geometry carries the hand, not the
+ * treatment.
+ *
+ * The treeline sits at the top of the footer and overflows upward into the
+ * --kamen band above, which is the only place the fill reads: --les on --les
+ * inside the footer is invisible by design, so the depth ranks are seen exactly
+ * where they should be, against the lighter band.
+ *
+ * SIZE AND RANDOMNESS. The ranks are generated, not typed out — see forest.ts for
+ * why, and for the seeding rule. Trees are roughly a third taller than the first
+ * pass and there are five ranks rather than four, so the edges read as a wood
+ * with depth in it rather than as a decorative border.
+ *
+ * The one thing that is NOT random is the overall silhouette: full height at both
+ * edges, dropping to a low saddle across the middle. The wood overflows upward
+ * into the section above, where the inquiry form sits, and that card has to stay
+ * in clear air. `saddle` in each rank below is what buys it.
+ */
+import { plantRank, transformFor } from './forest';
+
+/*
+ * Six hand-authored spruces. CROWN ONLY — no trunk. The skirt of the lowest tier
+ * runs straight to the ground line at y=0 and the tree is closed there.
+ *
+ * A trunk is the wrong drawing for this: a wood seen from outside is a mass of
+ * foliage, and the gap under each crown that a trunk implies is exactly what made
+ * the first version read as a row of separate ornaments rather than as a forest.
+ * The trunks were also invisible in practice — the solid foot on the front rank
+ * covers that band — so they cost geometry and bought a worse silhouette.
+ *
+ * Tip at y=-112, centred on x=0, so `translate(x BASE) scale(s)` plants every tree
+ * on the same ground line whatever its scale — and a negative x-scale mirrors it.
+ *
+ * Every one is asymmetric — the left flank never mirrors the right. A: four even
+ * tiers. B: broad, heavy lower skirt. C: five tiers, the finest stepping.
+ * D: leaning, wide bottom tier. E: narrow sapling. F: the widest, most ragged.
+ */
+const SPRUCES = [
+  `M0 -112 L5 -88 L2 -93 L14 -58 L6 -64 L24 -24 L9 -31 L30 0 L-28 0 L-8.5 -30 L-22 -25 L-5.5 -63 L-13 -57 L-2 -92 L-4.5 -87 Z`,
+  `M0 -112 L6 -80 L2.5 -86 L17 -50 L7 -57 L27 -18 L10 -26 L32 0 L-30 0 L-9 -27 L-25 -19 L-6.5 -55 L-15 -48 L-2.5 -85 L-5 -79 Z`,
+  `M0 -112 L4.5 -94 L1.5 -98 L11 -70 L5 -75 L19 -44 L8 -50 L27 -20 L10 -27 L31 0 L-29 0 L-9.5 -28 L-25 -21 L-7 -49 L-17.5 -43 L-4.5 -74 L-10 -69 L-1.5 -97 L-4 -93 Z`,
+  `M0 -112 L7 -84 L2 -90 L18 -52 L6 -60 L28 -20 L9 -28 L33 0 L-27 0 L-8 -29 L-23 -22 L-5.5 -58 L-14 -51 L-2 -89 L-5.5 -83 Z`,
+  `M0 -112 L4 -90 L1.5 -95 L10 -62 L4.5 -68 L17 -30 L7 -37 L22 0 L-20 0 L-6.5 -38 L-15.5 -32 L-4 -67 L-9 -61 L-1.5 -94 L-3.5 -89 Z`,
+  `M1 -112 L8 -76 L2.5 -83 L20 -46 L7 -54 L30 -16 L10 -25 L35 0 L-32 0 L-10 -26 L-26 -17 L-7 -52 L-17 -44 L-2.5 -81 L-6 -74 Z`,
+];
+
+const WIDTH = 1440;
+const BASE_Y = 322;
+
+/*
+ * Five ranks, back to front. The back rank is the tallest and the front rank the
+ * shortest, which is the wrong way round for perspective and the right way round
+ * for a treeline: everything stands on one ground line, so a tall front rank would
+ * simply hide the wood behind it.
+ *
+ * NO FADE. The ranks used to run 0.2 → 1 in opacity, which put atmospheric haze
+ * on the far ones. They are all solid --les now: this is a silhouette against a
+ * light band, and it is meant to read as one sharp cut edge rather than as a mist.
+ * The ranks still earn their keep — five passes at different scales, gaps and
+ * saddle depths are what make the canopy line dense and irregular — they just no
+ * longer differ in weight.
+ *
+ * Scales never go below 0.45. Smaller than that the notches close up and the tree
+ * reverts to the plain triangle the whole shape exists to avoid.
+ */
+const RANKS = [
+  { seed: 20260813, gap: [34, 118] as [number, number], scale: [1.7, 2.85] as [number, number], saddle: 0.27, giants: 0.14 },
+  { seed: 771302, gap: [32, 108] as [number, number], scale: [1.48, 2.4] as [number, number], saddle: 0.29, giants: 0.12 },
+  { seed: 415509, gap: [29, 98] as [number, number], scale: [1.22, 2.0] as [number, number], saddle: 0.32, giants: 0.1 },
+  { seed: 908114, gap: [26, 86] as [number, number], scale: [0.98, 1.6] as [number, number], saddle: 0.36, giants: 0.08 },
+  { seed: 133707, gap: [23, 74] as [number, number], scale: [0.75, 1.25] as [number, number], saddle: 0.42, giants: 0.06 },
+];
+
+const PLANTED = RANKS.map((r) =>
+  plantRank({
+    seed: r.seed,
+    width: WIDTH,
+    shapes: SPRUCES.length,
+    gap: r.gap,
+    scale: r.scale,
+    saddle: r.saddle,
+    giants: r.giants,
+    wobble: 5,
+  }),
+);
+---
+
+{/*
+  `slice`, paired with the min-height in global.css. Left to its intrinsic ratio
+  this wood is 65 px tall on a phone — the trees turn into a serrated line and the
+  point of drawing them is lost. Below ~600 px the min-height wins, the SVG scales
+  up to cover, and the sides crop instead. One stretch of wood looks like any
+  other, so the crop costs nothing.
+*/}
+<svg
+  class="treeline"
+  viewBox={`0 0 ${WIDTH} 332`}
+  preserveAspectRatio="xMidYMax slice"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    {SPRUCES.map((d, i) => <path id={`tl${i}`} d={d} />)}
+  </defs>
+  {
+    PLANTED.map((rank, i) => (
+      <g fill="var(--color-les)">
+        {rank.map((t) => <use href={`#tl${t.shape}`} transform={transformFor(t, BASE_Y)} />)}
+        {/*
+          Solid foot on the front rank only. Without it the light band above shows
+          through the gaps between the trunks and the treeline reads as a torn
+          seam rather than a wood the footer rises out of.
+        */}
+        {i === PLANTED.length - 1 && <rect x="0" y="318" width={WIDTH} height="16" />}
+      </g>
+    ))
+  }
+</svg>

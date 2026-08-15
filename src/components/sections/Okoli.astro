@@ -1,0 +1,285 @@
+---
+/**
+ * Okolí — the illustrated regional map, and what the map cannot tell you.
+ *
+ * THE MAP'S LABELS ARE NOW ONLY IN THE MAP
+ * ----------------------------------------
+ * Every label on this map is baked into the raster: place names, descriptions,
+ * distances, travel modes. The column beside it used to restate all five
+ * destinations as real text, and then a collapsed <details> under the figure did.
+ * Both are gone by decision — the duplication was not wanted on the page in any
+ * form. The figcaption under it ("Poloha chalupy a nejbližší cíle v okolí.")
+ * went the same way for the same reason: the heading and the lead beside the map
+ * already say what the map is, and the <img> alt says it to a screen reader. The
+ * <figure> is kept — it is still a figure, it simply no longer has a caption.
+ *
+ * What that costs, so nobody has to rediscover it: `Klepáč`, `Klášter Hedeč`,
+ * `Międzygórze` and the rest are no longer machine-readable anywhere except the
+ * <img> alt below, which names the places but not their distances or
+ * descriptions. If those need to be indexed again, the fix is the one
+ * docs/01-content.md §7.4 always wanted — redraw the labels as inline SVG <text>
+ * over the photograph, so they are the map AND the text at once, rather than a
+ * second copy printed underneath it.
+ *
+ * WHAT IT SAYS INSTEAD
+ * --------------------
+ * The map answers "where can we go from here", in kilometres of driving. It has
+ * nothing to say about the thing that actually sells a cottage in a valley: how
+ * little of it needs a car. Every figure in the trail below is from the distance
+ * table in docs/01-content.md §5.2 — the one the content audit calls "quietly the
+ * most useful content on the site" — including `Les, 10 metrů, hned za chalupou`,
+ * which it calls the best line on the whole website. It is on no map.
+ *
+ * Two distances are deliberately absent because the sources disagree and the
+ * conflict is unresolved (docs/01-content.md §9):
+ *   - Králíky: 3 km in the distance table, 7 km on this map.
+ *   - The summit trail: 14 km in the /tipy-na-vylety copy, 17 km on this map.
+ * Both are TODO(client). Naming either one next to a map that contradicts it is
+ * worse than not naming it, so the closing line names the trail and not its
+ * length.
+ */
+import { Image } from 'astro:assets';
+import mapa from '@img/situace1-1.webp';
+
+const NBSP = ' ';
+
+/**
+ * Outward from the front door. Ordered by distance — that order is the whole
+ * point, so this is an <ol>.
+ */
+const odDveri: { vzdalenost: string; co: string }[] = [
+  { vzdalenost: `10${NBSP}m`, co: 'Les. Začíná hned za chalupou.' },
+  { vzdalenost: `500${NBSP}m`, co: 'Autobusová zastávka a penzion s restaurací.' },
+  { vzdalenost: `2${NBSP}km`, co: 'Vlak Prostřední Lipka a obchod.' },
+  { vzdalenost: `3${NBSP}km`, co: 'Ski areál Dolní Morava, vzdušnou čarou.' },
+];
+
+---
+
+<section class="okoli section" aria-labelledby="okoli-nadpis">
+  <div class="wrap">
+    <div class="okoli-grid">
+      <figure class="okoli-mapa" data-reveal>
+        <div class="media-frame photo-frame">
+          <Image
+            src={mapa}
+            alt="Letecký snímek okolí Heřmanic u Králík s vyznačenou polohou chalupy Heřmanka a okolními cíli: Polsko, Klepáč, Králický Sněžník, Dolní Morava, Klášter Hedeč a Králíky"
+            widths={[640, 960, 1280]}
+            sizes="(min-width: 64rem) 55vw, 100vw"
+            width={1280}
+            height={958}
+            format="webp"
+            quality={68}
+            loading="lazy"
+          />
+        </div>
+      </figure>
+
+      <div class="okoli-text" data-reveal>
+        <h2 id="okoli-nadpis">Příroda, lyžování, historie i památky</h2>
+        <p class="lead">Mapa ukazuje, kam se odsud dá vyrazit. Tohle je vzdálenost od dveří.</p>
+
+        {/*
+          The trail. The dashed line and the ring markers are the map's own line
+          work — it draws a dashed track and rings every place it names — brought
+          off the photograph and into the type.
+        */}
+        <ol class="trail">
+          {
+            odDveri.map((k) => (
+              <li>
+                <span class="trail-km">{k.vzdalenost}</span>
+                <span>{k.co}</span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <p class="trail-konec">
+          Turistické značky se dají chytit přímo u chalupy. Jedna z nich vede až na
+          vrchol Králického Sněžníku.
+        </p>
+
+        <p class="more">
+          <a href="/okoli" class="link-more">
+            <span>Tipy na výlety</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .okoli {
+    background-color: var(--color-kamen);
+  }
+
+  .okoli-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .okoli-grid {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  .okoli-mapa {
+    margin: 0;
+  }
+
+  .okoli-mapa :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  h2 {
+    color: var(--color-mosaz-tmava);
+  }
+
+  .lead {
+    margin-top: 1.25rem;
+    font-size: var(--text-lead);
+    max-width: 32ch;
+  }
+
+  /* ---- The trail -------------------------------------------------------
+   *
+   * One dashed line down the left with a ring at every stop. `left: 0.4375rem`
+   * puts it through the centre of a 1rem ring sitting at `left: 0`.
+   */
+  .trail {
+    position: relative;
+    display: grid;
+    gap: 1.5rem;
+    margin: 2.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .trail::before {
+    content: '';
+    position: absolute;
+    left: 0.4375rem;
+    top: 0.6rem;
+    width: 2px;
+    /* Stops at the last ring rather than running past it into nothing. */
+    height: calc(100% - 1.9rem);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--color-mosaz) 0 5px,
+      transparent 5px 11px
+    );
+    opacity: 0.65;
+  }
+
+  /*
+   * Two columns, not a wrapping row. The distances have to line up under each
+   * other like a timetable — and a long label has to wrap inside its own column
+   * rather than dropping underneath the number it belongs to.
+   */
+  .trail li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    gap: 0 0.875rem;
+    padding-left: 2.25rem;
+  }
+
+  .trail li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.32rem;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--color-mosaz);
+    border-radius: 50%;
+    /* Filled with the band colour so the dashes stop at the ring, not under it. */
+    background-color: var(--color-kamen);
+  }
+
+  .trail-km {
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    /* --mosaz-tmava on --kamen = 5.06:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .trail-konec {
+    margin-top: 1.75rem;
+    max-width: 40ch;
+    color: var(--color-kura);
+  }
+
+  /* ---- Drawing it in ---------------------------------------------------
+   *
+   * The line grows from nothing and each ring lands as it arrives. Hung off
+   * `.is-revealed`, the class src/scripts/motion.ts already puts on every
+   * `[data-reveal]` when its observer fires — so this adds no JavaScript.
+   *
+   * Everything here is additive. No JS, a dead chunk or reduced motion means
+   * `.js-motion` is never on the page, none of these rules match, and the trail
+   * renders complete and still. docs/02-design-system.md §5.1.
+   *
+   * ⚠ `:global()` on `.js-motion` is load-bearing. Astro scopes EVERY compound in
+   * a selector, not just the last one — without it this compiles to
+   * `.js-motion[data-astro-cid-…]`, which asks for the cid on <html>, an element
+   * that will never have it. The rule then matches nothing, silently, and the
+   * trail just sits there fully drawn with no way to tell why.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js-motion) [data-reveal].is-revealed .trail::before {
+      animation-name: trail-draw;
+      animation-duration: 900ms;
+      animation-timing-function: var(--ease-out);
+      animation-fill-mode: both;
+    }
+
+    :global(.js-motion) [data-reveal].is-revealed .trail li::before {
+      animation-name: trail-stop;
+      animation-duration: 320ms;
+      animation-timing-function: var(--ease-out);
+      animation-fill-mode: both;
+    }
+
+    /* Each ring lands roughly as the line reaches it. */
+    .trail li:nth-child(1)::before {
+      animation-delay: 60ms;
+    }
+
+    .trail li:nth-child(2)::before {
+      animation-delay: 300ms;
+    }
+
+    .trail li:nth-child(3)::before {
+      animation-delay: 540ms;
+    }
+
+    .trail li:nth-child(4)::before {
+      animation-delay: 780ms;
+    }
+  }
+
+  /* No `to` — the missing half is the element's own computed height. */
+  @keyframes trail-draw {
+    from {
+      height: 0;
+    }
+  }
+
+  @keyframes trail-stop {
+    from {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+  }
+
+  .more {
+    margin-top: 2rem;
+  }
+</style>

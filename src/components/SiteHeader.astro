@@ -1,0 +1,402 @@
+---
+/**
+ * Site header. Transparent over the hero, frosted --les once scrolled.
+ * Mobile navigation is a <details> disclosure, so it works with JavaScript off.
+ *
+ * The brand is the client's supplied logo. It replaced a text lockup with a
+ * drawn spruce that stood in while no artwork existed — see RoofMark.astro for
+ * the roof from that same logo rebuilt as vector paths, which the section
+ * dividers and the favicon use.
+ *
+ * The glass, the sliding nav underline and the hamburger→close morph are all
+ * CSS; src/scripts/motion.ts only animates the mobile panel's contents in, and
+ * adds Escape-to-close.
+ */
+import { Image } from 'astro:assets';
+import { NAV } from '../data/site';
+import logo from '@img/logo3-inv.png';
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    {/*
+      The client's own logo, supplied white on transparent — so it works over the
+      hero photograph and over the frosted --les header with no second asset and
+      no colour variant. WebP keeps the alpha; the source PNG is 36 kB against
+      about 4 kB here.
+
+      The <img> alt carries the site name, so the <a> needs no aria-label: one
+      would override the alt and the link would announce the same thing twice.
+    */}
+    <a href="/" class="brand">
+      <Image
+        src={logo}
+        alt="Chalupa Heřmanka, domů"
+        widths={[96, 156, 200]}
+        sizes="(min-width: 64rem) 96px, 78px"
+        width={554}
+        height={450}
+        format="webp"
+        quality={60}
+        loading="eager"
+        class="brand-logo"
+      />
+    </a>
+
+    <nav class="nav-desktop" aria-label="Hlavní navigace">
+      <ul>
+        {NAV.map((item) => (
+          <li>
+            <a href={item.href}>
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <a href="/terminy-a-ceny" class="btn btn-primary header-cta">Zjistit volný termín</a>
+
+    <details class="nav-mobile">
+      <summary aria-label="Otevřít menu">
+        <span class="nav-mobile-label">Menu</span>
+        {/*
+          Three separate lines rather than one path: the top and bottom rotate
+          into the cross and the middle fades, which needs them addressable
+          individually.
+        */}
+        <svg
+          class="burger"
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <line class="burger-top" x1="4" y1="7" x2="20" y2="7" />
+          <line class="burger-mid" x1="4" y1="12" x2="20" y2="12" />
+          <line class="burger-bot" x1="4" y1="17" x2="20" y2="17" />
+        </svg>
+      </summary>
+      <nav class="nav-mobile-panel" aria-label="Hlavní navigace">
+        <ul>
+          {NAV.map((item) => (
+            <li><a href={item.href}>{item.label}</a></li>
+          ))}
+        </ul>
+        <a href="/terminy-a-ceny" class="btn btn-primary nav-mobile-cta">Zjistit volný termín</a>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 50;
+    /*
+     * Safe default: solid. Browsers without scroll-driven animations keep a
+     * readable header everywhere rather than a transparent one stranded over a
+     * pale photograph further down the page.
+     */
+    background-color: var(--color-les);
+  }
+
+  /*
+   * Progressive enhancement: where scroll timelines exist, start transparent
+   * over the hero and settle into frosted glass as it scrolls away.
+   * docs/02-design-system.md §5.1.
+   *
+   * ⚠ LONGHANDS ONLY — do not rewrite these five lines as `animation: … `.
+   * The CSS minifier folds a neighbouring `animation-timeline` into the shorthand
+   * (`animation: linear both header-solid scroll(root)`), which Chromium rejects
+   * as invalid, so `animation-name` computes to `none` and the header stays
+   * transparent over every section on the page. It fails silently and only in the
+   * production build. Keeping the longhands apart is what stops the fold.
+   */
+  @supports (animation-timeline: scroll()) {
+    .site-header {
+      background-color: transparent;
+      animation-name: header-solid;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 70vh;
+    }
+
+    @keyframes header-solid {
+      0%,
+      35% {
+        background-color: transparent;
+        backdrop-filter: blur(0px) saturate(1);
+        -webkit-backdrop-filter: blur(0px) saturate(1);
+        box-shadow: 0 0 0 0 rgb(22 36 28 / 0);
+        border-bottom-color: rgb(140 99 24 / 0);
+      }
+      100% {
+        /*
+         * Not opaque: the blur behind it is the point. --omitka text on this
+         * over the palest photograph on the site still measures above 4.5:1,
+         * because the blur pulls the backdrop toward the mean and the 0.82
+         * --les does the rest.
+         */
+        background-color: rgb(22 36 28 / 0.82);
+        backdrop-filter: blur(14px) saturate(1.25);
+        -webkit-backdrop-filter: blur(14px) saturate(1.25);
+        box-shadow: 0 10px 30px -18px rgb(22 36 28 / 0.9);
+        border-bottom-color: rgb(140 99 24 / 0.35);
+      }
+    }
+  }
+
+  /* Declared unconditionally so the animated colour above has something to
+     transition; transparent until the keyframe brings it in. */
+  .site-header {
+    border-bottom: 1px solid transparent;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 4.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .header-inner {
+      min-height: 5.5rem;
+    }
+  }
+
+  /* ---- Brand ---------------------------------------------------------- */
+
+  .brand {
+    display: flex;
+    align-items: center;
+    flex: none;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  /*
+   * Sized by width, not height: the logo's own aspect is 554:450 and the artwork
+   * carries roughly 10% of internal padding, so a height-driven size makes the
+   * wordmark smaller than it looks on paper.
+   *
+   * Widths are picked against the header's own height, not chosen freely. At
+   * 110px the logo is 89px tall in an 88px bar — it fills it edge to edge with
+   * no air and the header reads as cramped. 78/96 leaves a few pixels top and
+   * bottom at both breakpoints.
+   */
+  .brand-logo {
+    display: block;
+    width: 78px;
+    height: auto;
+    transform-origin: center;
+    transition: transform 400ms var(--ease-spring);
+  }
+
+  @media (width >= 64rem) {
+    .brand-logo {
+      width: 96px;
+    }
+  }
+
+  @media (hover: hover) {
+    .brand:hover .brand-logo {
+      transform: scale(1.04);
+    }
+  }
+
+  /* ---- Desktop nav ---------------------------------------------------- */
+
+  .nav-desktop {
+    display: none;
+  }
+
+  .nav-desktop ul {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-desktop a {
+    position: relative;
+    display: block;
+    color: var(--color-omitka);
+    font-size: var(--text-caption);
+    text-decoration: none;
+    padding-block: 0.5rem;
+    overflow: hidden;
+  }
+
+  /*
+   * The underline grows from the left instead of the old border appearing all at
+   * once. `scaleX` on a pseudo-element, so it composites and never reflows.
+   */
+  .nav-desktop a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 2px;
+    background-color: var(--color-mosaz-svetla);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 280ms var(--ease-emphasized);
+  }
+
+  @media (hover: hover) {
+    .nav-desktop a:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Keyboard users get the same affordance as the mouse. */
+  .nav-desktop a:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* The label rides up a hair under the cursor. */
+  .nav-desktop a span {
+    display: block;
+    transition: transform 280ms var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .nav-desktop a:hover span {
+      transform: translateY(-2px);
+    }
+  }
+
+  .header-cta {
+    display: none;
+  }
+
+  @media (width >= 64rem) {
+    .nav-desktop,
+    .header-cta {
+      display: flex;
+    }
+  }
+
+  /* ---- Mobile nav — <details>, no JavaScript -------------------------- */
+
+  .nav-mobile {
+    position: relative;
+  }
+
+  @media (width >= 64rem) {
+    .nav-mobile {
+      display: none;
+    }
+  }
+
+  .nav-mobile summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-right: -0.5rem;
+    color: var(--color-omitka);
+    font-size: var(--text-caption);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .nav-mobile summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nav-mobile-label {
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .nav-mobile[open] summary {
+    color: var(--color-mosaz-svetla);
+  }
+
+  /* ---- Hamburger → close ---------------------------------------------- */
+
+  .burger line {
+    transition:
+      transform 320ms var(--ease-spring),
+      opacity 160ms var(--ease-out);
+    transform-origin: center;
+  }
+
+  .nav-mobile[open] .burger-top {
+    transform: translateY(5px) rotate(45deg);
+  }
+
+  .nav-mobile[open] .burger-mid {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+
+  .nav-mobile[open] .burger-bot {
+    transform: translateY(-5px) rotate(-45deg);
+  }
+
+  /* ---- Mobile panel ---------------------------------------------------- */
+
+  .nav-mobile-panel {
+    position: absolute;
+    right: -1.5rem;
+    top: calc(100% + 0.5rem);
+    min-width: 16rem;
+    padding: 1rem 1.5rem 1.5rem;
+    /*
+     * 0.97, not 0.9. The blur is the look, but it must not be the thing keeping
+     * the menu readable: Safari drops backdrop-filter under Low Power Mode and
+     * some Android WebViews never composite it at all, and on those the panel
+     * falls back to whatever this alpha alone gives. At 0.97 over --kura that is
+     * still --omitka at 11.6:1; at 0.9 the hero photograph starts showing
+     * through the labels.
+     */
+    background-color: rgb(62 50 38 / 0.97);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-top: 2px solid var(--color-mosaz);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-float);
+    transform-origin: top right;
+  }
+
+  .nav-mobile-panel ul {
+    list-style: none;
+    margin: 0 0 1.25rem;
+    padding: 0;
+  }
+
+  .nav-mobile-panel li + li {
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+
+  .nav-mobile-panel a:not(.btn) {
+    display: block;
+    padding-block: 0.875rem;
+    color: var(--color-omitka);
+    text-decoration: none;
+    transition: color 200ms var(--ease-out);
+  }
+
+  .nav-mobile-panel a:not(.btn):hover {
+    color: var(--color-mosaz-svetla);
+  }
+
+  .nav-mobile-cta {
+    width: 100%;
+  }
+</style>

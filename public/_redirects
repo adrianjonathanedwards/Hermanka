@@ -1,0 +1,41 @@
+# Cloudflare Pages redirects.
+#
+# The old 2019 URLs 301 to their new homes. These pages have been indexed for
+# years; every one of them is a route someone may still arrive on. Do not remove
+# them, and do not downgrade any of them to a 302.
+#
+# Rules are matched top to bottom. Cloudflare Pages allows 2100 static rules; we
+# are using a handful. Splats (:splat) are supported.
+
+# --- old page structure --------------------------------------------------
+/o-nas                  /chalupa         301
+/o-nas/                 /chalupa         301
+/ubytovani              /chalupa         301
+/ubytovani/             /chalupa         301
+/video                  /chalupa#video   301
+/video/                 /chalupa#video   301
+/volne-terminy-a-ceny   /terminy-a-ceny  301
+/volne-terminy-a-ceny/  /terminy-a-ceny  301
+/tipy-na-vylety         /okoli           301
+/tipy-na-vylety/        /okoli           301
+
+# --- trailing slashes on surviving routes --------------------------------
+# astro.config.mjs sets trailingSlash: 'never'; keep one canonical URL per page.
+/kontakt/               /kontakt         301
+/galerie/               /galerie         301
+/chalupa/               /chalupa         301
+/terminy-a-ceny/        /terminy-a-ceny  301
+/okoli/                 /okoli           301
+
+# --- WordPress leftovers -------------------------------------------------
+# The old site was WordPress. These paths are probed constantly by bots and are
+# also occasionally still linked; send them home rather than serving a 404 page
+# to a crawler.
+/wp-content/*           /                301
+/wp-includes/*          /                301
+/feed                   /                301
+/feed/                  /                301
+
+# Note: Pages `_redirects` matches paths, not query strings, so the old
+# WordPress search URLs (/?s=…) cannot be caught here. They resolve to `/`
+# anyway, which is the right destination.

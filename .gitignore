@@ -1,0 +1,30 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# font sources — downloaded by `npm run build:fonts`, never committed.
+# The generated subsets in public/fonts/ ARE committed.
+.cache/
+
+# cloudflare
+.wrangler/
+
+# environment
+.env
+.env.production
+.dev.vars
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

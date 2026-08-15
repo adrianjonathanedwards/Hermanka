@@ -1,0 +1,430 @@
+---
+/**
+ * Dolní Morava. Photograph bleeding left, text right.
+ *
+ * The original copy is one subordinate clause with no main verb, and it spells
+ * `bobový dráha` (should be `bobová`) and `Sky bridge` (the attraction is
+ * `Sky Bridge 721`, spelled correctly on the old /tipy-na-vylety/ page).
+ * Rewritten here into three sentences — same facts, correct Czech.
+ * docs/01-content.md §4.8.
+ *
+ * ---------------------------------------------------------------------------
+ * WHY THIS SECTION IS THE COLD ONE
+ *
+ * It read as another split with another photograph, which is not what it is
+ * about. This is the only section on the page about *altitude and winter*: ten
+ * kilometres of piste, a walkway named for standing in the clouds, and a
+ * suspension bridge over the ridge. Three things make it feel like that, and
+ * each is doing a job rather than decorating:
+ *
+ *   1. FROST GROUND. The copy panel is --jinovatka instead of --omitka.
+ *      docs/02-design-system.md §1 reserves that colour for exactly this — snow,
+ *      ski content, the cold months — and forbids it everywhere else, so this is
+ *      the one section on the site where it may appear at all. It is also what
+ *      stops the panel reading as a repeat of the Wellness split two screens up.
+ *      Measured on it: --les 12.17:1, --kura 9.39:1, --mosaz-tmava 4.81:1. All
+ *      clear of the 4.5:1 floor.
+ *
+ *   2. THE WOOD. A stand of spruce across the near edge of the photograph, so
+ *      the resort is something seen from inside the wood the cottage stands in —
+ *      which is the actual relationship between the two places, and the thing
+ *      "12 minutes away" is trying to say. See PhotoWood.astro.
+ *
+ *   3. WEATHER. A slow drift on the photograph and a thin fall of snow over it.
+ *      Both are pure CSS and both stop dead under `prefers-reduced-motion`.
+ *
+ * ⚠ §5.3 bans parallax outright. This is a deliberate, recorded exception, and a
+ * small one: the drift is ±5 % inside a frame that does not move, it runs off a
+ * scroll timeline rather than a scroll listener so it costs no JavaScript and
+ * never touches the main thread, and where the timeline does not exist the
+ * photograph is simply still. Nothing about the section depends on it.
+ * ---------------------------------------------------------------------------
+ */
+import { Image } from 'astro:assets';
+import sjezdovky from '@img/dolnimorava.webp';
+import PhotoWood from '../decor/PhotoWood.astro';
+import { makeRng } from '../decor/forest';
+
+const NBSP = ' ';
+
+/*
+ * Snow. Seeded for the same reason the treelines are — this runs at BUILD time,
+ * and `Math.random()` here would re-roll every flake on every build: changed
+ * HTML and a missed cache on every deploy, for an effect nobody could see had
+ * moved.
+ *
+ * Sixteen flakes, not sixty. Enough to read as weather over a snowfield; past
+ * about twenty it stops being a mountain in winter and becomes a screensaver.
+ */
+const r2 = (n: number): number => Math.round(n * 100) / 100;
+const rnd = makeRng(30112026);
+
+const FLAKES = Array.from({ length: 16 }, () => ({
+  /** Start position across the frame, in per cent. */
+  x: r2(rnd() * 100),
+  /** 3–7 px. Small enough to be weather, big enough to survive the halo. */
+  size: r2(3 + rnd() * 4),
+  /** Negative, so every fall is already in progress on the first paint. */
+  delay: r2(-rnd() * 18),
+  duration: r2(13 + rnd() * 12),
+  /** Sideways travel over the whole fall. Wind, not gravity. */
+  drift: Math.round((rnd() * 2 - 1) * 46),
+  opacity: r2(0.3 + rnd() * 0.45),
+}));
+---
+
+<section class="split split--media-left dolni-morava" aria-labelledby="dolni-morava-nadpis">
+  <div class="split-media dm-media" data-reveal="wipe">
+    <Image
+      src={sjezdovky}
+      alt="Letecký pohled na zasněžený areál Dolní Morava se sjezdovkami, lanovkou a Stezkou v oblacích"
+      widths={[560, 900, 1200]}
+      sizes="(min-width: 64rem) 50vw, 100vw"
+      width={950}
+      height={789}
+      format="webp"
+      quality={64}
+      loading="lazy"
+      class="dm-img"
+    />
+
+    <div class="dm-snow" aria-hidden="true">
+      {
+        FLAKES.map((f) => (
+          <span
+            style={`--x:${f.x}%;--s:${f.size}px;--delay:${f.delay}s;--dur:${f.duration}s;--drift:${f.drift}px;--o:${f.opacity}`}
+          />
+        ))
+      }
+    </div>
+
+    {/* The near edge of the wood, closing in at the sides and dropping across
+        the middle so the pistes stay in the open. PhotoWood.astro. */}
+    <PhotoWood class="dm-wood" />
+  </div>
+
+  <div class="split-body">
+    <div data-reveal="up">
+
+      <h2 id="dolni-morava-nadpis">
+        Na Dolní Moravu dorazíte z Heřmanky za 12{NBSP}minut
+      </h2>
+
+      <p class="lead">
+        Resort nabízí více než deset kilometrů sjezdovek s umělým zasněžováním,
+        v zimě pro lyžování a snowboarding, v létě pro sjezdy na kolech.
+      </p>
+      <p>
+        Nad hřebenem stojí Stezka v oblacích a od ní vede visutý most Sky Bridge{NBSP}721.
+        Celoročně je v provozu bobová dráha a dětské zábavní areály.
+      </p>
+      <p>
+        A pokud vás sjezdovky nelákají, můžete se z chalupy vydat rovnou do lesa
+        a putovat po hřebenech hor.
+      </p>
+
+      {/*
+        Decorative: both figures are stated in the copy and in the okolí list.
+
+        Was two `.chip`s side by side — a caption in brass with a hairline under
+        it, twice, which at this size reads as two loose underlined fragments
+        rather than as figures. Set as a pair of numbers under one rule instead,
+        the way a printed guide sets a fact box: the figure large in the display
+        face, what it measures small underneath it.
+      */}
+      <dl class="dm-fakta" aria-hidden="true">
+        <div class="dm-fakt">
+          <dt class="dm-fakt-cislo">12{NBSP}min</dt>
+          <dd class="dm-fakt-popis">autem z chalupy</dd>
+        </div>
+        <div class="dm-fakt">
+          <dt class="dm-fakt-cislo">10{NBSP}km</dt>
+          <dd class="dm-fakt-popis">sjezdovek</dd>
+        </div>
+      </dl>
+
+      <p class="more">
+        <a href="/okoli" class="link-more">
+          <span>Tipy na výlety</span>
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---- The frost panel -------------------------------------------------- */
+
+  .dolni-morava .split-body {
+    background-color: var(--color-jinovatka);
+  }
+
+  /*
+   * The panel is deliberately SHORTER than the photograph beside it.
+   *
+   * Both halves used to end on exactly the same two lines, because the copy is
+   * what sets the row height and the photograph stretches to meet it. Two slabs
+   * of identical height butted together is the flattest thing a split can do —
+   * it reads as a table cell, and it is the one shape §3 keeps telling this site
+   * not to make.
+   *
+   * A margin on the copy column is all it takes. `.split` centres its items, so
+   * the margin is shared equally top and bottom, the photograph stretches past
+   * the panel at both ends, and the page ground shows through in two strips. The
+   * frost stops being the right-hand column and becomes a panel laid against the
+   * picture — which is what it is.
+   *
+   * ⚠ Height is never set here. The panel is as tall as its copy plus its
+   * padding, whatever the copy grows to; the 3rem is the only fixed figure, and
+   * the photograph follows it.
+   */
+  @media (width >= 64rem) {
+    .dolni-morava .split-body {
+      margin-block: 3rem;
+    }
+  }
+
+  h2 {
+    /* --mosaz-tmava on --jinovatka = 4.81:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  p {
+    margin-top: 1.25rem;
+    /* --kura on --jinovatka = 9.39:1 */
+    color: var(--color-kura);
+  }
+
+  .lead {
+    margin-top: 1.5rem;
+    font-size: var(--text-lead);
+    /* --les on --jinovatka = 12.17:1 */
+    color: var(--color-les);
+  }
+
+  /* ---- The two figures --------------------------------------------------
+   *
+   * One hairline over both, and the pair set on a two-column grid so the
+   * captions sit under their own figure rather than trailing after it. The rule
+   * is the only chrome — no fill, no border box, nothing that turns two numbers
+   * into two badges.
+   *
+   * `max-width` keeps the pair narrower than the measure above it, so the second
+   * column lands inside the text block and the rule stops short of the panel's
+   * right edge instead of running out to it like a section divider.
+   */
+  .dm-fakta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    max-width: 22rem;
+    margin: 2rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgb(126 89 22 / 0.35);
+  }
+
+  .dm-fakt-cislo {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-title-s);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    /* --mosaz-tmava on --jinovatka = 4.81:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .dm-fakt-popis {
+    margin: 0.3rem 0 0;
+    font-size: var(--text-caption);
+    line-height: 1.4;
+    color: var(--color-kura);
+  }
+
+  .more {
+    margin-top: 2rem;
+  }
+
+  /* ---- The photograph --------------------------------------------------- */
+
+  .dm-media {
+    position: relative;
+    /*
+     * Unconditional. `.photo-frame` only clips inside `@media (hover: hover)`,
+     * and the drift below has to be clipped on a touch device too, or the
+     * photograph slides out across the section boundary.
+     */
+    overflow: hidden;
+    min-height: 22rem;
+    background-color: var(--color-les);
+  }
+
+  @media (width >= 64rem) {
+    .dm-media {
+      /*
+       * `.split` centres its items at this breakpoint, so without this the
+       * photograph column is only as tall as the photograph and the two halves
+       * of the split end at different heights.
+       */
+      align-self: stretch;
+      min-height: 34rem;
+    }
+  }
+
+  /*
+   * Absolute, not in flow. `height: 100%` on an in-flow image resolves against a
+   * parent with no definite height — `min-height` is not one — so it fell back
+   * to the intrinsic ratio and left the bottom of the panel empty. Taken out of
+   * flow it covers whatever height the grid gives the column, and the drift
+   * below has a box to move inside.
+   */
+  .dm-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /*
+   * The drift. ±5 % inside a frame that does not move.
+   *
+   * The scale lives in the KEYFRAMES and not in the base rule, which is what
+   * makes the skip graceful: with no scroll timeline the photograph is an
+   * ordinary `object-fit: cover` image at 1:1, correctly framed and perfectly
+   * still. Only while the animation is actually running is it oversized enough
+   * to have anywhere to go.
+   *
+   * ⚠ LONGHANDS ONLY — never fold these into `animation:`. The CSS minifier
+   * pulls a neighbouring `animation-timeline` into the shorthand, Chromium
+   * rejects the result as invalid grammar, `animation-name` computes to `none`,
+   * and the effect dies silently in the production build alone. This has already
+   * bitten this codebase twice. docs/02-design-system.md §5.1.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .dm-img {
+        animation-name: dm-drift;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+    }
+  }
+
+  @keyframes dm-drift {
+    from {
+      transform: scale(1.12) translateY(-5%);
+    }
+    to {
+      transform: scale(1.12) translateY(5%);
+    }
+  }
+
+  /* ---- The wood ---------------------------------------------------------
+   *
+   * Covers the whole panel and is bottom-aligned inside it, so the trees always
+   * stand on the frame's lower edge whatever the panel's proportions and the
+   * crop falls at the sides. The stand does its own composition — full height at
+   * both edges, low across the middle — see PhotoWood.astro.
+   *
+   * No scrim under it, deliberately. A --les gradient would give the silhouettes
+   * something softer to sit against and would cost them their edge: solid trees
+   * on a darkening ground read as faded trees. This is a cut shape on a
+   * photograph, and it wants to stay cut.
+   */
+  .dm-wood {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /*
+   * On a narrow frame the stand is overdressed: the full-height trees the saddle
+   * puts at each edge close over nearly half the picture, and the pistes — the
+   * reason the photograph is here — end up peering through a gap.
+   *
+   * Rather than draw a second, shorter wood, the box is made wider than the panel
+   * and hung off both sides. The trees keep their scale and their composition;
+   * the tall shoulder at each end simply falls outside the frame, and what is
+   * left on screen is the low band from the middle of the saddle.
+   */
+  @media (width < 64rem) {
+    .dm-wood {
+      width: 150%;
+      left: -25%;
+    }
+  }
+
+  /* ---- Snow ------------------------------------------------------------- */
+
+  .dm-snow {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .dm-snow span {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    /* --linka, the illustration white. The only white on this site that is not a
+       surface, and over photography is its other legitimate home. */
+    background-color: var(--color-linka);
+    /*
+     * The halo is not decoration — without it there is no snow.
+     *
+     * The photograph underneath is a snowfield: white dots on it are invisible
+     * over more than half the frame, which is the whole problem with putting
+     * falling snow over a picture of snow. A soft --les shadow gives each flake
+     * an edge on the bright pistes, and on the dark forest the white core does
+     * the work instead. Neither reads as a ring at 3–6 px.
+     */
+    box-shadow: 0 0 3px rgb(22 36 28 / 0.55);
+    opacity: 0;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .dm-snow span {
+      animation-name: dm-snow;
+      animation-duration: var(--dur);
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-delay: var(--delay);
+    }
+  }
+
+  /*
+   * Under `reduce`, the global clamp would freeze sixteen dots partway down the
+   * photograph — worse than no snow at all. Take them out entirely: reduced
+   * motion means reduced, and a still photograph is what reduced looks like here.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .dm-snow {
+      display: none;
+    }
+  }
+
+  @keyframes dm-snow {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -12%, 0);
+    }
+    12%,
+    82% {
+      opacity: var(--o);
+    }
+    to {
+      opacity: 0;
+      /* Past the bottom edge, so no flake is ever seen to stop. */
+      transform: translate3d(var(--drift), 115%, 0);
+    }
+  }
+</style>

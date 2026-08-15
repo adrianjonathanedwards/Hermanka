@@ -1,0 +1,229 @@
+---
+/**
+ * Site footer.
+ *
+ * The copyright year is computed at build time. The current site is frozen at
+ * `© 2019`, which is the clearest signal a visitor gets that nobody is minding it.
+ */
+import { Image } from 'astro:assets';
+import { NAV, SITE, mapyUrl } from '../data/site';
+import Treeline from './decor/Treeline.astro';
+import Icon from './Icon.astro';
+import logo from '@img/logo3-inv.png';
+
+const rok = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  {/*
+    The treeline overflows upward out of the footer into the --kamen band above,
+    which is the only place it reads: --les trees on the --les footer are
+    invisible by design, so the four depth layers are seen exactly where they
+    should be. Content sits in front, in the low saddle across the middle.
+  */}
+  <div class="treeline-wrap"><Treeline /></div>
+
+  <div class="wrap footer-grid">
+    <div class="footer-contact" data-reveal="up">
+      {/*
+        The logo stands in for the heading text. It stays an <h2> so the document
+        outline is unchanged; the alt supplies the same words the text did.
+      */}
+      <h2 class="footer-brand">
+        <Image
+          src={logo}
+          alt="Chalupa Heřmanka"
+          widths={[160, 240, 320]}
+          sizes="160px"
+          width={554}
+          height={450}
+          format="webp"
+          quality={60}
+          loading="lazy"
+        />
+      </h2>
+      <address>
+        <p class="footer-row">
+          <Icon name="pin" size={18} strokeWidth={1.5} class="footer-icon" />
+          <span>{SITE.obec}</span>
+        </p>
+        <p class="footer-row">
+          <Icon name="telefon" size={18} strokeWidth={1.5} class="footer-icon" />
+          <a href={`tel:${SITE.telHref}`}>{SITE.telefon}</a>
+        </p>
+        {/*
+          TODO(client) — LAUNCH-BLOCKING: no e-mail address is published anywhere
+          on the current site. docs/01-content.md §9 item 13.
+        */}
+        <p class="footer-row">
+          <Icon name="hora" size={18} strokeWidth={1.5} class="footer-icon" />
+          <a href={mapyUrl} rel="noopener noreferrer" target="_blank">
+            {SITE.gps.label}
+            <span class="sr-only"> (otevřít v mapě, nové okno)</span>
+          </a>
+        </p>
+      </address>
+    </div>
+
+    <nav class="footer-nav" aria-label="Patička" data-reveal="up" data-reveal-delay="80">
+      <h2>Rozcestník</h2>
+      <ul>
+        {NAV.map((item) => (
+          <li>
+            <a href={item.href}>
+              <span>{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="footer-cta" data-reveal="up" data-reveal-delay="160">
+      <h2>Máte zájem o ubytování?</h2>
+      <p>Napište nám termín a počet osob. Ozveme se co nejdříve.</p>
+      <a href="#poptavka" class="btn btn-primary">Odeslat poptávku</a>
+    </div>
+  </div>
+
+  <div class="wrap footer-legal">
+    <p>© {rok} Chalupa Heřmanka</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+    padding-block: 4rem 2rem;
+  }
+
+  /*
+   * Sits above the footer's top edge, in the --kamen section's lower padding.
+   * The bases land exactly on the footer edge so the trunks merge into the
+   * footer mass with no seam.
+   */
+  .treeline-wrap {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 100%;
+    /* Bases overlap the footer edge by a pixel to defeat sub-pixel seams. */
+    margin-bottom: -1px;
+    pointer-events: none;
+
+    /*
+     * NO SCRIM. There was a --les gradient painted on this box, from nothing at
+     * the top to solid at the bottom, so the wood dissolved into the footer
+     * instead of meeting it. It was doing the job the front rank's solid foot
+     * already does — the last 14 viewBox units of the SVG are flat --les across
+     * the full width, so the bases merge into the footer with no seam — and it
+     * cost the whole drawing its edge: solid trees on a darkening ground read as
+     * faded trees. This is a silhouette. It is supposed to be cut, not misted.
+     */
+  }
+
+  .footer-grid,
+  .footer-legal {
+    position: relative;
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (width >= 48rem) {
+    .footer-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
+    }
+  }
+
+  h2 {
+    font-size: var(--text-title-s);
+    color: var(--color-omitka);
+    margin-bottom: 1rem;
+  }
+
+  /* The logo replaces the words, so the heading needs no type of its own. */
+  .footer-brand {
+    margin-bottom: 1.5rem;
+  }
+
+  .footer-brand :global(img) {
+    display: block;
+    width: 160px;
+    height: auto;
+  }
+
+  address {
+    font-style: normal;
+  }
+
+  address p,
+  .footer-cta p {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Icon and text on one baseline-ish row; the icon is decorative and the text
+     next to it carries every bit of the meaning. */
+  .footer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .footer-icon {
+    flex: none;
+    color: var(--color-mosaz-svetla);
+    opacity: 0.9;
+  }
+
+  .footer-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer-nav li {
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-nav a {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* --mosaz-svetla on --les = 6.19:1. Plain --mosaz would be 3.00:1 and fail. */
+  a {
+    color: var(--color-mosaz-svetla);
+    text-underline-offset: 0.25em;
+  }
+
+  .footer-nav a,
+  .footer-cta p {
+    color: var(--color-omitka);
+  }
+
+  .footer-nav a:hover span {
+    color: var(--color-mosaz-svetla);
+  }
+
+  .footer-cta .btn {
+    margin-top: 1rem;
+    color: var(--color-omitka);
+  }
+
+  .footer-legal {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(251 250 248 / 0.15);
+    font-size: var(--text-caption);
+    /* --jinovatka on --les = 12.17:1 */
+    color: var(--color-jinovatka);
+  }
+
+  .footer-legal p {
+    margin: 0;
+  }
+</style>

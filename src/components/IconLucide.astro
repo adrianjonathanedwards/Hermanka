@@ -1,0 +1,117 @@
+---
+/**
+ * Premade line icons, from Lucide (ISC licence, `lucide-static`).
+ *
+ * Separate from Icon.astro on purpose. Icon.astro holds the drawings made for
+ * this site — the facts strip's original set and the inquiry form's field marks.
+ * This one holds icons somebody else drew, and keeping the two apart means it is
+ * always obvious which is which when one of them needs changing.
+ *
+ * WHY RAW IMPORTS AND NOT `astro-icon`
+ * ------------------------------------
+ * `?raw` gives the SVG source as a string at build time. Vite tree-shakes the
+ * imports, so only the icons actually named below reach the bundle, and the
+ * markup is inlined into the HTML — no integration, no sprite sheet, no runtime.
+ * The whole of `lucide-static` (2 025 icons) stays in node_modules.
+ *
+ * WHAT `prepare()` DOES AND WHY
+ * -----------------------------
+ * Lucide ships each icon as a complete <svg> with its own width, stroke-width of
+ * 2 and so on. Two rounds of surgery on it:
+ *
+ *   1. The wrapper is stripped and only the geometry kept, so the <svg> below —
+ *      with this site's 1.5 stroke rather than Lucide's 2 — is the one that
+ *      renders. At the sizes used here a 2px stroke reads as a UI icon from a
+ *      dashboard; 1.5 sits with the rest of the page.
+ *   2. Nothing else. There was a `pathLength="1"` pass here to drive a stroke
+ *      draw-in; the draw-in is gone (see Icon.astro) and so is the attribute.
+ */
+import users from 'lucide-static/icons/users.svg?raw';
+import bedDouble from 'lucide-static/icons/bed-double.svg?raw';
+/*
+ * Sauna. It was `heater` — a boxy panel radiator with feet, which at 30px is a
+ * white rectangle with lines in it and reads as a microwave, not as heat.
+ *
+ * Lucide's own tags point at `waves-vertical` for "sauna, steam, heat", and it
+ * was rejected: the same strip already carries `waves` for the pond and
+ * `waves-ladder` for the hot tub, so a third wave motif two items along would
+ * have been three near-identical glyphs in one row.
+ *
+ * `flame-kindling` — a flame over two crossed logs — is the wood-fired stove
+ * this sauna actually has. It shares the row with `brick-wall-fire` for the
+ * hearths, but the two silhouettes are not close: a bordered wall against an
+ * open fire on the ground.
+ */
+import flameKindling from 'lucide-static/icons/flame-kindling.svg?raw';
+import wavesLadder from 'lucide-static/icons/waves-ladder.svg?raw';
+import brickWallFire from 'lucide-static/icons/brick-wall-fire.svg?raw';
+import waves from 'lucide-static/icons/waves.svg?raw';
+import dog from 'lucide-static/icons/dog.svg?raw';
+import accessibility from 'lucide-static/icons/accessibility.svg?raw';
+
+export type LucideName =
+  | 'users'
+  | 'bed-double'
+  | 'flame-kindling'
+  | 'waves-ladder'
+  | 'brick-wall-fire'
+  | 'waves'
+  | 'dog'
+  | 'accessibility';
+
+const SOURCES: Record<LucideName, string> = {
+  users,
+  'bed-double': bedDouble,
+  'flame-kindling': flameKindling,
+  'waves-ladder': wavesLadder,
+  'brick-wall-fire': brickWallFire,
+  waves,
+  dog,
+  accessibility,
+};
+
+interface Props {
+  name: LucideName;
+  class?: string;
+  /** Square, in px. */
+  size?: number;
+  strokeWidth?: number;
+}
+
+function prepare(source: string): string {
+  return source
+    .replace(/^[\s\S]*?<svg[^>]*>/, '')
+    .replace(/<\/svg>[\s\S]*$/, '')
+    .trim();
+}
+
+/*
+ * `rest` exists for the same reason as in Icon.astro: Astro hands a child the
+ * parent's `data-astro-cid-…` as a prop and expects it on the root element, but
+ * a root rendered through `set:html` does not pick it up on its own. Without the
+ * spread, a scoped rule like `.fact-icon { … }` in the calling component
+ * silently matches nothing.
+ *
+ * ⚠ `interface Props` must be declared ABOVE this. Astro only wires it into
+ * `Astro.props` when it appears before first use; declared after, `Astro.props`
+ * falls back to `Record<string, any>`, `name` becomes `any`, and the check that
+ * it is a real icon name disappears without a word.
+ */
+const { name, class: className, size = 30, strokeWidth = 1.5, ...rest } = Astro.props;
+---
+
+<svg
+  class={className}
+  {...rest}
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  set:html={prepare(SOURCES[name])}
+/>

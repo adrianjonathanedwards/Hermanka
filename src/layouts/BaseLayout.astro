@@ -1,0 +1,200 @@
+---
+/**
+ * The only layout. Every page wraps in this.
+ *
+ * It owns <head>, the site header and the site footer — the three landmarks every
+ * page shares. Page content goes in the <main> slot.
+ */
+import { getLocaleFromUrl, localePath, stripLocale } from '../i18n/utils';
+import { useTranslations } from '../i18n/ui';
+import { HTML_LANG, LIVE_LOCALES } from '../i18n/config';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import Lightbox from '../components/Lightbox.astro';
+import '../styles/global.css';
+
+interface Props {
+  /** Page title, without the site name — that is appended here. */
+  title: string;
+  /** Meta description. Czech. Aim for 140–160 characters. */
+  description: string;
+  /**
+   * The hero image, if this page has one. Preloaded at high priority; it is the
+   * only image on the page that may be. Everything else is lazy
+   * (docs/03-tech.md §Images).
+   *
+   * `srcset`/`sizes` must match the <Image> in the hero component exactly, or the
+   * browser preloads a variant the page never uses and downloads the hero twice.
+   */
+  heroPreload?: { src: string; srcset?: string; sizes?: string };
+  /**
+   * Social share image. Absolute or site-root path.
+   * TODO: /og-default.webp does not exist yet — it needs a 1200×630 crop once
+   * the photography is chosen (docs/01-content.md §10).
+   */
+  ogImage?: string;
+  /** Set true on pages that must not be indexed. */
+  noindex?: boolean;
+}
+
+const { title, description, heroPreload, ogImage = '/og-default.webp', noindex = false } = Astro.props;
+
+const locale = getLocaleFromUrl(Astro.url);
+const t = useTranslations(locale);
+
+const siteName = t('site.name');
+/* Pipe, not a dash. No em dash appears in any text this site renders. */
+const fullTitle = title ? `${title} | ${siteName}` : siteName;
+
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
+const pathWithoutLocale = stripLocale(Astro.url.pathname);
+---
+
+<!doctype html>
+<html lang={HTML_LANG[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/*
+      Fonts are preloaded before anything else in <head> so the request starts on
+      the first byte of HTML. Two files, 40.7 kB together, both subset to a Czech
+      charset — see docs/02-design-system.md §2.3.
+      `crossorigin` is required on font preloads even for same-origin, or the
+      browser fetches the file twice.
+    */}
+    <link
+      rel="preload"
+      href="/fonts/fraunces-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/public-sans-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    {/* The hero is the LCP element and the only image that gets this treatment. */}
+    {
+      heroPreload && (
+        <link
+          rel="preload"
+          as="image"
+          href={heroPreload.src}
+          imagesrcset={heroPreload.srcset}
+          imagesizes={heroPreload.sizes}
+          fetchpriority="high"
+        />
+      )
+    }
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/*
+      hreflang is emitted only for locales that actually have content
+      (src/i18n/config.ts LIVE_LOCALES). Today that is Czech alone.
+    */}
+    {
+      LIVE_LOCALES.length > 1 &&
+        LIVE_LOCALES.map((loc) => (
+          <link
+            rel="alternate"
+            hreflang={HTML_LANG[loc]}
+            href={new URL(localePath(pathWithoutLocale, loc), Astro.site).href}
+          />
+        ))
+    }
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={locale === 'cs' ? 'cs_CZ' : 'de_DE'} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/*
+      The client's own favicon, copied from img/cropped-favicon-1-32x32.png.
+
+      It is listed ALONE and deliberately. A browser offered both this and an SVG
+      picks the SVG wherever it can, so leaving the old one in place would have
+      meant the client's icon never rendering in the browsers that matter.
+      public/favicon.svg is now unreferenced and safe to delete.
+
+      32×32 is the only size supplied, so there is no apple-touch-icon (that
+      wants 180×180) and it will be resampled on a high-DPI tab. A 180 px source
+      would fix both.
+    */}
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+    <meta name="theme-color" content="#16241C" />
+
+    {/*
+      Motion gate + failsafe. `is:inline` and in <head> on purpose: it has to run
+      before first paint, or elements the reveal system is about to hide would
+      flash in at full opacity and then vanish.
+
+      Adding `.js-motion` is what arms every `opacity: 0` rule in global.css.
+      The timer is what guarantees they can never stick: if src/scripts/motion.ts
+      does not check in within 2 s — chunk 404, parse error, blocked script,
+      anything — the class comes off and the page renders complete.
+      docs/02-design-system.md §5.1.
+    */}
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js-motion');
+        window.__hkMotionFailsafe = setTimeout(function () {
+          d.classList.remove('js-motion');
+        }, 2000);
+      })();
+    </script>
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a href="#obsah" class="skip-link">{t('nav.skipToContent')}</a>
+
+    <SiteHeader />
+
+    <main id="obsah">
+      <slot />
+    </main>
+
+    <SiteFooter />
+
+    <Lightbox />
+
+    <script>
+      import '../scripts/motion.ts';
+    </script>
+
+    <style>
+      /* Off-screen until focused. First thing in the tab order, on every page. */
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        z-index: 100;
+        padding: 0.75rem 1.25rem;
+        background: var(--color-mosaz);
+        color: var(--color-omitka);
+        font-size: var(--text-caption);
+        text-decoration: none;
+      }
+
+      .skip-link:focus {
+        left: 0;
+      }
+    </style>
+  </body>
+</html>

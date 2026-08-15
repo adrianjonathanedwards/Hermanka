@@ -1,0 +1,90 @@
+---
+/**
+ * Bilberry sprig — `borůvka`. A small hand-drawn mark for the hero eyebrow.
+ *
+ * It exists because the hero has to smell of the place, and a bilberry sprig is
+ * the shortest way to say "spruce forest under the Sněžník" without a word of
+ * copy. Bilberries carpet the floor of exactly this wood; docs/02-design-system.md
+ * §4 rule 4 asks for subjects from this place and nothing else, and this is one.
+ *
+ * The rules it is built to (§4):
+ *
+ *  - **Unfilled, white line only, over photography.** The berries are outlines,
+ *    not discs. Filling them was the obvious first move and it is wrong twice
+ *    over: rule 3 keeps the line unfilled, and three solid dots at 22px read as
+ *    an icon from a set rather than as drawing. Outlined, they read the way a
+ *    berry reads in an engraved herbarium plate, which is the register the
+ *    existing owl-and-spruce mark is already in.
+ *  - **The wobble is deliberate.** No two leaves are the same shape, the stem
+ *    does not run straight, and the three berries are three different sizes on
+ *    three different stalks. A symmetrical sprig drawn from a primitive would
+ *    stand next to the 2019 mark and read as a different brand.
+ *  - `vector-effect: non-scaling-stroke` so the line stays 1.15px whatever size
+ *    the mark is set at — a scaled SVG otherwise thins out or fattens up.
+ *
+ * Decorative: `aria-hidden`, and `pointer-events: none` comes from the global
+ * `svg[aria-hidden='true']` rule.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+{/*
+  The viewBox is cropped to the drawing, not to a tidy round number. It was
+  `0 0 40 46` and the sprig only ever occupied the middle 23 units of it — so a
+  mark set to 40px rendered 23px of line inside 17px of nothing, and looked thin
+  and lost however large the box was made. It also clipped the lowest berry,
+  which reaches y=46.8.
+*/}
+<svg
+  class:list={['sprig', className]}
+  viewBox="6.5 1.5 27 47.5"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.3"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  vector-effect="non-scaling-stroke"
+  aria-hidden="true"
+  focusable="false"
+>
+  {/* Stem. Three shallow reversals — a bilberry twig is never straight. */}
+  <path d="M20.6 45 C19.4 37.5 21.3 30 19.6 22.4 C18.4 16.8 20.2 10.5 21.4 4" />
+
+  {/* Upper leaf, right. Longer and narrower than its opposite. */}
+  <path d="M20.9 13.2 C26.4 12.4 30.6 9.1 32.1 3.9 C26.2 3.6 21.9 6.9 20.9 13.2 Z" />
+
+  {/* Lower leaf, left. Shorter, blunter, and set lower than the pair would be. */}
+  <path d="M19.7 21.6 C14.1 21.1 10 17.7 8.6 12.6 C14.2 12.4 18.5 15.6 19.7 21.6 Z" />
+
+  {/* A third leaf, half-turned away — breaks the two-leaf symmetry. */}
+  <path d="M21 30.2 C25.1 30.6 28.4 29 30.2 25.7 C26.3 24.6 22.9 26.2 21 30.2 Z" />
+
+  {/*
+    Three berries on three stalks. Sizes 3.5 / 3 / 2.6 and no two hanging at the
+    same angle — the largest is furthest from the stem, as a heavy one is.
+  */}
+  <path d="M19.8 24.6 C17.3 26.4 15.2 28.2 14.4 30.4" />
+  <circle cx="12.6" cy="33.6" r="3.5" />
+  {/* Calyx: the little five-point crown a bilberry carries, on the largest only. */}
+  <path d="M11.2 30.6 L12.6 30.1 L14 30.6" />
+
+  <path d="M20.2 33.8 C21.9 35.1 23.2 36.4 23.8 38" />
+  <circle cx="25.1" cy="40.7" r="3" />
+
+  <path d="M19.9 37.6 C19 39 18.5 40.4 18.6 41.8" />
+  <circle cx="18.1" cy="44.2" r="2.6" />
+</svg>
+
+<style>
+  .sprig {
+    display: block;
+    flex: none;
+    /* Sized by the caller; this is the fallback. */
+    width: 1.375rem;
+    height: auto;
+  }
+</style>

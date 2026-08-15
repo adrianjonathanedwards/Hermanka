@@ -1,0 +1,270 @@
+---
+/**
+ * Ubytování — the aerial property map, the corrected prose, and the bed layout
+ * as a real HTML table.
+ *
+ * The prose fixes three errors that are live on the current homepage
+ * (docs/01-content.md §1): `poskutuje` → `poskytuje`, `mednou` → `jednou`,
+ * `K objedou` → `K objektu`.
+ *
+ * The bed table is the 2 / 2+3 / 6+2 = 15 breakdown from the site plan and the
+ * brief. The old /ubytovani/ prose gives per-room ranges totalling up to 19 against
+ * a stated maximum of 15 — that conflict is unresolved and 15 is authoritative
+ * until the client says otherwise (docs/00-brief.md, docs/01-content.md §9 item 1).
+ *
+ * It stays a <table>, not a row of cards. Three rows of two numbers that have to
+ * add up is exactly what a table is for, and the modernisation pass is not a
+ * reason to throw away the row/column semantics a screen reader relies on.
+ */
+
+import { Image } from 'astro:assets';
+import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+
+const NBSP = ' ';
+
+const loznice = [
+  { nazev: 'Ložnice v přízemí', osoby: `2${NBSP}osoby` },
+  { nazev: 'Mezonetová ložnice', osoby: `2${NBSP}+${NBSP}3 osoby` },
+  { nazev: 'Mezonetová ložnice', osoby: `6${NBSP}+${NBSP}2 osoby` },
+];
+---
+
+<section class="section" aria-labelledby="ubytovani-nadpis">
+  <div class="wrap">
+    <div class="ubytovani-grid">
+      <div class="ubytovani-text">
+        <div data-reveal="up">
+          <h2 id="ubytovani-nadpis">Ubytování v jedinečném prostředí</h2>
+
+          <p class="lead">
+            Ubytování poskytuje kapacitu 2 až 15 osob ve 3 ložnicích. Chalupa disponuje
+            jednou krytou terasou s venkovním krbem s výhledem na pastviny a okolo
+            protékající potůček a jednou otevřenou terasou s výhledem do zalesněného
+            údolí. K objektu vede vlastní příjezdová cesta a parkování je možné pro
+            4 auta přímo u objektu.
+          </p>
+        </div>
+
+        <div class="loznice-card card" data-reveal="up" data-reveal-delay="120">
+          <table class="loznice">
+            <caption>Rozložení lůžek</caption>
+            <thead>
+              <tr>
+                <th scope="col">Ložnice</th>
+                <th scope="col">Kapacita</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                loznice.map((l) => (
+                  <tr>
+                    <th scope="row">{l.nazev}</th>
+                    <td>{l.osoby}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <th scope="row">Celkem</th>
+                <td>15{NBSP}osob</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <p class="more">
+          <a href="/chalupa" class="link-more">
+            <span>Více o ubytování</span>
+          </a>
+        </p>
+      </div>
+
+      {/*
+        The aerial plan used to sit here as a plain figure. It now has a section
+        of its own directly below, where it is wide enough to be worked with:
+        every place on it is a hotspot. See PlanArealu.astro. Two copies of the
+        same photograph one screen apart would have been the worst of both.
+
+        What it left behind was an empty half. At 64rem and up this grid is
+        `1fr 1.1fr` and the second column held nothing at all, so the section
+        read as a column of text beside a hole rather than as a two-column
+        section — and the wider the screen, the more of it there was.
+
+        The covered terrace fills it, and it is not a stock choice: the lead
+        paragraph beside it is about that terrace, its outdoor fireplace and the
+        view over the pastures, and this is the only photograph of it there is.
+        The picture and the sentence are about the same thing.
+      */}
+      <figure class="ubytovani-foto" data-reveal="up" data-reveal-delay="60">
+        <div class="media-frame photo-frame">
+          <Image
+            src={terasa}
+            alt="Krytá terasa chalupy s venkovním zděným krbem, dřevěným stolem a proutěnými křesly, v pozadí les"
+            widths={[500, 750, 1000]}
+            sizes="(min-width: 64rem) 45vw, 100vw"
+            width={1000}
+            height={667}
+            format="webp"
+            quality={66}
+            loading="lazy"
+          />
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ubytovani-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .ubytovani-grid {
+      grid-template-columns: 1fr 1.1fr;
+      gap: 4rem;
+      /*
+       * `start` while the second column was empty. Now that it holds the
+       * photograph, both columns run to the same line and the photograph is as
+       * tall as the copy and the bed table together, whatever those come to.
+       */
+      align-items: stretch;
+    }
+  }
+
+  h2 {
+    color: var(--color-mosaz-tmava);
+  }
+
+  .lead {
+    margin-top: 1.5rem;
+    max-width: var(--container-prose);
+  }
+
+  /* The table sits on its own raised surface so the totals read as a summary
+     panel rather than as more body copy. */
+  .loznice-card {
+    margin-top: 2.5rem;
+    padding: 1.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .loznice-card {
+      padding: 1.75rem 2rem;
+    }
+  }
+
+  .loznice {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  caption {
+    text-align: left;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-kura);
+    padding-bottom: 0.75rem;
+  }
+
+  thead th {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-kura);
+    padding-block: 0.5rem;
+    border-bottom: 2px solid var(--color-mosaz);
+  }
+
+  tbody th,
+  tfoot th {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-normal);
+  }
+
+  td,
+  th {
+    padding-block: 0.875rem;
+    padding-right: 1rem;
+  }
+
+  td {
+    text-align: right;
+    padding-right: 0;
+    white-space: nowrap;
+  }
+
+  tbody tr + tr th,
+  tbody tr + tr td {
+    border-top: 1px solid var(--color-kamen);
+  }
+
+  tbody tr {
+    transition: color 200ms var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    tbody tr:hover {
+      color: var(--color-mosaz-tmava);
+    }
+  }
+
+  tfoot th,
+  tfoot td {
+    border-top: 2px solid var(--color-mosaz);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* ---- The photograph ----------------------------------------------------
+   *
+   * No caption. The Okolí figure lost its own for the same reason: the heading
+   * and the paragraph beside it already say what the picture is, and the alt
+   * text says it to a screen reader. A line under it repeating either would be
+   * a third copy.
+   */
+  .ubytovani-foto {
+    margin: 0;
+  }
+
+  .ubytovani-foto :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  /*
+   * On a laptop the figure is a stretched grid item with a definite height, so
+   * the frame can be taken out of flow to fill it and the photograph cropped to
+   * whatever shape the column turns out to be.
+   *
+   * ⚠ The `position: relative` on the FIGURE and the absolute frame inside it
+   * are a pair. `height: 100%` on the frame alone would resolve against a
+   * parent with no definite height and fall back to the intrinsic ratio, which
+   * is the trap already documented in DolniMorava.astro.
+   */
+  @media (width >= 64rem) {
+    .ubytovani-foto {
+      position: relative;
+      min-height: 24rem;
+    }
+
+    .ubytovani-foto .media-frame {
+      position: absolute;
+      inset: 0;
+    }
+
+    .ubytovani-foto :global(img) {
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .more {
+    margin-top: 2rem;
+  }
+</style>

@@ -1,0 +1,38 @@
+---
+/**
+ * Section divider — a thin --mosaz rule interrupted at its centre by the roof
+ * from the logo, sitting on the line as if the eaves rested on it.
+ *
+ * Replaces the spruce sprig that was here before. The roof is the client's own
+ * mark rather than a motif invented for the site, so it ties the dividers to the
+ * header, the footer and the favicon instead of introducing a fourth idea.
+ *
+ * Drawn in --mosaz, not white. docs/02-design-system.md §4 rule 5 is explicit
+ * that white line work must never go on --omitka or --kamen — it is invisible on
+ * a near-white ground. Both dividers sit on light bands, so the mark takes the
+ * colour of the rule it interrupts and the three pieces read as one ornament.
+ *
+ * The rule and the roof are bottom-aligned, not centre-aligned: the roof's two
+ * eaves land exactly on the line. Centre-aligning it would float the gable above
+ * the rule and the whole thing would read as two unrelated marks.
+ */
+import RoofMark from './RoofMark.astro';
+
+interface Props {
+  /** Extra class for spacing control at the call site. */
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['divider', className]} aria-hidden="true">
+  <span class="rule"></span>
+  {/*
+    88px, not smaller. Below about 80 the chimney closes into a nub against the
+    left slope and reads as a stray square rather than a chimney — checked
+    against a size ramp at 62 / 88 / 110.
+  */}
+  <RoofMark class="divider-roof" width={88} />
+  <span class="rule"></span>
+</div>

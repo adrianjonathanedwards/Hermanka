@@ -1,0 +1,44 @@
+---
+/**
+ * Gallery lightbox.
+ *
+ * A native <dialog>, which is the whole reason this is ~15 lines instead of a
+ * dependency: the browser supplies the top layer, the focus trap, the inert
+ * background, Escape-to-close and the ::backdrop. src/scripts/motion.ts adds
+ * only the wiring — which photograph, and the two arrows.
+ *
+ * It renders empty on every page and stays `display: none` until something
+ * opens it. If a page has no `[data-lightbox]` triggers the script bails and
+ * this is inert markup; the triggers themselves are ordinary links to /galerie,
+ * so with JavaScript off a click simply navigates there.
+ *
+ * The <img> has no src until it is opened, so it costs no bytes on load.
+ */
+import Icon from './Icon.astro';
+---
+
+<dialog id="lightbox" class="lightbox" aria-label="Prohlížeč fotografií">
+  <button type="button" class="icon-btn lightbox-close" aria-label="Zavřít">
+    <Icon name="zavrit" size={20} strokeWidth={1.7} />
+  </button>
+
+  <button type="button" class="icon-btn lightbox-nav lightbox-prev" aria-label="Předchozí fotografie">
+    <Icon name="zpet" size={20} strokeWidth={1.7} />
+  </button>
+
+  <button type="button" class="icon-btn lightbox-nav lightbox-next" aria-label="Další fotografie">
+    <Icon name="dalsi" size={20} strokeWidth={1.7} />
+  </button>
+
+  <figure class="lightbox-figure">
+    {/*
+      `alt` is filled in from the trigger's thumbnail when the dialog opens, so
+      the description is written once, in the gallery data, and never twice.
+    */}
+    <img class="lightbox-img" alt="" width="1600" height="1067" />
+    <figcaption class="lightbox-caption">
+      <span class="lightbox-text"></span>
+      <span class="lightbox-count tabular"></span>
+    </figcaption>
+  </figure>
+</dialog>

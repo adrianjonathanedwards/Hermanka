@@ -1,0 +1,564 @@
+---
+/**
+ * Hero. Five photographs, one headline, one button.
+ *
+ * ---------------------------------------------------------------------------
+ * STRIPPED BACK ON PURPOSE
+ *
+ * A previous pass had an eyebrow, a drawn bilberry mark, a headline, a subhead,
+ * a button, a text link and a line of reassurance under it — seven things laid
+ * over the picture, each defensible on its own and collectively a scrim's worth
+ * of furniture in front of the only asset that sells a cottage, which is what
+ * the cottage looks like.
+ *
+ * What is left: **headline, one line, one button, one link.** Everything else
+ * that was there has a home further down the page, and the photograph gets the
+ * middle of the frame back.
+ *
+ * The scrim went with it. It is now two gradients — a short veil under the site
+ * header and a floor under the copy — instead of the five-layer construction it
+ * had grown into. The middle two thirds of every slide is now untouched
+ * photograph. That is the point of the section.
+ *
+ * The drawn treeline that used to stand along the bottom edge, and the pale mist
+ * gradient that existed only to give it something to stand in, are both gone by
+ * request: the hero is the photograph and the copy on it, and it ends on a clean
+ * horizontal against the Fakta band. The floor gradient below STAYS — it is not
+ * decoration, it is the only thing holding the headline above 4.5:1.
+ *
+ * ⚠ The floor gradient is sized against the BRIGHTEST slide, not the first one.
+ * Slide three is a sunlit interior of pale wood; if that gradient is lightened,
+ * re-measure the copy against slide three specifically, not against the exterior.
+ *
+ * ---------------------------------------------------------------------------
+ * THE CAROUSEL
+ *
+ * Against the documentation — see the warning at the top of src/data/hero.ts,
+ * which also covers the LCP and `prefers-reduced-motion` mitigations.
+ *
+ * It is built to work in the order things actually load:
+ *
+ *  - **No JavaScript**: every slide is in the markup, the first is opaque and
+ *    the rest are transparent by a plain CSS rule, the controls are `hidden`.
+ *    The hero is a static photograph with a headline on it. Nothing is broken
+ *    and nothing is invisible.
+ *  - **JavaScript**: `setUpHeroCarousel` in src/scripts/motion.ts unhides the
+ *    controls and takes over. The controls are hidden in markup rather than
+ *    revealed by it, because a dot that does nothing is worse than no dot.
+ *  - **Reduced motion**: no rotation, no crossfade, dots switch instantly.
+ *
+ * The slides are `<figure>` elements in a list, not divs, and only the visible
+ * one is exposed to assistive technology — otherwise a screen reader meets five
+ * long Czech alt strings in a row before it reaches the headline.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ The entrance below is CSS, deliberately NOT the `data-reveal` system.
+ * `data-reveal` hides its target until IntersectionObserver has booted, which
+ * would put a JavaScript round-trip in front of the first thing anyone sees. A
+ * plain keyframe starts at first paint instead, costs nothing, and — because
+ * the photographs are never animated — leaves the LCP measurement alone.
+ * docs/02-design-system.md §5.3 bans animating the hero *image*; this does not.
+ */
+import { Image } from 'astro:assets';
+import { HERO_SLIDES, SLIDE_IMAGE_PROPS } from '../../data/hero';
+
+/*
+ * Czech hard spaces. A numeral must never be split from its unit and a
+ * single-letter preposition must never end a line (docs/02-design-system.md
+ * §2.6) — in Czech that is a typesetting error, not a nicety. Named rather than
+ * pasted so the character is visible in a diff.
+ */
+const NBSP = ' ';
+---
+
+<section class="hero" aria-labelledby="hero-nadpis">
+  <ul class="hero-slides" aria-roledescription="karusel" aria-label="Fotografie chalupy">
+    {
+      HERO_SLIDES.map((slide, i) => (
+        <li
+          class="hero-slide"
+          data-slide={i}
+          data-current={i === 0 ? '' : undefined}
+          aria-hidden={i === 0 ? undefined : 'true'}
+        >
+          <Image
+            {...SLIDE_IMAGE_PROPS}
+            src={slide.src}
+            alt={slide.alt}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : 'low'}
+            class="hero-img"
+            style={`object-position:${slide.position}`}
+          />
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="hero-scrim"></div>
+
+  <div class="wrap hero-content">
+    <h1 id="hero-nadpis" class="hero-title">
+      Chalupa pro 15{NBSP}lidí v{NBSP}údolí pod Králickým Sněžníkem
+    </h1>
+
+    <p class="hero-sub">Sauna, vířivka pod širým nebem a{NBSP}les deset metrů za{NBSP}dveřmi.</p>
+
+    <div class="hero-actions">
+      <a href="#poptavka" class="btn btn-primary">Zjistit volný termín</a>
+      <a href="/chalupa" class="btn btn-ghost">Prohlédnout chalupu</a>
+    </div>
+  </div>
+
+  {/*
+    Hidden until the script runs — see the note at the top. The caption is a
+    polite live region so a slide change is announced once, quietly, rather than
+    interrupting whatever is being read.
+
+    ⚠ THE PAUSE BUTTON IS GONE BY REQUEST — the carousel always autoplays.
+    That is a knowing departure from WCAG 2.2.2, which asks for a stop mechanism
+    on anything moving for more than five seconds and does not accept
+    hover/focus pausing as one. What is left: `prefers-reduced-motion` still
+    stops it dead, and pointer or keyboard focus anywhere in the hero holds it.
+    If the button is ever wanted back, both halves are in git — the markup here
+    and `setPaused` in src/scripts/motion.ts.
+  */}
+  <div class="hero-controls wrap" data-hero-controls hidden>
+    <p class="hero-caption" data-hero-caption aria-live="polite">{HERO_SLIDES[0].caption}</p>
+
+    <div class="hero-dots">
+      {
+        HERO_SLIDES.map((slide, i) => (
+          <button
+            type="button"
+            class="hero-dot"
+            data-hero-dot={i}
+            aria-current={i === 0 ? 'true' : undefined}
+            aria-label={`Fotografie ${i + 1} z ${HERO_SLIDES.length}: ${slide.caption}`}
+          >
+            <span class="hero-dot-mark"></span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    /* svh, not vh — vh is wrong on mobile while the browser chrome is showing. */
+    /*
+     * A full screen on every device, by request — no sliver of the next section
+     * showing under it at any width.
+     *
+     * `svh`, not `vh` or `dvh`. `vh` is the viewport with mobile browser chrome
+     * RETRACTED, so it overshoots by the height of the URL bar on first paint
+     * and pushes the button off the screen. `dvh` tracks the chrome as it hides
+     * and shows, which means the hero changes height mid-scroll and drags the
+     * whole page with it. `svh` is the viewport as it actually is when the page
+     * lands: exactly full, and stable.
+     */
+    min-height: 100svh;
+    background-color: var(--color-les);
+    /*
+     * No `overflow` rule needed: nothing overhangs the box any more, and the
+     * photographs are `position: absolute; inset: 0` with `object-fit: cover`,
+     * so they are confined by their own geometry.
+     */
+  }
+
+  /*
+   * ⚠ There used to be a `93svh` rule here for laptops, so that a sliver of the
+   * Fakta band showed under the hero as a scroll affordance — a full-viewport
+   * hero with a clean bottom edge reads as the whole page to a surprising number
+   * of people. It is gone by request: 100% on every device. If nobody scrolls,
+   * that trade is where to look first.
+   */
+
+  /* ---- Slides ----------------------------------------------------------- */
+
+  .hero-slides {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    /*
+     * ⚠ The base state is VISIBLE, and the hiding rule below is a sibling, not a
+     * default that JavaScript undoes. If this is ever inverted to `opacity: 0`
+     * with the script restoring it, a failed chunk leaves the hero blank —
+     * docs/02-design-system.md §5.1, the same rule the reveal system follows.
+     */
+    opacity: 1;
+  }
+
+  /* Everything after the first is transparent until the script says otherwise. */
+  .hero-slide:not([data-current]) {
+    opacity: 0;
+    /* Off the compositor when invisible; a five-layer stack of full-bleed images
+       all painting at once is real work on a phone. */
+    visibility: hidden;
+  }
+
+  .hero-slide[data-current] {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /*
+   * The crossfade. Only present under `no-preference`, so reduced motion gets an
+   * instant cut rather than a fade clamped to 0.01ms — same outcome, less work.
+   * `visibility` is stepped at the end of the outgoing transition so the leaving
+   * slide stays paintable while it fades.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-slide {
+      transition:
+        opacity 900ms var(--ease-out),
+        visibility 0s linear 900ms;
+    }
+
+    .hero-slide[data-current] {
+      transition:
+        opacity 900ms var(--ease-out),
+        visibility 0s linear 0s;
+    }
+  }
+
+  .hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* `object-position` is per slide — set inline from HERO_SLIDES, because each
+       photograph keeps its subject in a different part of the frame. */
+  }
+
+  /* ---- Scrim -----------------------------------------------------------
+   *
+   * Two gradients. It had five, plus a warm radial and a vignette, and between
+   * them they turned every slide into the same olive rectangle.
+   *
+   * ⚠ THE FLOOR IS SIZED AGAINST THE BRIGHTEST SLIDE, NOT THE FIRST ONE.
+   *
+   * This is the trap the carousel introduced, and it is worth stating precisely
+   * because the scrim looked fine while it was failing. The gradient inherited
+   * from the single-photograph hero was tuned against the exterior, which is the
+   * darkest of the five. Measured against what is actually rendered behind each
+   * line of copy on all five slides, the headline came out at **1.13:1** over the
+   * covered terrace. The floor in docs/03-tech.md is 4.5:1.
+   *
+   * As rebuilt, the worst case across 5 slides × 4 viewports is **4.82:1**
+   * (headline, hot tub, 1024px). Sampled per text LINE rather than per element
+   * box — an 18ch headline box is mostly empty to the right of its short lines,
+   * and sampling the box reports failures where there is no glyph.
+   *
+   * So: **add, reorder or replace a photograph and this must be re-measured.**
+   * A brighter replacement is exactly how it quietly stops passing, and
+   * src/data/hero.ts already asks the client for a better terrace shot.
+   */
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      /*
+       * There used to be a third gradient above these two: a pale `--kamen` mist
+       * lifting the foot of the photograph toward stone, so the drawn treeline
+       * had something its own value to stand in. The treeline is gone, and the
+       * mist went with it — on its own it was a grey wash across the bottom of
+       * every slide with nothing left to justify it.
+       */
+      linear-gradient(
+        to bottom,
+        rgb(22 36 28 / 0.55) 0%,
+        rgb(22 36 28 / 0.14) 14%,
+        rgb(22 36 28 / 0) 26%
+      ),
+      linear-gradient(
+        to top,
+        rgb(22 36 28 / 0.94) 0%,
+        rgb(22 36 28 / 0.9) 30%,
+        rgb(22 36 28 / 0.86) 50%,
+        rgb(22 36 28 / 0.79) 66%,
+        rgb(22 36 28 / 0.63) 76%,
+        rgb(22 36 28 / 0.35) 86%,
+        rgb(22 36 28 / 0.09) 95%,
+        rgb(22 36 28 / 0) 100%
+      );
+  }
+
+  @media (width >= 64rem) {
+    /*
+     * Landscape: the copy sits in the left half, so a horizontal ramp takes over
+     * most of the legibility work and the floor drops back. The right-hand third
+     * of every photograph is then almost untouched.
+     */
+    .hero-scrim {
+      background:
+        linear-gradient(
+          to bottom,
+          rgb(22 36 28 / 0.5) 0%,
+          rgb(22 36 28 / 0.12) 14%,
+          rgb(22 36 28 / 0) 26%
+        ),
+        linear-gradient(
+          to right,
+          rgb(22 36 28 / 0.52) 0%,
+          rgb(22 36 28 / 0.42) 30%,
+          rgb(22 36 28 / 0.18) 60%,
+          rgb(22 36 28 / 0) 86%
+        ),
+        linear-gradient(
+          to top,
+          rgb(22 36 28 / 0.93) 0%,
+          rgb(22 36 28 / 0.88) 28%,
+          rgb(22 36 28 / 0.79) 48%,
+          rgb(22 36 28 / 0.63) 62%,
+          rgb(22 36 28 / 0.35) 76%,
+          rgb(22 36 28 / 0.09) 88%,
+          rgb(22 36 28 / 0) 100%
+        );
+    }
+  }
+
+  /* ---- Copy ------------------------------------------------------------ */
+
+  .hero-content {
+    position: relative;
+    /*
+     * The bottom padding used to be measured off the treeline's solid end. With
+     * the drawing gone it is now simply air plus the control row.
+     *
+     * ⚠ The 2.75rem is the slide controls' own height. Below 64rem they sit on
+     * their own line under the actions rather than beside them, and without this
+     * the dots land on top of "Prohlédnout chalupu" — which is exactly what
+     * happened, and only at 360px, because that is the width where the button
+     * goes full-bleed and the link drops onto its own line.
+     */
+    padding-block: 5rem calc(3.5rem + 2.75rem);
+    color: var(--color-omitka);
+  }
+
+  @media (width >= 64rem) {
+    .hero-content {
+      /* Side by side from here up: the copy is left, the controls are right, and
+         they no longer need a row of their own. */
+      padding-block: 8rem 4.5rem;
+    }
+  }
+
+  .hero-title {
+    max-width: 18ch;
+    color: var(--color-omitka);
+  }
+
+  /*
+   * 61px, the next step up the 1.25 scale, and only here — see the note on
+   * `--text-hero` in global.css for why the h1 size is not enough on this one
+   * screen.
+   */
+  @media (width >= 64rem) {
+    .hero-title {
+      font-size: var(--text-hero);
+      line-height: var(--text-hero--line-height);
+    }
+  }
+
+  .hero-sub {
+    max-width: 40ch;
+    margin-top: 1.25rem;
+    font-size: var(--text-lead);
+    /* --jinovatka on the scrim clears the floor and reads as one step back from
+       the headline, which is what the hierarchy wants here. */
+    color: var(--color-jinovatka);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+    margin-top: 2.5rem;
+  }
+
+  /*
+   * The gallery path. It was an underlined link until it was asked to be a
+   * bordered button, and the note that used to sit here argued against exactly
+   * that: two calls to action of equal weight split the click and lower both.
+   * What is left of the argument is the WEIGHT — `.btn-ghost` is an outline on
+   * nothing, against the primary's solid brass fill, so the hierarchy still
+   * reads even though the two are now the same shape and size.
+   *
+   * White, not brass. `--mosaz-svetla` is 6.19:1 on FLAT `--les`, and nothing
+   * here is on flat `--les` — it is on a thin scrim over a lit photograph, where
+   * brass measured 2.64:1. White border and white label match the headline,
+   * which is the one thing on this screen already measured against all five
+   * slides.
+   *
+   * There is no rule for it here on purpose: `.btn` carries the size, the
+   * uppercase and the letter-spacing, `.btn-ghost` carries the border and the
+   * hover fill, and the full-width rule below already reaches both buttons.
+   * Anything restated here would be a second place to keep in step with
+   * global.css.
+   */
+
+  @media (width < 25rem) {
+    .hero-actions {
+      gap: 1.25rem;
+    }
+
+    .hero-actions .btn {
+      width: 100%;
+    }
+  }
+
+  /* ---- Slide controls ---------------------------------------------------
+   *
+   * Bottom right, opposite the copy, offset by the same measurement the copy
+   * block uses so the two share a baseline.
+   */
+  .hero-controls {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 2rem;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    /*
+     * Left below 64rem, where they are a row under the copy; right above it,
+     * where they are the opposite corner from it. The dots are inset by their own
+     * 44px tap target, so the negative margin is what lines the first dot up with
+     * the text column rather than 18px inside it.
+     */
+    justify-content: flex-start;
+    margin-inline-start: -0.75rem;
+    gap: 0.75rem 1rem;
+    pointer-events: none;
+  }
+
+  /*
+   * From 64rem the control row sits on the SAME line as the actions, opposite
+   * them — so its offset is the copy block's own bottom padding, not the smaller
+   * mobile one. The caption is white on the darkest end of the floor gradient
+   * here and clears the 4.5:1 floor comfortably; the pale mist that used to make
+   * this measurement delicate is gone.
+   */
+  @media (width >= 64rem) {
+    .hero-controls {
+      bottom: 4.5rem;
+      justify-content: flex-end;
+      margin-inline-start: 0;
+      margin-inline-end: -0.75rem;
+    }
+  }
+
+  .hero-controls[hidden] {
+    display: none;
+  }
+
+  /* The bar is a positioning box; only the controls themselves take the pointer. */
+  .hero-controls > * {
+    pointer-events: auto;
+  }
+
+  .hero-caption {
+    margin: 0;
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-omitka);
+  }
+
+  /* Below the tablet break the caption would wrap under the dots and push them
+     into the treeline; the dot labels carry the same words to a screen reader. */
+  @media (width < 48rem) {
+    .hero-caption {
+      display: none;
+    }
+  }
+
+  .hero-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  /*
+   * The tap target is 44 × 44; the mark inside it is 8px. Making the visible dot
+   * the target is the usual way carousel controls end up unusable on a phone.
+   */
+  .hero-dot {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--color-omitka);
+  }
+
+  .hero-dot-mark {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-omitka);
+    background-color: transparent;
+    transition:
+      background-color 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+
+  .hero-dot[aria-current='true'] .hero-dot-mark {
+    background-color: var(--color-omitka);
+    transform: scale(1.35);
+  }
+
+  @media (hover: hover) {
+    .hero-dot:hover .hero-dot-mark {
+      background-color: var(--color-omitka);
+    }
+  }
+
+  /* ---- Entrance --------------------------------------------------------
+   *
+   * Three elements, 90 ms apart, done in under 800 ms. `both` fill plus a single
+   * iteration means the global `prefers-reduced-motion` clamp lands every one of
+   * them on its finished state instantly — nothing can be left faded out.
+   */
+  .hero-title,
+  .hero-sub,
+  .hero-actions {
+    animation-name: hero-in;
+    animation-duration: 700ms;
+    animation-timing-function: var(--ease-emphasized);
+    animation-fill-mode: both;
+  }
+
+  .hero-sub {
+    animation-delay: 90ms;
+  }
+
+  .hero-actions {
+    animation-delay: 180ms;
+  }
+
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+</style>

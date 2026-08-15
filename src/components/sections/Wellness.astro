@@ -1,0 +1,99 @@
+---
+/**
+ * Wellness.
+ *
+ * The current site sets this copy in white over an underexposed winter photograph
+ * and it is effectively unreadable. Not reproduced: the text sits on a solid --les
+ * panel beside the photograph instead, giving --omitka on --les at 15.45:1 against
+ * the 4.5:1 floor — no scrim, no gradient, nothing that depends on which part of a
+ * photograph happens to be behind a given line.
+ */
+import { Image } from 'astro:assets';
+import virivka from '@img/DSC_4684-scaled-1.jpg';
+---
+
+<section class="split split--media-left wellness" aria-labelledby="wellness-nadpis">
+  <div class="split-media photo-frame" data-reveal="wipe">
+    <Image
+      src={virivka}
+      alt="Dřevěná vířivka s vyhřívanými schody na terase, kolem dokola vzrostlý les"
+      widths={[640, 960, 1280]}
+      sizes="(min-width: 64rem) 50vw, 100vw"
+      width={1920}
+      height={1282}
+      format="webp"
+      quality={62}
+      loading="lazy"
+    />
+  </div>
+
+  <div class="split-body">
+    <div data-reveal="up">
+      <h2 id="wellness-nadpis">Venkovní sauna, jezírko, HotTube a venkovní posezení</h2>
+      <p>
+        Dopřejte si dokonalý relax v naší venkovní sauně s výhledem do přírody.
+        Po saunování se můžete osvěžit v jezírku nebo si užít teplou lázeň v dřevěném
+        HotTube pod širým nebem. K dispozici je také venkovní posezení, kde si můžete
+        vychutnat klid a pohodu v jedinečném horském prostředí.
+      </p>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .wellness .split-body {
+    /* Solid ground, not a scrim over a photograph. */
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+  }
+
+  @media (width >= 64rem) {
+    .wellness .split-body {
+      /* Panel fills its half of the split so the colour block reads as deliberate. */
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding-block: 5rem;
+    }
+
+    /*
+     * The dark panel stands 4rem PROUD OF THE PHOTOGRAPH AT BOTH ENDS.
+     *
+     * The two halves used to begin and finish on the same two lines, which is
+     * the flattest thing a split can do. Now the panel is the full height of the
+     * row and the picture is inset inside it, so the colour block overhangs the
+     * photograph top and bottom and the page ground shows through in a strip at
+     * each end of the left-hand column.
+     *
+     * By decision, and it costs one thing worth knowing: the section above ends
+     * in the stone band, so the top strip puts a band of page white between that
+     * stone and the top of the photograph. Deliberate. Do not "fix" it by
+     * dropping the top margin — the symmetry is the point.
+     *
+     * `align-self: stretch` is what gives the photograph column a definite
+     * height, and that is load-bearing twice over: it is what the margins
+     * subtract from, and it is what lets `height: 100%` on the image resolve at
+     * all. Without it the column is centred at the picture's own aspect ratio and
+     * neither the offset nor the crop happens. See the same trap, from the other
+     * side, in DolniMorava.astro.
+     */
+    .wellness .split-media {
+      align-self: stretch;
+      margin-block: 4rem;
+    }
+  }
+
+  h2 {
+    /* --omitka on --les = 15.45:1 */
+    color: var(--color-omitka);
+  }
+
+  p {
+    margin-top: 1.5rem;
+    font-size: var(--text-lead);
+    /* --jinovatka on --les = 12.17:1 */
+    color: var(--color-jinovatka);
+  }
+
+</style>

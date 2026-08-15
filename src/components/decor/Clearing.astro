@@ -1,0 +1,194 @@
+---
+/**
+ * Two small stands of spruce, one at each end of a section, with nothing between
+ * them. The text sits in the gap — a clearing.
+ *
+ * WHY THIS EXISTS
+ * It replaced a flat-vector scene of a house on a hillside in the O nás panel:
+ * mountains, a pond, a row of little solid triangles for trees. The drawing was
+ * competent and completely generic, and its trees in particular contradicted
+ * every other tree on the site. There was also nothing in it a reader needed:
+ * the paragraph beside it already says where the cottage is, and the photograph
+ * of the same valley is two screens further down.
+ *
+ * So: no illustration. The section is a centred column of type standing in a gap
+ * in the wood.
+ *
+ * ---------------------------------------------------------------------------
+ * THE TREES ARE PREMADE — see pine-tree.ts for the source, the licence and the
+ * reason the procedural ones were dropped. Short version: `makeSpruce` is built
+ * for a hundred small trees massed along an edge, and this section stands three
+ * of them alone at 400px, where the regularity of generated notching is all you
+ * can see.
+ *
+ * ONE drawing, not three, and the variety comes from placement instead:
+ *
+ *  - **Scale.** Roughly 2 : 1 between the largest and the smallest here, which is
+ *    a stand of different-aged trees rather than one tree at three sizes.
+ *  - **Mirroring.** The silhouette is markedly asymmetric — the left flank is
+ *    heavier than the right — so a horizontal flip genuinely reads as a second
+ *    tree, and the flips are set per tree below rather than alternating.
+ *  - **The slope.** No two feet share a ground line. `y` lifts a tree up the
+ *    hillside, which is both the oldest depth cue there is and what the
+ *    paragraph beside it says: `zasazený do zalesněné stráně`.
+ *  - **Two ranks.** The back rank is drawn at 45%, higher up the slope and
+ *    smaller. There is no blur and no gradient — this stays a flat print.
+ *
+ * FILL AND WEIGHT. --kamen on --omitka, which is one tonal step: the trees read
+ * as the paper's texture rather than as a picture, and never compete with the
+ * type.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ NOTHING HERE IS EVER CLIPPED, AND THAT IS ENFORCED RATHER THAN EYEBALLED.
+ *
+ * An earlier version hand-typed a viewBox and hand-placed the trees inside it,
+ * and several of them crossed it — a whole flank of the tallest tree was being
+ * eaten by the SVG viewport at every width.
+ *
+ * Now: every tree's placed extent is computed from `PINE_BOX` (`placeAll`
+ * below), the stand's viewBox is fitted to the union of them, and
+ * `preserveAspectRatio="…YMax meet"` pins the outer edge and the ground line
+ * while scaling uniformly. `meet` only ever scales DOWN into the box CSS gives
+ * it, so the drawing cannot be cut and cannot be squashed, whatever the viewport
+ * does. ONas.astro caps that box to the gutter beside the measure so the trees
+ * cannot reach the type either.
+ *
+ * Move a tree, resize it, add one — the box follows. That is the point.
+ */
+import { PINE_PATH, PINE_BOX } from './pine-tree';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className, ...rest } = Astro.props;
+
+/**
+ * One placed tree. `x` is the trunk on the stand's own ground line, `h` the tip
+ * height in the same units, `y` how far ABOVE the ground line the foot stands,
+ * and `flip` mirrors the silhouette.
+ */
+type Tree = { x: number; h: number; y: number; flip?: boolean };
+
+/*
+ * Left: one big tree at the page edge with a second in front of it and a third
+ * behind, all three overlapping. Right: two, and the taller one is the outer
+ * one, so the two stands are not each other's mirror — docs/02-design-system.md
+ * §3, the asymmetry is deliberate.
+ *
+ * Kept few and large on purpose. A row of five reads as a border pattern; three
+ * overlapping trees read as the corner of a wood, and at this size the drawing
+ * is worth looking at.
+ */
+const LEFT = {
+  ground: 470,
+  back: [{ x: 258, h: 340, y: 86 }],
+  /*
+   * ⚠ The two front trees only just touch, and that is the whole composition.
+   * An earlier pass overlapped them by half: same fill, no outline, so they
+   * merged into one silhouette with a tangle of white notches through the middle
+   * and neither one read as a tree. Depth comes from the BACK rank being behind
+   * both — not from stacking the front ones.
+   */
+  front: [
+    { x: 118, h: 470, y: 0 },
+    { x: 348, h: 246, y: 6, flip: true },
+  ],
+} satisfies Stand;
+
+const RIGHT = {
+  ground: 430,
+  back: [{ x: 92, h: 268, y: 84, flip: true }],
+  front: [
+    { x: 214, h: 430, y: 0, flip: true },
+    { x: 22, h: 214, y: 10 },
+  ],
+} satisfies Stand;
+
+interface Stand {
+  /** Distance from the top of the composition to the ground line. */
+  ground: number;
+  back: Tree[];
+  front: Tree[];
+}
+
+/**
+ * Places one tree: scales `PINE_BOX` to the wanted height and sets its foot on
+ * the ground line, mirroring about the trunk when asked.
+ *
+ * The inner `translate` is in the ARTWORK's coordinates and moves the box's
+ * bottom-centre onto the origin; the outer one then puts that origin where the
+ * tree stands. Order matters — swapping them mirrors the whole stand instead of
+ * the one tree.
+ */
+function place(t: Tree, ground: number) {
+  const s = t.h / PINE_BOX.h;
+  const foot = ground - t.y;
+  const cx = PINE_BOX.x + PINE_BOX.w / 2;
+  const cy = PINE_BOX.y + PINE_BOX.h;
+  const w = PINE_BOX.w * s;
+
+  return {
+    transform: `translate(${round(t.x)} ${round(foot)}) scale(${t.flip ? -s : s} ${s}) translate(${round(-cx)} ${round(-cy)})`,
+    /* Where it actually lands, for the viewBox. Mirroring is about the trunk, so
+       the extent is the same either way. */
+    x0: t.x - w / 2,
+    x1: t.x + w / 2,
+    y0: foot - t.h,
+    y1: foot,
+  };
+}
+
+const round = (n: number) => Math.round(n * 100) / 100;
+
+/** Every tree in a stand, plus the exact box the lot of them occupy. */
+function placeAll(stand: Stand) {
+  const back = stand.back.map((t) => place(t, stand.ground));
+  const front = stand.front.map((t) => place(t, stand.ground));
+  const all = [...back, ...front];
+
+  /* A hair of margin so an anti-aliased outer edge is never shaved by the
+     viewport boundary it sits exactly on. */
+  const pad = 1;
+  const x0 = Math.min(...all.map((t) => t.x0)) - pad;
+  const y0 = Math.min(...all.map((t) => t.y0)) - pad;
+  const x1 = Math.max(...all.map((t) => t.x1)) + pad;
+  const y1 = Math.max(...all.map((t) => t.y1)) + pad;
+
+  return {
+    back,
+    front,
+    viewBox: `${round(x0)} ${round(y0)} ${round(x1 - x0)} ${round(y1 - y0)}`,
+  };
+}
+
+const stands = [
+  /* Outer edge pinned to the page edge, feet to the ground line, uniform scale. */
+  { cls: 'clearing-left', fit: 'xMinYMax meet', ...placeAll(LEFT) },
+  { cls: 'clearing-right', fit: 'xMaxYMax meet', ...placeAll(RIGHT) },
+];
+---
+
+{
+  stands.map(({ cls, fit, viewBox, back, front }) => (
+    <svg
+      class:list={['clearing', cls, className]}
+      {...rest}
+      viewBox={viewBox}
+      preserveAspectRatio={fit}
+      fill="var(--color-kamen)"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {/* Back rank first, so the front rank overlaps it and not the reverse. */}
+      <g opacity="0.45">
+        {back.map((t) => (
+          <path d={PINE_PATH} transform={t.transform} />
+        ))}
+      </g>
+      {front.map((t) => (
+        <path d={PINE_PATH} transform={t.transform} />
+      ))}
+    </svg>
+  ))
+}

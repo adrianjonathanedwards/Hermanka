@@ -1,0 +1,184 @@
+---
+/**
+ * O nás — a centred column of type standing in a clearing.
+ *
+ * Copy is the paragraph from the current homepage, which is correct as written —
+ * KEEP, docs/01-content.md §4.2.
+ *
+ * WHAT WAS ON THE RIGHT, AND WHY NOTHING IS NOW
+ * This was a split: text on the left, a panel on the right. The panel held a
+ * photograph of the terrace, then a flat-vector drawing of the valley. Both had
+ * the same problem — there was nothing for them to say. The paragraph already
+ * places the cottage, and every other section on this page carries a photograph
+ * of its own subject, so a second picture of the same valley was filling a
+ * rectangle rather than answering a question.
+ *
+ * A panel with nothing to put in it is a panel that should not be there. So the
+ * section is now one measure of type in the middle of the page, with a stand of
+ * spruce at each end and a gap between them (Clearing.astro). This is the first
+ * prose on the page and the only place that says where the cottage IS; setting it
+ * alone, centred, is the strongest thing that can be done to it.
+ *
+ * ⚠ The centring is deliberate and it is the exception, not the rule.
+ * docs/02-design-system.md §3 sets the page left-of-centre with the right third
+ * open. Two places break it: this one and the inquiry form. Both are moments
+ * where the page stops and addresses the reader directly. A third would make the
+ * asymmetry look like an accident rather than a decision.
+ */
+import Clearing from '../decor/Clearing.astro';
+---
+
+<section class="section onas" aria-labelledby="o-nas-nadpis">
+  <Clearing />
+
+  <div class="wrap onas-inner" data-reveal>
+    <h2 id="o-nas-nadpis">O nás</h2>
+    <p class="lead">
+      Chalupa Heřmanka se nachází v malé obci Heřmanice u Králík, která je situována
+      v malebném údolí pod masivem Králického Sněžníku. Jedná se o kompletně
+      zrekonstruovaný dvoupodlažní objekt, zasazený do zalesněné stráně. Chalupa
+      k pronajmutí poskytuje ubytování pro 2 až 15 osob ve 3 ložnicích.
+    </p>
+    <p class="more">
+      <a href="/chalupa" class="link-more">
+        <span>Více o nás</span>
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .onas {
+    /* The measure, and the one number the stands are sized against — see the
+       gutter arithmetic further down. It is a variable because it is read in two
+       places and two hand-typed 46rems would drift. */
+    --measure: 46rem;
+    position: relative;
+    /*
+     * A backstop, not a layout tool. Nothing is supposed to reach it: the stands
+     * are fitted to their own drawing and capped to the gutter below, so this
+     * only catches a future mistake before it spills into the neighbouring band.
+     */
+    overflow: hidden;
+    background-color: var(--color-omitka);
+  }
+
+  /*
+   * The type sits above the drawing in the stacking order but never over it in
+   * space: the stands are outside the measure, and the measure is centred.
+   */
+  .onas-inner {
+    position: relative;
+    max-width: var(--measure);
+    text-align: center;
+  }
+
+  .onas-inner > * {
+    margin-inline: auto;
+  }
+
+  h2 {
+    color: var(--color-mosaz-tmava);
+  }
+
+  .lead {
+    margin-top: 1.5rem;
+    /* Shorter than the 65ch default: centred text is harder to track back to the
+       start of the next line, so the measure has to be tighter than it would be
+       for the same paragraph set ragged-right. */
+    max-width: 54ch;
+    font-size: var(--text-lead);
+  }
+
+  .more {
+    margin-top: 2rem;
+  }
+
+  /*
+   * The stands.
+   *
+   * ⚠ REMOVED BELOW 64rem, not shrunk — `display: none`, so nothing is painted
+   * and nothing is downloaded twice. It is not that they would not fit: below
+   * that width the measure fills the page, so there is no clearing left for them
+   * to stand at the edge of and they would end up behind the type. A phone gets
+   * the centred column on its own, which is the version of this section that
+   * never needed help.
+   */
+  .onas :global(.clearing) {
+    display: none;
+  }
+
+  @media (width >= 64rem) {
+    /*
+     * The stands are taller than the paragraph, so THEY set the height of the
+     * band and the type is centred against them. Padding alone left the type at
+     * the top with a field of empty stone under it.
+     */
+    .onas {
+      --stand-h: clamp(210px, 26vw, 390px);
+      /*
+       * What the stand can ACTUALLY draw, which is not always what it asked for:
+       * the box is capped to the gutter (see below), so from 64rem to about
+       * 76rem the width binds first and the trees come out shorter than
+       * `--stand-h`. Reserving the full height there left a field of empty stone
+       * over their tips.
+       *
+       * 1 is the stands' own aspect — roughly 477 × 470 and 414 × 430, the
+       * viewBoxes Clearing.astro measures from the placed trees. It is an
+       * estimate for WHITESPACE only; nothing is clipped if it drifts. `100vw`
+       * rather than `100%` because a percentage in `min-height` resolves against
+       * height.
+       */
+      --stand-drawn: min(var(--stand-h), max(0px, (100vw - var(--measure)) / 2 + 1.5rem));
+      display: grid;
+      align-content: center;
+      min-height: calc(var(--stand-drawn) + 11rem);
+      padding-block: 5.5rem;
+    }
+
+    /*
+     * ---- THE NO-CLIP CONTRACT, WHICH IS TWO RULES AND BOTH ARE LOAD-BEARING --
+     *
+     * 1. `height` is the drawing's AMBITION and `max-width` is its permission.
+     *    The stand is `preserveAspectRatio="…YMax meet"` (Clearing.astro), so
+     *    whichever of the two binds first, the drawing scales down uniformly
+     *    inside the box, stays pinned to the outer edge and the ground line, and
+     *    is never cropped and never squashed. On a wide screen the height binds
+     *    and the stand is full size; from 64rem to about 76rem the gutter binds
+     *    and the trees are simply smaller. Neither case cuts anything.
+     *
+     * 2. The gutter is (page − measure) / 2. The extra 1.5rem is borrowed from
+     *    the measure's own 2rem of `.wrap` padding — no glyph is ever set there,
+     *    so the outermost crown may lean into it, and the remaining 0.5rem is
+     *    the gap that keeps it off the text.
+     *
+     * `max()` rather than a bare `calc()` on purpose: a negative `max-width` is
+     * an invalid declaration and would be DROPPED — i.e. the guard would vanish
+     * at exactly the width where it matters. Clamped at zero it fails closed.
+     *
+     * Vertical clearance is the section's own `min-height` above: stand + 11rem
+     * against the stand + the 2.75rem it is lifted by, so the top of the drawing
+     * always has room.
+     */
+    .onas :global(.clearing) {
+      display: block;
+      position: absolute;
+      /* Not 0. Sitting on the section edge, the overlapping skirts merge into one
+         hard-cut block against the band below and read as a notch in the layout
+         rather than as trees. A strip of clear ground under them fixes it. */
+      bottom: 2.75rem;
+      height: var(--stand-h);
+      width: auto;
+      max-width: max(0px, calc((100% - var(--measure)) / 2 + 1.5rem));
+      pointer-events: none;
+    }
+
+    .onas :global(.clearing-left) {
+      left: 0;
+    }
+
+    .onas :global(.clearing-right) {
+      right: 0;
+    }
+  }
+</style>
