@@ -505,6 +505,26 @@
     --treeline-h: clamp(280px, 30vw, 460px);
   }
 
+  /*
+   * ⚠ `--treeline-h` HAS A HARD FLOOR, AND IT IS A RATIO, NOT A NUMBER.
+   *
+   * The artwork is 1440 × 332 drawn `xMidYMax slice` — scaled to COVER the box,
+   * cropping whatever will not fit. Which edge is cropped is decided entirely by
+   * the box's own ratio:
+   *
+   *     height / width  >=  332 / 1440  =  0.2306   →  the SIDES crop
+   *     height / width  <   0.2306                  →  the TOP crops
+   *
+   * Cropping the sides is the design: one stretch of wood looks like any other,
+   * and a narrow page is simply shown less of it. Cropping the top takes the tips
+   * off the tallest trees and stands them flat — and it appears FIRST AT THE LEFT
+   * AND RIGHT EDGES, because the saddle in forest.ts is what puts the full-height
+   * trees there, which makes it read as "the sides are cut off" and sends anyone
+   * debugging it looking at the wrong axis. The 404 shipped like that once.
+   *
+   * The default below is 30vw, comfortably clear. Any page overriding it must
+   * stay above 24vw or scale the artwork's viewBox to match.
+   */
   .treeline {
     display: block;
     width: 100%;
@@ -517,6 +537,24 @@
    * page, so that section has to end above the trees rather than behind them.
    * `:last-child` beats `.section` on specificity, which is what lets this live
    * here instead of being repeated in every page's final component.
+   *
+   * ---- WHAT MUST NEVER HAPPEN TO IT ----
+   * The drawing is `position: absolute; bottom: 100%` inside the FOOTER, so it is
+   * not a child of the section it hangs over and that section's `overflow` cannot
+   * touch it. Two things elsewhere can, and both fail silently:
+   *
+   *   1. **`overflow: hidden` (or a clip-path, or a filter) on any ANCESTOR of
+   *      the footer** — `main`, `body`, a wrapper. That crops the tips flat.
+   *   2. **`z-index` above 0 on the last section.** Both it and the treeline sit
+   *      in the root stacking context at `z-index: auto`, so the wood paints last
+   *      simply because the footer comes later in the DOM. Raise the section and
+   *      its background covers the wood.
+   *
+   * Neither is true today — checked on all six pages plus the 404 by walking
+   * every ancestor of `.treeline` for a computed `overflow` other than `visible`.
+   * The SVG's own viewport does clip, and that is the one that is meant to: it
+   * crops the SIDES under `slice`, and the note above `.treeline` explains why
+   * making it visible would put a horizontal scrollbar on the site.
    *
    * ---- WHY 55% AND NOT 100% ----
    * Reserving the wood's FULL height was clearing a tree that is not there. The

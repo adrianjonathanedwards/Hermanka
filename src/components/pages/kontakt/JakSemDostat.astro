@@ -1,0 +1,144 @@
+---
+/**
+ * Getting here — how to reach the cottage by car, bus and train.
+ *
+ * Access road and parking data from docs/01-content.md §5.6. The brief says
+ * four cars at the building plus more on the drive; "3 až 4" in the original
+ * prose was the conflict — four wins.
+ *
+ * Bus and train distances come from DOSTUPNOST in src/data/okoli.ts: they are
+ * the same figures as the distance table on /chalupa. Never retyped here.
+ *
+ * Band: --omitka. This is the LAST section on /kontakt and must be on a light
+ * band — the footer's treeline (drawn in --les) rises out of it. The
+ * <Poptavka band="kamen"> above already alternates to stone, so --omitka is
+ * both different from the section before it and light. Rules 10 and 11.
+ */
+import IconLucide from '../../IconLucide.astro';
+import { DOSTUPNOST } from '../../../data/okoli';
+
+/* Czech hard space — after single-letter prepositions and numeral + unit. */
+const NBSP = ' ';
+
+/* Pull bus and train from the shared distance table. */
+const autobus = DOSTUPNOST.find((d) => d.co === 'Autobus');
+const vlak = DOSTUPNOST.find((d) => d.co === 'Vlak');
+---
+
+<section class="section jak" aria-labelledby="jak-nadpis">
+  <div class="wrap">
+
+    <div class="jak-hlava reveal">
+      <h2 id="jak-nadpis">Jak se k{NBSP}nám dostat</h2>
+    </div>
+
+    <ul class="jak-grid" role="list">
+
+      {/* ---- Car and parking -------------------------------------------- */}
+      <li class="jak-polozka">
+        <div class="jak-ikona-wrap" aria-hidden="true">
+          <IconLucide name="car" size={28} class="jak-ikona" />
+        </div>
+        <div class="jak-text">
+          <h3>Autem</h3>
+          <p>
+            K{NBSP}objektu vede příjezdová cesta dimenzovaná i na nákladní
+            automobil. Parkování je možné pro 4{NBSP}auta přímo u{NBSP}objektu;
+            na příjezdové cestě se vejdou další osobní automobily.
+          </p>
+        </div>
+      </li>
+
+      {/* ---- Bus -------------------------------------------------------- */}
+      {autobus && (
+        <li class="jak-polozka">
+          <div class="jak-ikona-wrap" aria-hidden="true">
+            <IconLucide name="bus" size={28} class="jak-ikona" />
+          </div>
+          <div class="jak-text">
+            <h3>Autobusem</h3>
+            <p>
+              Nejbližší zastávka: {autobus.kde}.
+            </p>
+          </div>
+        </li>
+      )}
+
+      {/* ---- Train ------------------------------------------------------ */}
+      {vlak && (
+        <li class="jak-polozka">
+          <div class="jak-ikona-wrap" aria-hidden="true">
+            <IconLucide name="train-front" size={28} class="jak-ikona" />
+          </div>
+          <div class="jak-text">
+            <h3>Vlakem</h3>
+            <p>
+              Nejbližší vlaková stanice: {vlak.kde}.
+            </p>
+          </div>
+        </li>
+      )}
+
+    </ul>
+  </div>
+</section>
+
+<style>
+  .jak {
+    background-color: var(--color-omitka);
+  }
+
+  .jak-hlava {
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* Three-column grid of travel-mode cards on wide screens; stacks below. */
+  .jak-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (width >= 48rem) {
+    .jak-grid {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+  }
+
+  .jak-polozka {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .jak-ikona-wrap {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgb(140 99 24 / 0.25);
+    background-color: rgb(140 99 24 / 0.06);
+  }
+
+  .jak-ikona {
+    color: var(--color-mosaz-tmava);
+  }
+
+  h3 {
+    color: var(--color-les);
+    margin-bottom: 0.4rem;
+  }
+
+  p {
+    color: var(--color-kura);
+  }
+</style>

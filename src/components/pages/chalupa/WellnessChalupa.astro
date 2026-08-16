@@ -1,0 +1,172 @@
+---
+/**
+ * Wellness — section 5 on /chalupa (#wellness).
+ *
+ * Copy from docs/01-content.md §4.7 (KEEP) with edits:
+ *   - "HotTube" → „vířivka" (Czech word, awaiting the client's decision
+ *     on the final term — docs/01-content.md §9 item 16)
+ *   - Added the statement that the sauna and hot tub are chargeable. This
+ *     information was missing from the original text and docs/04-pages.md
+ *     requires it explicitly in this section: "It MUST state that the sauna
+ *     and hot tub are chargeable."
+ *
+ * ⚠ --jinovatka must not be used on this page for content that is not
+ *    winter-related. Secondary text on the --les background therefore uses
+ *    --color-kamen (12.91:1 on --les, AAA). docs/02-design-system.md §1.2.
+ *
+ * Photos: sauna (portrait, 1280×1920) and hot tub (landscape, 1920×1282).
+ */
+import { Image } from 'astro:assets';
+import sauna from '@img/DSC_5204-scaled-1.jpg';
+import virivka from '@img/DSC_4684-scaled-1.jpg';
+---
+
+<section id="wellness" class="section wellness-sekce" aria-labelledby="wellness-nadpis">
+  <div class="wrap">
+
+    {/* ---- Text panel ------------------------------------------- */}
+    <div class="wellness-text" data-reveal>
+      <h2 id="wellness-nadpis">Sauna, jezírko a&nbsp;vířivka</h2>
+
+      <p class="wellness-lead">
+        Dopřejte si dokonalý relax v&nbsp;naší venkovní sauně s&nbsp;výhledem
+        do&nbsp;přírody. Po saunování se můžete osvěžit v&nbsp;jezírku nebo si
+        užít teplou lázeň v&nbsp;dřevěné vířivce pod širým nebem.
+        K&nbsp;dispozici je také venkovní ohniště a&nbsp;posezení, kde si
+        můžete vychutnat klid a&nbsp;pohodu v&nbsp;jedinečném horském
+        prostředí.
+      </p>
+
+      {/*
+        The sauna and hot-tub charge — information that was missing from the
+        site and must be visible here. Originally buried in the fees paragraph
+        on /volne-terminy-a-ceny/. See docs/04-pages.md section 5.
+      */}
+      <p class="wellness-poplatek">
+        Sauna a&nbsp;vířivka jsou za poplatek:
+        1&nbsp;000&nbsp;Kč za den nebo 3&nbsp;000&nbsp;Kč za týden.
+        Bez objednání se neúčtují.
+      </p>
+    </div>
+
+    {/* ---- Photo pair ------------------------------------- */}
+    <div class="wellness-fotky">
+      <figure class="wellness-foto" data-reveal data-reveal-delay="60">
+        <div class="media-frame photo-frame">
+          <Image
+            src={sauna}
+            alt="Otevřené dveře do venkovní dřevěné finské sauny s lavicemi a oknem do lesa"
+            widths={[480, 720, 960]}
+            sizes="(min-width: 64rem) 40vw, 100vw"
+            width={1280}
+            height={1920}
+            format="webp"
+            quality={66}
+            loading="lazy"
+          />
+        </div>
+        <figcaption>Venkovní sauna</figcaption>
+      </figure>
+
+      <figure class="wellness-foto" data-reveal data-reveal-delay="120">
+        <div class="media-frame photo-frame">
+          <Image
+            src={virivka}
+            alt="Dřevěná vířivka s vyhřívanými schody a výhledem do lesa za soumraku"
+            widths={[480, 720, 960]}
+            sizes="(min-width: 64rem) 40vw, 100vw"
+            width={1920}
+            height={1282}
+            format="webp"
+            quality={66}
+            loading="lazy"
+          />
+        </div>
+        <figcaption>Vířivka pod širým nebem</figcaption>
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .wellness-sekce {
+    /* The only dark band on the page. */
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+  }
+
+  /* ---- Text panel ------------------------------------------------------ */
+  .wellness-text {
+    max-width: 52ch;
+  }
+
+  h2 {
+    /* --omitka on --les = 15.45:1 */
+    color: var(--color-omitka);
+  }
+
+  .wellness-lead {
+    margin-top: 1.5rem;
+    font-size: var(--text-lead);
+    /*
+     * --color-kamen on --les = 12.91:1 (AAA).
+     * ⚠ --jinovatka is a winter accent and must not be used for wellness
+     *    content (docs/02-design-system.md §1.3, rules for this page).
+     */
+    color: var(--color-kamen);
+    max-width: 52ch;
+  }
+
+  .wellness-poplatek {
+    margin-top: 1.5rem;
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-semibold);
+    /*
+     * --mosaz-svetla on --les = 6.19:1 (AA).
+     * Gold tone on a dark ground — the charge stands out without shouting.
+     */
+    color: var(--color-mosaz-svetla);
+    max-width: var(--container-prose);
+  }
+
+  /* ---- Photo pair ------------------------------------------------ */
+  .wellness-fotky {
+    display: grid;
+    gap: 1rem;
+    margin-top: 3rem;
+  }
+
+  @media (width >= 48rem) {
+    .wellness-fotky {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  .wellness-foto {
+    margin: 0;
+  }
+
+  /*
+   * Both photos cropped to the same height with object-fit: cover. The sauna
+   * is portrait (1280×1920), the hot tub landscape (1920×1282) — without a
+   * fixed aspect ratio they would look mismatched side by side.
+   */
+  .wellness-foto .media-frame {
+    aspect-ratio: 3 / 2;
+  }
+
+  .wellness-foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  figcaption {
+    margin-top: 0.625rem;
+    font-size: var(--text-caption);
+    /* --kamen on --les = 12.91:1 */
+    color: var(--color-kamen);
+  }
+</style>

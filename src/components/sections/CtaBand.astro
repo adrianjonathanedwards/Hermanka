@@ -1,0 +1,95 @@
+---
+/**
+ * The cross-page closing CTA.
+ *
+ * The old site ended `/o-nas/` and `/tipy-na-vylety/` with
+ * `Máte zájem o ubytování nebo informace?` over a button reading `KONTAKTUJE NÁS`
+ * — error #4 in docs/01-content.md §1, a verb with a letter missing, shouted in
+ * capitals, pointing at a bare contact page. Fixed here, and pointed at the thing
+ * the site exists to collect: an inquiry with dates on it (docs/04-pages.md).
+ *
+ * ⚠ THIS BAND IS LIGHT AND HAS TO STAY LIGHT.
+ *
+ * It is the last section on the pages that do not end with the form, which means
+ * the footer's treeline rises out of it (`main > *:last-child` in global.css
+ * reserves the room). That treeline is a `--les` silhouette. On a `--les` band it
+ * is invisible — the drawing simply does not appear, and the page ends on a
+ * strip of dark nothing with a lot of padding under it. Stone or render white
+ * only. The dark statement band already exists and is CenaBand.astro.
+ *
+ * `band` is here for the same reason it is on Poptavka.astro: two identical bands
+ * must never be adjacent (docs/02-design-system.md §3), and what sits above this
+ * one differs per page.
+ */
+interface Props {
+  /** The <h2>. */
+  nadpis?: string;
+  /** One line under it. Optional — on a page that has already said enough. */
+  text?: string;
+  /** Where the button goes. */
+  href?: string;
+  /** What the button says. Sentence case; `.btn` tracks it out itself. */
+  cta?: string;
+  /** Which band this sits on. Never the same as the section directly above. */
+  band?: 'kamen' | 'omitka';
+}
+
+const {
+  nadpis = 'Máte zájem o ubytování?',
+  text = 'Napište nám termín a počet osob. Ozveme se co nejdříve s dostupností a cenou.',
+  href = '/kontakt#poptavka',
+  cta = 'Nezávazná poptávka',
+  band = 'omitka',
+} = Astro.props;
+---
+
+<section class:list={['section', 'cta-band', `cta-band--${band}`]} aria-labelledby="cta-band-nadpis">
+  <div class="wrap cta-band-inner" data-reveal>
+    <h2 id="cta-band-nadpis">{nadpis}</h2>
+    {text && <p>{text}</p>}
+    <p class="cta-band-akce">
+      <a href={href} class="btn btn-primary">{cta}</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .cta-band--kamen {
+    background-color: var(--color-kamen);
+  }
+
+  .cta-band--omitka {
+    background-color: var(--color-omitka);
+  }
+
+  /*
+   * Centred, and it is the third exception to the left-of-centre rule after the
+   * O nás clearing and the inquiry form (docs/02-design-system.md §3). All three
+   * are the same moment: the page stops laying things out and asks the reader
+   * for something. A fourth would make the asymmetry look accidental.
+   */
+  .cta-band-inner {
+    max-width: 44rem;
+    text-align: center;
+  }
+
+  .cta-band-inner > * {
+    margin-inline: auto;
+  }
+
+  h2 {
+    /* --mosaz-tmava: 6.05:1 on --omitka, 5.06:1 on --kamen. Plain --mosaz as
+       text is 4.30:1 on stone and fails (§1.2). */
+    color: var(--color-mosaz-tmava);
+  }
+
+  p {
+    margin-top: 1rem;
+    max-width: 46ch;
+    font-size: var(--text-lead);
+  }
+
+  .cta-band-akce {
+    margin-top: 2rem;
+  }
+</style>

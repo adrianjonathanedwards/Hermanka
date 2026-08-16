@@ -42,6 +42,27 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
 </section>
 
 <style>
+  /*
+   * The stone from the section above, carried on past the join.
+   *
+   * The photograph is inset 4rem from the top of this section (see below), and
+   * that strip was showing page white directly under the stone band the section
+   * above ends with — a colour change on the section line, which is the one
+   * place it gets noticed. So the stone is painted on for the first 8rem of this
+   * section instead. Nothing moves: the change now happens at 8rem, which is
+   * 4rem BEHIND the top edge of the photograph, where nothing can see it.
+   *
+   * 8rem and not 4rem on purpose. Landing the stop exactly on the photograph's
+   * edge would leave it to subpixel rounding whether a hairline of one colour or
+   * the other shows at that line.
+   *
+   * The bottom strip is left as page white deliberately — it runs into the page
+   * ground the next section sits on, so there is no change to hide there.
+   */
+  .wellness {
+    background-image: linear-gradient(to bottom, var(--color-kamen) 0 8rem, transparent 8rem);
+  }
+
   .wellness .split-body {
     /* Solid ground, not a scrim over a photograph. */
     background-color: var(--color-les);
@@ -82,6 +103,20 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
       align-self: stretch;
       margin-block: 4rem;
     }
+
+    /*
+     * A wider measure than the 34rem `.split-body` gives every other split.
+     *
+     * The panel is half the viewport and its copy was stopping about 6rem short
+     * of its own padding, so the block of text sat in the left two thirds of a
+     * dark rectangle with the rest empty. 40rem is what fills the column at a
+     * laptop width, and it is still inside the 65ch ceiling docs §3 puts on body
+     * copy: this paragraph is set at --text-lead, where 40rem comes out around
+     * 60 characters.
+     */
+    .wellness .split-body > * {
+      max-width: 40rem;
+    }
   }
 
   h2 {
@@ -96,4 +131,39 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
     color: var(--color-jinovatka);
   }
 
+  /*
+   * A step up the scale for both, on this section only.
+   *
+   * The panel is half the viewport and it is the one place on the page where the
+   * type has a dark ground the full height of the section to fill; at the page's
+   * default sizes it sat in the middle of it looking like a caption. Heading to
+   * --text-display, the h1 step, and the paragraph to --text-title-s.
+   *
+   * ⚠ Both are steps ON the scale in docs §2.4, not numbers picked to look right.
+   * That is the only legal way to resize type here — a `clamp()` full of magic
+   * rem values is what the rule exists to stop.
+   *
+   * ≥64rem only. Below it the heading already fills the measure at the default
+   * size, and 49px would put this one four lines deep on a phone.
+   *
+   * Line heights come down as the sizes go up: the tokens' own 1.15 and 1.6 are
+   * set for 39px and 20px, and left alone they read as gaps at 49 and 25.
+   *
+   * ⚠ THIS BLOCK MUST STAY BELOW THE TWO RULES ABOVE. It was written into the
+   * earlier `@media (width >= 64rem)`, which sits above them — and a media query
+   * adds no specificity, so the plain `p` rule's `font-size: var(--text-lead)`
+   * simply won on source order and the paragraph never moved. The heading did,
+   * which is exactly the sort of half-working that takes a while to spot.
+   */
+  @media (width >= 64rem) {
+    h2 {
+      font-size: var(--text-display);
+      line-height: 1.1;
+    }
+
+    p {
+      font-size: var(--text-title-s);
+      line-height: 1.45;
+    }
+  }
 </style>

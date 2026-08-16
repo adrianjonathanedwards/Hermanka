@@ -1,0 +1,220 @@
+﻿---
+/**
+ * Lyžování v okolí — nearby ski areas.
+ *
+ * Rewrites docs/01-content.md §7.3: "REWRITE — same treatment. Distances and
+ * drive times." Most distances are not available yet.
+ *
+ * DATA: src/data/okoli.ts LYZOVANI. Only the first entry (Dolní Morava) has a
+ * verified distance — it is the one in the distance table (§5.2). The remaining
+ * six entries have vzdalenost: null and cas: null and will stay that way until
+ * the client supplies the figures.
+ *
+ * TODO(client) — docs/01-content.md §9 item 21: distances for the remaining ski
+ * areas. Once they arrive, add vzdalenost and cas to each entry in LYZOVANI in
+ * src/data/okoli.ts and the list below will gain its chips automatically.
+ *
+ * WHY --jinovatka FOR THIS SECTION
+ * docs/02-design-system.md §1 reserves --jinovatka as a WINTER ACCENT ONLY —
+ * ski content, snow content, and the cold months of the calendar. The design
+ * system is explicit that this is one of the very few places it may appear.
+ * A full section background reads as a clear, immediate visual signal: "this
+ * is the ski section." No other section on this page may use this colour.
+ *
+ * Contrast on --jinovatka:
+ *   --les text:        12.17:1  (body copy, secondary list)
+ *   --kura text:        9.39:1  (descriptions)
+ *   --mosaz-tmava text: 4.81:1  (headings, chips) — passes the 4.5:1 floor ✓
+ *
+ * Band: --jinovatka. Follows --omitka (vylety) and precedes --kamen (koupani).
+ */
+import { LYZOVANI } from '../../../data/okoli';
+import IconLucide from '../../IconLucide.astro';
+
+/* U+00A0 — non-breaking space. */
+const NBSP = '\u00A0';
+
+/* The first entry is the only one with a verified distance. */
+const [dolniMorava, ...ostatni] = LYZOVANI;
+---
+
+<section class="lyzovani section" aria-labelledby="lyzovani-nadpis">
+  <div class="wrap">
+    <header class="lyzovani-header" data-reveal>
+      <h2 id="lyzovani-nadpis">Lyžování v okolí</h2>
+      <p class="lyzovani-lead">
+        Ski areál Dolní Morava je 9{NBSP}km vzdušnou čarou, autem 12{NBSP}minut.
+        V okolí jsou další střediska — vzdálenosti budou doplněny, až je klient potvrdí.
+      </p>
+    </header>
+
+    {/* ---- Featured: Dolní Morava (only verified distance) ---- */}
+    <div class="lyzovani-featured" data-reveal>
+      <div class="lyzovani-featured-ikona" aria-hidden="true">
+        <IconLucide name="cable-car" size={36} />
+      </div>
+      <div class="lyzovani-featured-text">
+        <h3 class="lyzovani-featured-nazev">{dolniMorava.nazev}</h3>
+        <p class="lyzovani-featured-popis">
+          Deset kilometrů sjezdovek, umělé zasněžování, Stezka v oblacích, Sky
+          Bridge{NBSP}721, bobová dráha a dětské zábavní areály.
+        </p>
+        {(dolniMorava.vzdalenost || dolniMorava.cas) && (
+          <div class="lyzovani-featured-meta">
+            {dolniMorava.vzdalenost && (
+              <span class="chip">
+                <IconLucide name="ruler" size={14} />
+                {dolniMorava.vzdalenost}
+              </span>
+            )}
+            {dolniMorava.cas && (
+              <span class="chip">
+                <IconLucide name="clock" size={14} />
+                {dolniMorava.cas}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+
+    {/* ---- Secondary list: remaining ski areas (no distances yet) ---- */}
+    {ostatni.length > 0 && (
+      <div class="lyzovani-ostatni" data-reveal>
+        <h3 class="lyzovani-ostatni-nadpis">Další střediska v okolí</h3>
+        <p class="lyzovani-ostatni-pozn sr-only">
+          Vzdálenosti k níže uvedeným střediskům nejsou ověřeny a nejsou proto uvedeny.
+        </p>
+        <ul class="lyzovani-seznam" role="list">
+          {ostatni.map((s) => (
+            <li class="lyzovani-polozka">
+              <IconLucide name="snowflake" size={18} class="lyzovani-polozka-ikona" />
+              <span>{s.nazev}</span>
+            </li>
+          ))}
+        </ul>
+        {/*
+          TODO(client) — docs/01-content.md §9 item 21. Once distances arrive,
+          add vzdalenost + cas to each LYZOVANI entry in src/data/okoli.ts. The
+          "Další střediska" subheading can then be folded into the main featured
+          list or shown as chips on each item.
+        */}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .lyzovani {
+    /*
+     * docs/02-design-system.md §1: --jinovatka is a winter accent only — ski
+     * content, snow, cold months. This is one of the very few places it may
+     * legitimately appear as a section background.
+     */
+    background-color: var(--color-jinovatka);
+  }
+
+  h2,
+  h3 {
+    /* --mosaz-tmava on --jinovatka = 4.81:1 — the tightest passing case here. */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .lyzovani-lead {
+    margin-top: 1rem;
+    font-size: var(--text-lead);
+    max-width: 52ch;
+    /* --les on --jinovatka = 12.17:1 */
+    color: var(--color-les);
+  }
+
+  /* ---- Featured entry ---------------------------------------------------- */
+
+  .lyzovani-featured {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-top: 2.5rem;
+    padding: 1.75rem;
+    border-radius: var(--radius-sm);
+    /* Panel on --jinovatka ground. --omitka (cream white) lifts clearly off
+       the frost without introducing a new hue. */
+    background-color: var(--color-omitka);
+    border: 1px solid rgb(140 99 24 / 0.2);
+  }
+
+  .lyzovani-featured-ikona {
+    flex: none;
+    /* --mosaz-tmava on the panel */
+    color: var(--color-mosaz-tmava);
+    margin-top: 0.2rem;
+  }
+
+  .lyzovani-featured-nazev {
+    font-size: var(--text-title-s);
+    color: var(--color-les);
+    margin-bottom: 0.5rem;
+  }
+
+  .lyzovani-featured-popis {
+    font-size: var(--text-body);
+    /* --kura on --jinovatka = 9.39:1 */
+    color: var(--color-kura);
+    max-width: none;
+  }
+
+  .lyzovani-featured-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid rgb(140 99 24 / 0.2);
+  }
+
+  /* ---- Secondary list ---------------------------------------------------- */
+
+  .lyzovani-ostatni {
+    margin-top: 3rem;
+  }
+
+  .lyzovani-ostatni-nadpis {
+    font-size: var(--text-title-s);
+  }
+
+  .lyzovani-seznam {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 40rem) {
+    .lyzovani-seznam {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 64rem) {
+    .lyzovani-seznam {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .lyzovani-polozka {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: var(--text-body);
+    /* --les on --jinovatka = 12.17:1 */
+    color: var(--color-les);
+  }
+
+  .lyzovani-polozka-ikona {
+    flex: none;
+    /* --mosaz-tmava on --jinovatka = 4.81:1 */
+    color: var(--color-mosaz-tmava);
+  }
+</style>

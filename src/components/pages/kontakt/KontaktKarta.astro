@@ -1,0 +1,192 @@
+---
+/**
+ * Contact card — the opening section of /kontakt.
+ *
+ * Left column: name, phone (tel: link) and email note.
+ * Right column: <MapaSlot /> — carries the address, GPS and outbound map link
+ * so those details are not repeated here.
+ *
+ * The email is SITE.email, which is null on the current site: no email address
+ * has ever been published. This is launch-blocking — docs/01-content.md §9 item 13.
+ * Until supplied, the reader is directed to the form below or the phone above.
+ *
+ * Missing from SITE and also blocked: owner name, house number, postcode, IČO.
+ * TODO(client): docs/01-content.md §8.1.
+ *
+ * Band: --omitka. The PageHero above is dark (--les); this must be light.
+ * The <Poptavka band="kamen"> section below alternates to stone.
+ */
+import IconLucide from '../../IconLucide.astro';
+import MapaSlot from '../../widgets/MapaSlot.astro';
+import { SITE } from '../../../data/site';
+---
+
+<section class="section karta" aria-labelledby="karta-nadpis">
+  <div class="wrap">
+    <div class="karta-mrizka">
+
+      {/* ---- Left: contact details ---------------------------------------- */}
+      <div class="karta-kontakty reveal">
+        <h2 id="karta-nadpis">Kde nás najdete</h2>
+
+        <ul class="karta-seznam" role="list">
+
+          {/* Name and village — house number, postcode and IČO blocked */}
+          <li class="karta-polozka">
+            <IconLucide name="map-pin" size={22} class="karta-ikona" />
+            <div class="karta-sloupec">
+              {/*
+                TODO(client): owner name, house number, postcode and IČO are all
+                missing from the current site. Only SITE.name and SITE.obec are
+                known — docs/01-content.md §8.1.
+              */}
+              <span class="karta-nazev">{SITE.name}</span>
+              <span class="karta-hodnota">{SITE.obec}</span>
+            </div>
+          </li>
+
+          {/* Phone — the primary contact method */}
+          <li class="karta-polozka">
+            <IconLucide name="phone" size={22} class="karta-ikona" />
+            <div class="karta-sloupec">
+              <span class="karta-popisek">Telefon</span>
+              <a href={`tel:${SITE.telHref}`} class="karta-tel">
+                {SITE.telefon}
+              </a>
+            </div>
+          </li>
+
+          {/* E-mail — null until the client supplies an address */}
+          <li class="karta-polozka">
+            <IconLucide name="mail" size={22} class="karta-ikona" />
+            <div class="karta-sloupec">
+              <span class="karta-popisek">E-mail</span>
+              {SITE.email ? (
+                <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+              ) : (
+                /*
+                 * TODO(client): no email address has been published on the current
+                 * site — launch-blocking, docs/01-content.md §9 item 13.
+                 * Until supplied, point the reader to the form below or the phone.
+                 */
+                <span class="karta-hodnota">
+                  Napište nám přes formulář níže nebo zavolejte.
+                </span>
+              )}
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      {/* ---- Right: map panel -------------------------------------------- */}
+      <div class="karta-mapa-panel">
+        <MapaSlot />
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .karta {
+    background-color: var(--color-omitka);
+  }
+
+  /* Two-column grid: contact details left, map right. Stacks on mobile. */
+  .karta-mrizka {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .karta-mrizka {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      gap: 3rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .karta-mrizka {
+      /* Contact info gets more room; map card has a natural max width. */
+      grid-template-columns: 1fr minmax(0, 28rem);
+      gap: 4rem;
+    }
+  }
+
+  h2 {
+    margin-bottom: 2rem;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .karta-seznam {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .karta-polozka {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  .karta-ikona {
+    flex: none;
+    margin-top: 0.15rem;
+    color: var(--color-mosaz);
+  }
+
+  .karta-sloupec {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  /* The cottage name rendered in the display face. */
+  .karta-nazev {
+    font-family: var(--font-display);
+    font-size: var(--text-title-s);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.3;
+    color: var(--color-les);
+  }
+
+  /* Uppercase eyebrow label — for "Telefon", "E-mail". */
+  .karta-popisek {
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* Secondary text — village name, email fallback. --kura on --omitka = 11.92:1 */
+  .karta-hodnota {
+    color: var(--color-kura);
+  }
+
+  /*
+   * The phone number is the primary call to action on the card.
+   * --les on --omitka = 15.45:1. Lead size (20px) so it reads at a glance.
+   */
+  .karta-tel {
+    display: block;
+    font-size: var(--text-lead);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-les);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    transition: color 150ms var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .karta-tel:hover {
+      color: var(--color-mosaz-tmava);
+    }
+  }
+</style>

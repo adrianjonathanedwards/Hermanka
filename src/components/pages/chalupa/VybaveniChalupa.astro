@@ -1,0 +1,199 @@
+---
+/**
+ * Cottage amenities — section 4 on /chalupa (#vybaveni).
+ *
+ * Data comes from src/data/vybaveni.ts VYBAVENI: five groups, each
+ * with an icon, a heading, and a list of items.
+ *
+ * ⚠ ITEMS WITH `overit` MUST NOT BE RENDERED AS A PLAIN TICK.
+ *
+ * Three items carry the `overit` flag — each has a caveat that must be
+ * visible. The `overit` item renderer therefore shows the caveat below the
+ * item text, with a circle-alert icon. A safety mechanism, not a style
+ * choice — see the header comment in src/data/vybaveni.ts.
+ *
+ * The old `Možnosti zábavy v okolí` group (bike hire, riding school,
+ * tennis…) is absent from the data deliberately: third parties, no distances,
+ * unverified since 2019. docs/01-content.md §9 item 20, §5.9.
+ */
+import { VYBAVENI } from '../../../data/vybaveni';
+import IconLucide from '../../IconLucide.astro';
+---
+
+<section id="vybaveni" class="section vybaveni-sekce" aria-labelledby="vybaveni-nadpis">
+  <div class="wrap">
+    <div class="vybaveni-head" data-reveal>
+      <h2 id="vybaveni-nadpis">Vybavení chalupy</h2>
+      <p class="vybaveni-intro">
+        Co na chalupě najdete. Položky označené výhradou potřebují předchozí
+        domluvou nebo platí s podmínkami.
+      </p>
+    </div>
+
+    <div class="vybaveni-skupiny">
+      {VYBAVENI.map((skupina, i) => (
+        <div
+          class="vybaveni-skupina"
+          data-reveal
+          data-reveal-delay={String(i * 60)}
+        >
+          <div class="skupina-nadpis">
+            <span class="skupina-ikona" aria-hidden="true">
+              <IconLucide name={skupina.icon} size={22} strokeWidth={1.5} />
+            </span>
+            <h3>{skupina.nazev}</h3>
+          </div>
+
+          <ul class="polozky-list">
+            {skupina.polozky.map((p) => (
+              <li class:list={['polozka', { 'polozka--overit': !!p.overit }]}>
+                <span class="polozka-ikona" aria-hidden="true">
+                  {p.overit ? (
+                    <IconLucide name="circle-alert" size={16} strokeWidth={1.5} />
+                  ) : (
+                    <IconLucide name="circle-check" size={16} strokeWidth={1.5} />
+                  )}
+                </span>
+                <span class="polozka-text">
+                  <span class="polozka-nazev">{p.nazev}</span>
+                  {p.overit && (
+                    <span class="polozka-caveat">{p.overit}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .vybaveni-sekce {
+    background-color: var(--color-kamen);
+  }
+
+  /* ---- Section header ---------------------------------------------------- */
+  .vybaveni-head {
+    margin-bottom: 3rem;
+  }
+
+  h2 {
+    /* --mosaz-tmava on --kamen = 5.06:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .vybaveni-intro {
+    margin-top: 1rem;
+    font-size: var(--text-lead);
+    max-width: 52ch;
+  }
+
+  /* ---- Group grid ---------------------------------------------------- */
+  /*
+   * Five groups in a grid. One column on mobile; two columns from 640 px;
+   * three columns from 1024 px (the two bottom groups flow automatically
+   * into the first two columns of the third row).
+   */
+  .vybaveni-skupiny {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  @media (width >= 40rem) {
+    .vybaveni-skupiny {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 64rem) {
+    .vybaveni-skupiny {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
+    }
+  }
+
+  /* ---- Individual group ----------------------------------------------- */
+  .vybaveni-skupina {
+    background-color: var(--color-omitka);
+    border: 1px solid rgb(62 50 38 / 0.14);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .skupina-nadpis {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .skupina-ikona {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: var(--text-title-s);
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+    margin: 0;
+  }
+
+  /* ---- Item list --------------------------------------------------- */
+  .polozky-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .polozka {
+    display: grid;
+    grid-template-columns: 1.25rem 1fr;
+    gap: 0.5rem;
+    align-items: start;
+  }
+
+  .polozka-ikona {
+    display: flex;
+    align-items: center;
+    padding-top: 0.1rem;
+    flex-shrink: 0;
+    /* Check mark: brass. Caveat: the kura warm tone. */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .polozka--overit .polozka-ikona {
+    /* circle-alert — a caveat, not a plain tick */
+    color: var(--color-kura);
+  }
+
+  .polozka-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .polozka-nazev {
+    font-size: var(--text-body);
+    /* --les on --omitka = 15.45:1 */
+    color: var(--color-les);
+  }
+
+  /*
+   * Caveat below the item name. Must always be visible — never suppressed,
+   * never converted back to a plain tick. See src/data/vybaveni.ts.
+   */
+  .polozka-caveat {
+    font-size: var(--text-caption);
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+  }
+</style>

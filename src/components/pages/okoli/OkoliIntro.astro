@@ -1,0 +1,132 @@
+---
+/**
+ * Intro — Dolní Morava, Stezka v oblacích, Sky Bridge 721.
+ *
+ * Rewrites docs/01-content.md §4.8 and §7.1:
+ *
+ *   - Error #9: `bobový dráha` → `bobová dráha`.
+ *   - Standardises `Sky Bridge 721` — the attraction's real name. The old site
+ *     spelled it three different ways across three pages (`Sky bridge`, `SkyBridge`,
+ *     `Sky Bridge 721`). One spelling, here.
+ *   - `Červená Voda` — both words capitalised, it is a place name (§7.1).
+ *   - The §4.8 original was a subordinate clause with no main verb ("Ať už je ve
+ *     vašem hledáčku… nebo se jen tak chcete potulovat…"); rewritten into three
+ *     complete sentences — same facts, correct Czech.
+ *
+ * We do NOT name the Sněžník summit trail distance here. The old copy says 14 km,
+ * the regional map says 17 km, the data holds null (docs/01-content.md §9 item 18).
+ * Naming either next to a map that contradicts it is worse than naming neither.
+ *
+ * IMAGE: img/dolnimorava.webp. Same photograph as the homepage DolniMorava section —
+ * the two pages serve different purposes: the homepage teases, this page expands.
+ * No second photograph of Dolní Morava exists in the asset set.
+ *
+ * Band: --omitka. First content section after the dark page hero.
+ */
+import { Image } from 'astro:assets';
+import sjezdovky from '@img/dolnimorava.webp';
+
+/* U+00A0 — non-breaking space. Binds numerals to their units and single-letter
+   prepositions to the word that follows (docs/02-design-system.md §2.6). */
+const NBSP = ' ';
+---
+
+<section class="intro split split--media-right" aria-labelledby="intro-nadpis">
+  <div class="intro-media split-media photo-frame" data-reveal>
+    <Image
+      src={sjezdovky}
+      alt="Letecký pohled na zasněžený areál Dolní Morava se sjezdovkami, lanovkou a Stezkou v oblacích nad korunami stromů"
+      widths={[560, 900, 1200]}
+      sizes="(min-width: 64rem) 50vw, 100vw"
+      width={950}
+      height={789}
+      format="webp"
+      quality={64}
+      loading="lazy"
+      class="intro-img"
+    />
+  </div>
+
+  <div class="split-body intro-body">
+    <div data-reveal>
+      <h2 id="intro-nadpis">
+        Dolní Morava, Stezka{NBSP}v oblacích, Sky Bridge{NBSP}721
+      </h2>
+      <p class="intro-lead">
+        Hlavní turistická atrakce v okolí je ski areál Dolní Morava — vzdušnou čarou
+        asi 3{NBSP}km, autem 12{NBSP}minut.
+      </p>
+      <p>
+        Resort nabízí více než deset kilometrů sjezdovek s umělým zasněžováním,
+        v zimě pro lyžování a snowboarding, v létě na sjezdy kol. Nad hřebenem stojí
+        Stezka v oblacích a od ní vede visutý most Sky Bridge{NBSP}721 — nejdelší visutý
+        most pro pěší na světě.
+      </p>
+      <p>
+        Celoročně je v provozu bobová dráha a dětské zábavní areály: Mamutíkův vodní
+        park, Lesní zážitkový park a Pískový svět. V okolí jsou i sjezdovky v Červené
+        Vodě a Čenkovicích a turistické stezky, které se dají chytit přímo u chalupy.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro {
+    background-color: var(--color-omitka);
+  }
+
+  /*
+   * The media cell needs overflow: hidden so the photo-frame hover-zoom is
+   * clipped. On mobile it forms a tall letterbox; from 64rem it takes the full
+   * grid-row height beside the text panel.
+   */
+  .intro-media {
+    overflow: hidden;
+    min-height: 18rem;
+    background-color: var(--color-les);
+  }
+
+  @media (width >= 64rem) {
+    .intro-media {
+      min-height: 28rem;
+      /*
+       * Override `.split`'s `align-items: center` for the media cell alone.
+       * Without this the photograph column is only as tall as the text column
+       * sets it — `align-self: stretch` fills the whole row instead.
+       */
+      align-self: stretch;
+    }
+  }
+
+  /*
+   * Out of flow so it fills the container regardless of what height the grid
+   * gives the cell. `.split-media img` in global.css sets width/height/object-fit
+   * but does not position — add that here.
+   */
+  .intro-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  h2 {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .intro-lead {
+    margin-top: 1.25rem;
+    font-size: var(--text-lead);
+    /* --les on --omitka = 15.45:1 */
+    color: var(--color-les);
+  }
+
+  p {
+    margin-top: 1.25rem;
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+  }
+</style>

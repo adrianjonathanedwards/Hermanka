@@ -81,7 +81,19 @@ const rok = new Date().getFullYear();
     <div class="footer-cta" data-reveal="up" data-reveal-delay="160">
       <h2>Máte zájem o ubytování?</h2>
       <p>Napište nám termín a počet osob. Ozveme se co nejdříve.</p>
-      <a href="#poptavka" class="btn btn-primary">Odeslat poptávku</a>
+      {/*
+        ⚠ An absolute path, not `#poptavka`.
+
+        The footer is on every page and the form is not — it is on `/`,
+        `/terminy-a-ceny` and `/kontakt` only. A bare fragment was fine while the
+        homepage was the only page there was; on `/galerie` or `/okoli` it is a
+        link to an anchor that does not exist, which scrolls nowhere and looks
+        broken in exactly the place the page is asking for the inquiry.
+
+        `/kontakt#poptavka` works from everywhere. On `/kontakt` itself the
+        browser treats it as the same-document fragment it always was.
+      */}
+      <a href="/kontakt#poptavka" class="btn btn-primary">Odeslat poptávku</a>
     </div>
   </div>
 

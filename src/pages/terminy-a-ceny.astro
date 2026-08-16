@@ -1,0 +1,153 @@
+---
+/**
+ * /terminy-a-ceny — calendar, price list, holiday blocks, fees, terms and
+ * the inquiry form.
+ *
+ * This is the most important page on the site (docs/04-pages.md). Calendar
+ * first, above the fold, no scrolling to find it. Every section exists to
+ * move the reader to the form with dates and a number in hand.
+ *
+ * SECTION ORDER (docs/04-pages.md §/terminy-a-ceny):
+ *   1. KalendarSlot   — booking rules + legend + "ask us today"
+ *   2. Ceník          — one price table, seasons as rows
+ *   3. Svátky         — Silvestr and Vánoce with self-expiring dates
+ *   4. Poplatky       — fee schedule (electricity, water, sauna, deposit)
+ *   5. Podmínky       — known terms as steps + missing terms as "ask us"
+ *   6. Poptavka       — the inquiry form
+ *
+ * BAND ALTERNATION (from KalendarSlot's --omitka):
+ *   KalendarSlot  --omitka   (the component sets this)
+ *   Ceník         --kamen    (alternates ✓)
+ *   Svátky        --les      (dark; different from kamen ✓)
+ *   Poplatky      --omitka   (different from les ✓)
+ *   Podmínky      --kamen    (different from omitka ✓)
+ *   Poptavka      --omitka   (band="omitka"; last section, light ✓)
+ *
+ * Poptavka receives band="omitka" because the section directly above it
+ * (Podmínky) is already stone. docs/02-design-system.md §3 forbids identical
+ * adjacent bands, and Poptavka.astro documents this exact case.
+ *
+ * PAGE HERO PRELOAD — follows the pattern in docs/01-content.md and the
+ * PageHero component header exactly. src and srcset from getImage() feed
+ * BaseLayout.heroPreload so the browser can start the image download from
+ * the <head> without waiting for the component to render.
+ *
+ * NO CLIENT JAVASCRIPT anywhere in this file or its components.
+ *
+ * TODO(feed) — docs/01-content.md §9 item 15 (LAUNCH-BLOCKING): the iCal
+ * feed is unresolved. KalendarSlot is already wired for the grid — it ships
+ * the real parts (booking rules, legend, CTA) and defers the grid to a
+ * .kalendar-plocha region that will receive the calendar when the feed
+ * arrives. Nothing on this page has to change when it does.
+ *
+ * TODO(feed) — docs/04-pages.md: dates prefilled in the form from the
+ * calendar selection. That interaction depends on the feed. When the feed
+ * and the calendar grid land, wire the Poptavka form's date field from the
+ * selection — no structural change to this file required.
+ */
+import { getImage } from 'astro:assets';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import KalendarSlot from '../components/widgets/KalendarSlot.astro';
+import Poptavka from '../components/sections/Poptavka.astro';
+import RoofDivider from '../components/decor/RoofDivider.astro';
+
+import Cenik from '../components/pages/terminy/Cenik.astro';
+import Svatky from '../components/pages/terminy/Svatky.astro';
+import Poplatky from '../components/pages/terminy/Poplatky.astro';
+import Podminky from '../components/pages/terminy/Podminky.astro';
+
+import { PAGE_HERO_PRELOAD_PROPS, PAGE_HERO_SIZES } from '../data/pageHero';
+
+/*
+ * Resolve the hero image transform at the page level so BaseLayout can emit
+ * a <link rel="preload"> in <head>. This is the pattern every subpage uses;
+ * the props object is exactly what PageHero spreads into its <Image>, so
+ * Astro dedupes the transform and only one file is generated.
+ */
+const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
+---
+
+<BaseLayout
+  title="Termíny a ceny"
+  description="Ceník a podmínky pronájmu Chalupy Heřmanka. Kapacita 2 až 15 osob ve 3 ložnicích. Přehled cen, poplatků a podmínek rezervace. Napište si o termín."
+  heroPreload={{ src: hero.src, srcset: hero.srcSet.attribute, sizes: PAGE_HERO_SIZES }}
+>
+
+  {/*
+    PageHero — the page's one <h1>. LCP element. No entrance animation on
+    the photograph; only the text copy fades in (docs/02-design-system.md §5.3).
+  */}
+  <PageHero
+    title="Termíny a ceny"
+    lead="Ceník za celou chalupu, přehled poplatků a podmínky rezervace."
+  />
+
+  {/*
+    1. KalendarSlot — first, above the fold.
+    The component ships what is real now: the two booking rules and the four
+    legend states. The calendar grid is deferred until the iCal feed is
+    resolved (docs/01-content.md §9 item 15). The component's own header
+    comment explains what goes in .kalendar-plocha when the feed arrives.
+    Section band: --omitka (set by the component).
+  */}
+  <KalendarSlot id="kalendar" />
+
+  {/*
+    2. Ceník — one table, seasons as rows, week and weekend as columns.
+    Not six cards. Section band: --kamen.
+  */}
+  <Cenik />
+
+  {/*
+    3. Svátky — Silvestr and Vánoce.
+    Both have null dates at launch (launch-blocking §9 items 3 and 4).
+    jeAktualni() renders the "termín upřesníme" path — never a stale year.
+    Section band: --les.
+  */}
+  <Svatky />
+
+  {/*
+    4. Poplatky — what is added to the rate.
+    Two entries are marked nepotvrzeno: true (electricity and municipal fee);
+    they render with an "orientačně" badge (§9 item 7).
+    Section band: --omitka.
+  */}
+  <Poplatky />
+
+  {/*
+    RoofDivider separates the fee table from the terms. One use here, at the
+    transition between pricing information and payment process — the natural
+    break in the reader's decision flow. docs/04-pages.md says once or twice
+    at most; homepage uses it twice.
+  */}
+  <RoofDivider />
+
+  {/*
+    5. Podmínky — known terms as steps, missing terms as "ask us".
+    CHYBEJICI_PODMINKY is never dropped — it is the honest answer to "what
+    does this site not yet tell you?" and bed linen is the single most-asked
+    question for a Czech chalupa let. Section band: --kamen.
+  */}
+  <Podminky />
+
+  {/*
+    6. Poptavka — the inquiry form.
+    band="omitka" because Podmínky above is --kamen (stone). The last section
+    must be on a light band ✓. The lead references the price list the reader
+    has just read.
+
+    TODO(feed): docs/04-pages.md wants the date fields prefilled from the
+    calendar selection. That wiring depends on the iCal feed (§9 item 15).
+    No structural change needed here when the feed arrives; the form's date
+    field already exists and accepts any free-text date string.
+  */}
+  <Poptavka
+    band="omitka"
+    nadpis="Napište si o termín"
+    lead="Přečetli jste ceny a podmínky — teď nám napište termín a kolik vás bude. Ozveme se s potvrzením dostupnosti co nejdříve."
+    id="poptavka"
+  />
+
+</BaseLayout>

@@ -35,9 +35,25 @@ interface Props {
   ogImage?: string;
   /** Set true on pages that must not be indexed. */
   noindex?: boolean;
+  /**
+   * Start the site header solid instead of transparent.
+   *
+   * ⚠ Required on any page whose FIRST SCREEN IS LIGHT. The header is white type
+   * on nothing until the hero scrolls away; over `--omitka` it is invisible. See
+   * the `solid` prop on SiteHeader.astro. Pages with a photographic hero — the
+   * homepage and everything using PageHero — leave this alone.
+   */
+  headerSolid?: boolean;
 }
 
-const { title, description, heroPreload, ogImage = '/og-default.webp', noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  heroPreload,
+  ogImage = '/og-default.webp',
+  noindex = false,
+  headerSolid = false,
+} = Astro.props;
 
 const locale = getLocaleFromUrl(Astro.url);
 const t = useTranslations(locale);
@@ -164,7 +180,7 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
   <body>
     <a href="#obsah" class="skip-link">{t('nav.skipToContent')}</a>
 
-    <SiteHeader />
+    <SiteHeader solid={headerSolid} />
 
     <main id="obsah">
       <slot />

@@ -1,0 +1,145 @@
+---
+/**
+ * Heating — section 6 on /chalupa (#vytapeni).
+ *
+ * Source: docs/01-content.md §5.5. Lightly rewritten for rhythm; no facts
+ * changed. The original read like a pellet-boiler manual; the rewrite splits
+ * the information into two sentences in logical order.
+ *
+ * Cross-link to /terminy-a-ceny: electricity at the cottage is billed by
+ * actual consumption, so for a guest heating and electricity are one subject.
+ *
+ * Photo: living room with fireplace (1920×1282). The fireplace is part of
+ * the heating system and the centrepiece of the living room — photo and text
+ * are about the same place.
+ */
+import { Image } from 'astro:assets';
+import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
+---
+
+<section id="vytapeni" class="section vytapeni-sekce" aria-labelledby="vytapeni-nadpis">
+  <div class="wrap">
+    <div class="vytapeni-grid">
+
+      {/* ---- Text panel ------------------------------------------- */}
+      <div class="vytapeni-text" data-reveal>
+        <h2 id="vytapeni-nadpis">Vytápění</h2>
+
+        <p class="vytapeni-odst">
+          Chalupa se vytápí třemi způsoby, které lze kombinovat: peletkovým
+          kotlem, krbovou vložkou na dřevo a&nbsp;akumulační nádrží
+          s&nbsp;elektrickými spirálami. Krbová vložka má horkovzdušné rozvody
+          do&nbsp;horních ložnic — lze topit jen jí, jen kotlem, nebo&nbsp;oběma
+          zároveň.
+        </p>
+
+        <p class="vytapeni-odst">
+          V&nbsp;zimě je kombinace kotle s&nbsp;přitápěním krbem obvyklá
+          volba — krb hřeje rychle a&nbsp;vzdušně, kotel zajišťuje stálou
+          teplotu i&nbsp;v&nbsp;noci.
+        </p>
+
+        {/*
+          Cross-link to /terminy-a-ceny: electricity is billed by actual
+          consumption and for the guest is practically one subject with heating.
+          docs/01-content.md §5.5: "Cross-link to the metered electricity
+          charge, because to a guest they are one subject."
+        */}
+        <p class="vytapeni-elektrina">
+          Elektřina se účtuje dle skutečné spotřeby.{' '}
+          <a href="/terminy-a-ceny" class="link">Přehled poplatků</a>{' '}
+          najdete na stránce Termíny a&nbsp;ceny.
+        </p>
+      </div>
+
+      {/* ---- Photo: living room with fireplace ----------------------------- */}
+      <figure class="vytapeni-foto" data-reveal data-reveal-delay="60">
+        <div class="media-frame photo-frame">
+          <Image
+            src={obyvak}
+            alt="Obývací pokoj chalupy Heřmanka: krbová vložka v kamenném ostění, dřevěný trámový strop a pohodlné sezení"
+            widths={[480, 768, 1024, 1280]}
+            sizes="(min-width: 64rem) 48vw, 100vw"
+            width={1920}
+            height={1282}
+            format="webp"
+            quality={68}
+            loading="lazy"
+          />
+        </div>
+      </figure>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .vytapeni-sekce {
+    background-color: var(--color-omitka);
+  }
+
+  /* ---- Grid: text left, photo right ----------------------------------- */
+  .vytapeni-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .vytapeni-grid {
+      grid-template-columns: 1fr 1.1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  /* ---- Text -------------------------------------------------------------- */
+  h2 {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+    margin-bottom: 1.5rem;
+  }
+
+  .vytapeni-odst {
+    max-width: var(--container-prose);
+    margin-top: 1rem;
+  }
+
+  .vytapeni-elektrina {
+    margin-top: 1.5rem;
+    font-size: var(--text-caption);
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+    max-width: var(--container-prose);
+  }
+
+  /* ---- Photo -------------------------------------------------------- */
+  .vytapeni-foto {
+    margin: 0;
+  }
+
+  .vytapeni-foto :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (width >= 64rem) {
+    .vytapeni-foto {
+      position: relative;
+      min-height: 20rem;
+    }
+
+    .vytapeni-grid {
+      align-items: stretch;
+    }
+
+    .vytapeni-foto .media-frame {
+      position: absolute;
+      inset: 0;
+    }
+
+    .vytapeni-foto :global(img) {
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+</style>

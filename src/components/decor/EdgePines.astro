@@ -1,0 +1,141 @@
+---
+/**
+ * Two spruce standing at the near edge of a photograph, the outer one running off
+ * the frame.
+ *
+ * Same drawing as the O nás clearing — the premade Lorc silhouette in
+ * pine-tree.ts, at two sizes with the smaller one set back. What is different is
+ * the contract. Clearing.astro exists to guarantee that NOTHING is ever clipped:
+ * it fits its viewBox to the union of its trees and scales the lot down to fit
+ * whatever box CSS hands it. This one exists to be clipped. The point is a tree
+ * you are standing beside rather than a tree you are looking at, and that only
+ * reads if the frame cuts it.
+ *
+ * ⚠ THE CROP IS IN THE VIEWBOX, NOT IN CSS. A negative `left` would crop by a
+ * fixed number of pixels while the drawing itself scales with the panel, so the
+ * same rule would take a third of the tree on a laptop and most of it on a phone.
+ * Trimming the box instead makes the crop a proportion of the drawing, identical
+ * at every width. See `CROP` below.
+ *
+ * Filled --les, per the treeline exception in docs/02-design-system.md §4 rule 3:
+ * these are masses the view is seen through, not ornament laid over a
+ * photograph. The white-line rule still governs anything that is genuinely
+ * ornament.
+ *
+ * ⚠ BOTH TREES ARE SOLID. The first pass drew the smaller one at 0.5, the way
+ * Clearing.astro sets its back rank. That works there because the fill is --kamen
+ * on --omitka and half of one tonal step is barely a change; over a photograph it
+ * is the photograph showing through a tree, and at this size it read as a
+ * printing fault rather than as distance. Depth here is size and placement only.
+ *
+ * The placement arithmetic below is Clearing.astro's, deliberately not shared
+ * with it. Its version carries the no-clip padding that is the whole point of
+ * that component and the opposite of the point of this one, and a single helper
+ * doing both would need a flag that changes what it guarantees.
+ */
+import { PINE_PATH, PINE_BOX } from './pine-tree';
+
+interface Props {
+  class?: string;
+}
+
+/*
+ * `rest` is load-bearing. Astro hands a child the PARENT's `data-astro-cid-…` as
+ * a prop and expects it on the child's root element; without the spread, every
+ * scoped rule the caller writes against this component matches nothing. See
+ * Icon.astro.
+ */
+const { class: className, ...rest } = Astro.props;
+
+/** `x` is the trunk on the ground line, `h` the tip height, `y` how far ABOVE
+    the ground line the foot stands, `flip` mirrors the silhouette. */
+type Tree = { x: number; h: number; y: number; flip?: boolean };
+
+const GROUND = 480;
+
+/*
+ * Two trees, and the sizes are doing the work: roughly 2 : 1, which is a pair of
+ * different-aged trees rather than one tree twice. The big one stands at the
+ * frame edge and takes the crop; the smaller is flipped and set a little up the
+ * slope, so the two do not read as a matched pair.
+ *
+ * ⚠ THE X POSITIONS ARE MEASURED, NOT EYEBALLED. The trunks are placed so the
+ * two crowns meet on a single line and no further: at these heights the drawing
+ * is 323 and 171 units across, so 118 and 366 put the big tree's right edge and
+ * the small one's left edge both at 281. An earlier pass had them overlapping by
+ * a third, and two flat silhouettes of the same fill do not overlap — they merge
+ * into one shape with a tangle of notches through the middle and neither one
+ * reads as a tree. The failure is recorded at length in Clearing.astro; this is
+ * the same trap with two trees instead of three.
+ */
+const TREES: Tree[] = [
+  { x: 118, h: 470, y: 0 },
+  { x: 366, h: 248, y: 14, flip: true },
+];
+
+/**
+ * How much of the drawing's left side the frame eats, in the stand's own units.
+ * The big tree is about 323 units across, so 96 takes a little under a third of
+ * it — enough to be unmistakably cut, not so much that it stops being a tree.
+ */
+const CROP = 96;
+
+const round = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * Scales the drawing to the wanted height and sets its foot on the ground line,
+ * mirroring about the trunk when asked.
+ *
+ * The inner `translate` is in the ARTWORK's coordinates and moves its box's
+ * bottom-centre onto the origin; the outer one puts that origin where the tree
+ * stands. Order matters — swap them and the whole stand mirrors instead of the
+ * one tree.
+ */
+function place(t: Tree) {
+  const s = t.h / PINE_BOX.h;
+  const foot = GROUND - t.y;
+  const cx = PINE_BOX.x + PINE_BOX.w / 2;
+  const cy = PINE_BOX.y + PINE_BOX.h;
+  const w = PINE_BOX.w * s;
+
+  return {
+    transform: `translate(${round(t.x)} ${round(foot)}) scale(${t.flip ? -s : s} ${s}) translate(${round(-cx)} ${round(-cy)})`,
+    x0: t.x - w / 2,
+    x1: t.x + w / 2,
+    y0: foot - t.h,
+  };
+}
+
+const placed = TREES.map(place);
+
+/*
+ * The box is fitted to the trees and then trimmed on the left. The right and top
+ * edges keep a hair of margin so an anti-aliased outer edge is never shaved by a
+ * boundary it sits exactly on; the LEFT edge has no margin by design, and the
+ * bottom is the ground line, which the feet are meant to sit on.
+ */
+const pad = 1;
+const x0 = Math.min(...placed.map((t) => t.x0)) + CROP;
+const x1 = Math.max(...placed.map((t) => t.x1)) + pad;
+const y0 = Math.min(...placed.map((t) => t.y0)) - pad;
+
+const viewBox = `${round(x0)} ${round(y0)} ${round(x1 - x0)} ${round(GROUND - y0)}`;
+---
+
+{/*
+  `meet`, pinned to the bottom-left: the drawing scales down uniformly into
+  whatever box it is given, the feet stay on the frame's lower edge and the cut
+  flank stays on its left edge. Never `slice` — this box is already the crop.
+*/}
+<svg
+  class={className}
+  {...rest}
+  viewBox={viewBox}
+  preserveAspectRatio="xMinYMax meet"
+  fill="var(--color-les)"
+  aria-hidden="true"
+  focusable="false"
+>
+  {/* Largest first, so the smaller one is drawn over it where they meet. */}
+  {placed.map((t) => <path d={PINE_PATH} transform={t.transform} />)}
+</svg>

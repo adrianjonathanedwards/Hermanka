@@ -1,0 +1,81 @@
+---
+/**
+ * /okoli — Tipy na výlety.
+ *
+ * The page for someone who has decided the cottage looks right and now wants to
+ * know what they can do from it. It answers the same question as the homepage's
+ * Okolí and DolníMorava sections, but in full.
+ *
+ * SECTION ORDER — docs/04-pages.md §/okoli:
+ *   1. PageHero
+ *   2. Intro — Dolní Morava, Stezka v oblacích, Sky Bridge 721 (§7.1 rewrite)
+ *   3. Regional map — the illustrated aerial photograph with full alt text
+ *   4. Výlety a atrakce — card grid from VYLETY
+ *   5. Lyžování — LYZOVANI (--jinovatka winter section, legitimately)
+ *   6. Koupání — KOUPANI_BLIZKO with chips, KOUPANI_DALSI secondary
+ *   7. CtaBand → /terminy-a-ceny
+ *
+ * BAND SEQUENCE (after the dark page hero):
+ *   --omitka → --kamen → --omitka → --jinovatka → --kamen → --omitka
+ * No two adjacent sections share a colour. Last section is light (--omitka) ✓
+ * so the footer treeline (--les silhouette) rises out of it visibly.
+ *
+ * HISTORIE A PAMÁTKY (§/okoli section 6) — NOT A SEPARATE SECTION.
+ * Klášter Hedeč, Vojenské muzeum Králíky and Králíky are included in the main
+ * VYLETY card grid in OkoliVylety.astro. A separate section would show the same
+ * cards a second time with only a heading change. See OkoliVylety.astro for the
+ * full reasoning comment.
+ *
+ * HERO PRELOAD PATTERN — docs/04-pages.md "PAGE HERO PRELOAD":
+ * getImage() resolves the same transform that PageHero.astro renders, so the
+ * browser's preload finds the exact file it will need. If they drift apart, the
+ * image is downloaded twice — the worst outcome for this site's one fast image.
+ */
+import { getImage } from 'astro:assets';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+import OkoliIntro from '../components/pages/okoli/OkoliIntro.astro';
+import OkoliMapa from '../components/pages/okoli/OkoliMapa.astro';
+import OkoliVylety from '../components/pages/okoli/OkoliVylety.astro';
+import OkoliLyzovani from '../components/pages/okoli/OkoliLyzovani.astro';
+import OkoliKoupani from '../components/pages/okoli/OkoliKoupani.astro';
+
+import { PAGE_HERO_PRELOAD_PROPS, PAGE_HERO_SIZES } from '../data/pageHero';
+
+/*
+ * Resolve the page hero transform here so <head> can preload exactly the variant
+ * PageHero.astro will render. Identical props → identical output → Astro dedupes
+ * the transform; this costs nothing extra in the build.
+ */
+const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
+---
+
+<BaseLayout
+  title="Tipy na výlety v okolí"
+  description="Co podniknout z chalupy Heřmanka: Dolní Morava a Sky Bridge 721 12 minut autem, Králický Sněžník pěšky od dveří, koupání, lyžování, historické Králíky a Klášter Hedeč."
+  heroPreload={{ src: hero.src, srcset: hero.srcSet.attribute, sizes: PAGE_HERO_SIZES }}
+>
+  <PageHero
+    title="Tipy na výlety"
+    lead="Dolní Morava 12 minut autem, Králický Sněžník od dveří. Les začíná deset metrů za chalupou."
+  />
+  <OkoliIntro />
+  <OkoliMapa />
+  <OkoliVylety />
+  <OkoliLyzovani />
+  <OkoliKoupani />
+  {/*
+    CtaBand is the last section. band="omitka" so it differs from the --kamen
+    OkoliKoupani above it, and stays light so the footer treeline is visible.
+    href points at /terminy-a-ceny per docs/04-pages.md §/okoli item 7.
+  */}
+  <CtaBand
+    href="/terminy-a-ceny"
+    nadpis="Máte zájem o pobyt?"
+    text="Zkontrolujte dostupnost termínů a napište nám počet osob. Ozveme se co nejdříve."
+    cta="Zkontrolovat termíny"
+    band="omitka"
+  />
+</BaseLayout>

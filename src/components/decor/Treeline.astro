@@ -32,6 +32,23 @@
 import { plantRank, transformFor } from './forest';
 
 /*
+ * ⚠ THIS WOOD IS --les ON A LIGHT BAND, AND IT DOES NOT INVERT.
+ *
+ * The 404 page tried it the other way round — a `fill` prop, the same drawing in
+ * `--kamen`, hung along the bottom of a dark panel — and it failed for a reason
+ * worth writing down rather than rediscovering. Five ranks at this density leave
+ * more canopy than sky, so on a dark ground the light fill becomes the mass and
+ * the gaps between the trees become the figure: the eye reads a bank of dark
+ * spikes hanging DOWNWARD, not a wood. It is not a colour problem and no amount
+ * of tuning the fill fixes it.
+ *
+ * The hero's old treeline was a separate component for exactly this reason — it
+ * was drawn sparse and dissolved into the photograph behind a mask. If a light
+ * wood on a dark ground is ever wanted again, that is the drawing to bring back,
+ * not this one recoloured.
+ */
+
+/*
  * Six hand-authored spruces. CROWN ONLY — no trunk. The skirt of the lowest tier
  * runs straight to the ground line at y=0 and the tree is closed there.
  *

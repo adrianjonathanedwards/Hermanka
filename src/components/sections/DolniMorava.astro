@@ -25,10 +25,17 @@
  *      Measured on it: --les 12.17:1, --kura 9.39:1, --mosaz-tmava 4.81:1. All
  *      clear of the 4.5:1 floor.
  *
- *   2. THE WOOD. A stand of spruce across the near edge of the photograph, so
- *      the resort is something seen from inside the wood the cottage stands in —
- *      which is the actual relationship between the two places, and the thing
- *      "12 minutes away" is trying to say. See PhotoWood.astro.
+ *   2. THE WOOD. Two spruce at the near edge of the photograph, the outer one
+ *      running off the left of the screen, so the resort is something seen from
+ *      inside the wood the cottage stands in — which is the actual relationship
+ *      between the two places, and the thing "12 minutes away" is trying to say.
+ *
+ *      This was PhotoWood.astro, a generated rank of small trees banded across
+ *      the whole lower edge. Two large drawn ones at one edge say the same thing
+ *      and say it better: a rank along the bottom is scenery behind the subject,
+ *      whereas a tree cut by the frame is a tree you are standing next to. They
+ *      are the O nás clearing's trees, at the size that section stands them.
+ *      See EdgePines.astro.
  *
  *   3. WEATHER. A slow drift on the photograph and a thin fall of snow over it.
  *      Both are pure CSS and both stop dead under `prefers-reduced-motion`.
@@ -42,7 +49,7 @@
  */
 import { Image } from 'astro:assets';
 import sjezdovky from '@img/dolnimorava.webp';
-import PhotoWood from '../decor/PhotoWood.astro';
+import EdgePines from '../decor/EdgePines.astro';
 import { makeRng } from '../decor/forest';
 
 const NBSP = ' ';
@@ -98,9 +105,9 @@ const FLAKES = Array.from({ length: 16 }, () => ({
       }
     </div>
 
-    {/* The near edge of the wood, closing in at the sides and dropping across
-        the middle so the pistes stay in the open. PhotoWood.astro. */}
-    <PhotoWood class="dm-wood" />
+    {/* The near edge of the wood: two spruce at the left of the frame, the
+        outer one cut by it. EdgePines.astro. */}
+    <EdgePines class="dm-wood" />
   </div>
 
   <div class="split-body">
@@ -323,10 +330,13 @@ const FLAKES = Array.from({ length: 16 }, () => ({
 
   /* ---- The wood ---------------------------------------------------------
    *
-   * Covers the whole panel and is bottom-aligned inside it, so the trees always
-   * stand on the frame's lower edge whatever the panel's proportions and the
-   * crop falls at the sides. The stand does its own composition — full height at
-   * both edges, low across the middle — see PhotoWood.astro.
+   * Feet on the frame's lower edge, cut flank on its left edge, and a height
+   * given as a PERCENTAGE of the panel so the pair keeps its proportion to the
+   * photograph however tall the section turns out to be. `width: auto` lets the
+   * drawing's own aspect set the rest; the crop is already inside its viewBox.
+   *
+   * 64% leaves the ridge, the Sky Walk and the top of the pistes — the reason
+   * the photograph is here — standing in open sky above the crowns.
    *
    * No scrim under it, deliberately. A --les gradient would give the silhouettes
    * something softer to sit against and would cost them their edge: solid trees
@@ -335,26 +345,21 @@ const FLAKES = Array.from({ length: 16 }, () => ({
    */
   .dm-wood {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    left: 0;
+    bottom: 0;
+    height: 64%;
+    width: auto;
     pointer-events: none;
   }
 
   /*
-   * On a narrow frame the stand is overdressed: the full-height trees the saddle
-   * puts at each edge close over nearly half the picture, and the pistes — the
-   * reason the photograph is here — end up peering through a gap.
-   *
-   * Rather than draw a second, shorter wood, the box is made wider than the panel
-   * and hung off both sides. The trees keep their scale and their composition;
-   * the tall shoulder at each end simply falls outside the frame, and what is
-   * left on screen is the low band from the middle of the saddle.
+   * Taller on a phone, where the panel is a wide letterbox rather than a tall
+   * half of a split: at 64% the pair comes out small enough to read as two
+   * ornaments parked in a corner rather than as the near edge of a wood.
    */
   @media (width < 64rem) {
     .dm-wood {
-      width: 150%;
-      left: -25%;
+      height: 76%;
     }
   }
 

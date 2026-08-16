@@ -1,0 +1,69 @@
+---
+/**
+ * /kontakt — Contact + inquiry form.
+ *
+ * Section order per docs/04-pages.md §/kontakt:
+ *   1. Page hero
+ *   2. Contact card — name, address, phone, email (null), GPS, map panel
+ *   3. Inquiry form (<Poptavka id="poptavka">) — ANCHOR MUST EXIST HERE.
+ *      The site footer links /kontakt#poptavka from every page; the 404 page
+ *      and other pages also target it. Keep the default id.
+ *   4. Getting here — access road, parking, bus 500 m, train 2 km
+ *
+ * Band alternation (docs/02-design-system.md §3 — never two adjacent the same):
+ *   PageHero  →  --les  (dark)
+ *   KontaktKarta  →  --omitka  (light)
+ *   Poptavka  →  --kamen  (stone — default band)
+ *   JakSemDostat  →  --omitka  (light — and LAST, so the footer treeline
+ *                               is visible; docs rule 11 satisfied)
+ *
+ * Zero client-side JavaScript. No <script> tag.
+ *
+ * ⚠ The form's Worker does not exist yet — docs/03-tech.md §2 and
+ *   src/data/site.ts POPTAVKA_ENDPOINT. The markup, labels and no-JS behaviour
+ *   are what this pass delivers.
+ */
+import { getImage } from 'astro:assets';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Poptavka from '../components/sections/Poptavka.astro';
+import KontaktKarta from '../components/pages/kontakt/KontaktKarta.astro';
+import JakSemDostat from '../components/pages/kontakt/JakSemDostat.astro';
+
+import { PAGE_HERO_PRELOAD_PROPS, PAGE_HERO_SIZES } from '../data/pageHero';
+
+/*
+ * Resolve the page-hero transform here so <head> can preload exactly the
+ * variant PageHero.astro will render. Both use PAGE_HERO_PRELOAD_PROPS so
+ * Astro dedupes the transform — this costs nothing extra in the build.
+ */
+const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
+---
+
+<BaseLayout
+  title="Kontakt"
+  description="Chalupa Heřmanka v Heřmanicích u Králík. Napište nám o termín nebo zavolejte. Parkování pro 4 auta přímo u objektu, autobus 500 m, vlak 2 km. Dolní Morava 12 minut autem."
+  heroPreload={{ src: hero.src, srcset: hero.srcSet.attribute, sizes: PAGE_HERO_SIZES }}
+>
+  <PageHero
+    title="Kontakt"
+    lead="Napište nám, zavolejte, nebo rovnou pošlete poptávku s termínem."
+  />
+
+  <KontaktKarta />
+
+  {/*
+    ⚠ The anchor #poptavka must be preserved here — the site footer links to
+    /kontakt#poptavka from every page on the site (SiteFooter.astro). The
+    Poptavka component's default id prop is already "poptavka"; passing it
+    explicitly here makes the dependency visible.
+  */}
+  <Poptavka
+    id="poptavka"
+    band="kamen"
+    lead="Pošlete nám termín a počet osob — ozveme se co nejdříve s dostupností a přesnou cenou. Nezávazně."
+  />
+
+  <JakSemDostat />
+</BaseLayout>

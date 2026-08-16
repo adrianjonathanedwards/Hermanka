@@ -1,0 +1,371 @@
+---
+/**
+ * Sections 1–3 on /chalupa: the intro paragraph, bedrooms, and bathroom facilities.
+ *
+ * SECTION 1 — About the cottage (no heading — h1 is in PageHero)
+ * Corrected version of the paragraph from docs/01-content.md §5.1, fixing
+ * error #7: `parkovaní` → `parkování`.
+ *
+ * SECTION 2 — Bedrooms and rooms (#loznice)
+ * Table 2 / 2+3 / 6+2 = 15 persons from src/data/vybaveni.ts. The old prose
+ * from /ubytovani/ gave a total of up to 19, so 15 is the authoritative figure
+ * until the client confirms otherwise (docs/01-content.md §9 item 1).
+ *
+ * SECTION 3 — Bathroom facilities
+ * From src/data/vybaveni.ts SOCIALNI_ZARIZENI. Two errors #8 corrected:
+ * `koupena` → `koupelna`.
+ *
+ * The terrace photo (max 1000×667 px) cannot be used full-bleed at 1920 px —
+ * see the spec. Here it sits in a layout grid column of roughly 42 vw, so it
+ * makes optimal use of its maximum resolution.
+ */
+import { Image } from 'astro:assets';
+import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+import { LOZNICE, LUZEK_CELKEM, SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
+---
+
+<section id="loznice" class="section intro-sekce" aria-labelledby="loznice-nadpis">
+  <div class="wrap">
+    <div class="intro-grid">
+
+      {/* ---- Text panel ------------------------------------------- */}
+      <div class="intro-text">
+
+        {/* Section 1: intro paragraph — §5.1 with parking correction */}
+        <p class="uvod-odst" data-reveal>
+          Chalupa Heřmanka se nachází v&nbsp;malé obci Heřmanice, která
+          je situována v&nbsp;malebném údolí pod masivem Králického Sněžníku.
+          Jedná se o&nbsp;kompletně zrekonstruovaný dvoupodlažní objekt
+          zasazený do&nbsp;zalesněné stráně. Chalupa disponuje jednou krytou
+          terasou s&nbsp;venkovním krbem s&nbsp;výhledem na pastviny
+          a&nbsp;okolo protékající potůček a&nbsp;jednou otevřenou terasou
+          s&nbsp;výhledem do&nbsp;zalesněného údolí. K&nbsp;objektu vede
+          vlastní příjezdová cesta a&nbsp;parkování je možné
+          pro&nbsp;4&nbsp;auta přímo u&nbsp;objektu.
+        </p>
+
+        {/* Section 2: bedrooms (#loznice is on <section>) */}
+        <div class="loznice-blok" data-reveal data-reveal-delay="80">
+          <h2 id="loznice-nadpis">Ložnice a&nbsp;pokoje</h2>
+
+          {/*
+            A table, not cards. Three rows of figures that must align together
+            are exactly what a table is for, and "modernising" is not a reason
+            to discard the row/column semantics that screen readers depend on.
+            Pattern from src/components/sections/Ubytovani.astro.
+          */}
+          <div class="card loznice-card">
+            <table class="loznice-tabulka">
+              <caption>Rozložení lůžek</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Ložnice</th>
+                  <th scope="col">Patro</th>
+                  <th scope="col">Kapacita</th>
+                </tr>
+              </thead>
+              <tbody>
+                {LOZNICE.map((l) => (
+                  <tr>
+                    <th scope="row">
+                      <span class="loznice-nazev">{l.nazev}</span>
+                      {l.poznamka && (
+                        <span class="loznice-pozn">{l.poznamka}</span>
+                      )}
+                    </th>
+                    <td>{l.patro}</td>
+                    <td class="kapacita-td">{l.kapacita}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row" colspan="2">Celkem</th>
+                  <td class="kapacita-td">{LUZEK_CELKEM}&nbsp;osob</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        {/* Section 3: bathroom facilities */}
+        <div class="zarizeni-blok" data-reveal data-reveal-delay="160">
+          <h3>Sociální zařízení</h3>
+          <div class="zarizeni-grid">
+            {SOCIALNI_ZARIZENI.map((z) => (
+              <div class="zarizeni-patro">
+                <p class="patro-label">{z.patro}</p>
+                <ul class="zarizeni-list">
+                  {z.polozky.map((p) => <li>{p}</li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+      {/* ---- Photo: covered terrace -------------------------------- */}
+      {/*
+        The terrace sits next to the text about the terrace — photo and
+        paragraph are about the same place. The photo is max 1000×667 px,
+        so in a layout column of roughly 42 vw on desktop (≈ 530 px) we
+        never scale it above its natural resolution.
+      */}
+      <figure class="intro-foto" data-reveal data-reveal-delay="40">
+        <div class="media-frame photo-frame">
+          <Image
+            src={terasa}
+            alt="Krytá terasa chalupy Heřmanka s venkovním zděným krbem, dřevěným stolem a proutěnými křesly, v pozadí vzrostlý les"
+            widths={[500, 750, 1000]}
+            sizes="(min-width: 64rem) 42vw, 100vw"
+            width={1000}
+            height={667}
+            format="webp"
+            quality={70}
+            loading="lazy"
+          />
+        </div>
+      </figure>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .intro-sekce {
+    background-color: var(--color-omitka);
+  }
+
+  /* ---- Grid: text left, photo right ----------------------------------
+   *
+   * On desktop: text and table left (1fr), photo right (1fr with at
+   * least 15rem height). On mobile: both columns stacked, text first —
+   * the reader needs to know what the photo shows before seeing it.
+   */
+  .intro-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .intro-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  /* ---- Intro paragraph ------------------------------------------------- */
+  .uvod-odst {
+    font-size: var(--text-lead);
+    max-width: var(--container-prose);
+    /* --les on --omitka = 15.45:1 */
+    color: var(--color-les);
+  }
+
+  /* ---- Bedroom heading -------------------------------------------------- */
+  h2 {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+    margin-top: 2.5rem;
+  }
+
+  /* ---- Bedroom table -------------------------------------------------- */
+  .loznice-blok {
+    margin-top: 0;
+  }
+
+  .loznice-card {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .loznice-card {
+      padding: 1.75rem 2rem;
+    }
+  }
+
+  .loznice-tabulka {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  caption {
+    text-align: left;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+    padding-bottom: 0.75rem;
+  }
+
+  thead th {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+    padding-block: 0.5rem;
+    border-bottom: 2px solid var(--color-mosaz);
+  }
+
+  tbody th,
+  tfoot th {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-normal);
+  }
+
+  td,
+  th {
+    padding-block: 0.875rem;
+    padding-right: 1rem;
+    vertical-align: top;
+  }
+
+  .kapacita-td {
+    text-align: right;
+    padding-right: 0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .loznice-nazev {
+    display: block;
+  }
+
+  /* Note below the bedroom name — a supplementary detail, not part of the capacity */
+  .loznice-pozn {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: var(--text-caption);
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+  }
+
+  tbody tr + tr th,
+  tbody tr + tr td {
+    border-top: 1px solid var(--color-kamen);
+  }
+
+  @media (hover: hover) {
+    tbody tr {
+      transition: color 200ms var(--ease-out);
+    }
+
+    tbody tr:hover {
+      color: var(--color-mosaz-tmava);
+    }
+  }
+
+  tfoot th,
+  tfoot td {
+    border-top: 2px solid var(--color-mosaz);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* ---- Bathroom facilities ----------------------------------------------- */
+  .zarizeni-blok {
+    margin-top: 2.5rem;
+  }
+
+  h3 {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+    margin-bottom: 1rem;
+  }
+
+  .zarizeni-grid {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  @media (width >= 40rem) {
+    .zarizeni-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .patro-label {
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+    margin-bottom: 0.5rem;
+    max-width: none;
+  }
+
+  .zarizeni-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .zarizeni-list li {
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .zarizeni-list li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    /*
+     * --mosaz-tmava, not --mosaz. This dash is rendered TEXT, and
+     * docs/02-design-system.md §1.2 states the rule without an exception:
+     * brass is a fill, and text that wants to be brass takes the darker step on
+     * a light ground. Plain --mosaz happens to measure 5.14:1 here and would
+     * have passed — but the moment this list is moved onto a --kamen band it
+     * drops to 4.30:1 and fails, silently, in a component nobody is looking at.
+     */
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* ---- Photo -------------------------------------------------------- */
+  .intro-foto {
+    margin: 0;
+  }
+
+  .intro-foto :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  /*
+   * On desktop: the photo stretches to the full height of the text column
+   * (align-self: stretch) so the visual weight of each side is balanced.
+   *
+   * ⚠ position: relative on FIGURE + the absolute frame inside it are a pair.
+   * `height: 100%` on the frame alone would compute from a parent with no
+   * defined height and fall back to its natural aspect ratio.
+   */
+  @media (width >= 64rem) {
+    .intro-foto {
+      position: relative;
+      min-height: 20rem;
+    }
+
+    .intro-grid {
+      align-items: stretch;
+    }
+
+    .intro-foto .media-frame {
+      position: absolute;
+      inset: 0;
+    }
+
+    .intro-foto :global(img) {
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+</style>

@@ -1,0 +1,244 @@
+---
+/**
+ * Co se připočítává — fee schedule.
+ *
+ * docs/01-content.md §6.4 (REWRITE): the old site buried all of this in a
+ * 120-word run of prose — the guest found out about the electricity meter after
+ * they had already decided. A table of line items makes each charge visible and
+ * comparable at a glance.
+ *
+ * The POPLATKY array in cenik.ts is the single source of truth for this section.
+ * Nothing about money is typed into this file (docs/01-content.md §2).
+ *
+ * ⚠ Two entries carry `nepotvrzeno: true`. They must be shown as approximate
+ * rather than as confirmed prices — a guest who bases a budget on an unconfirmed
+ * rate and finds a different one on arrival loses trust in everything on the page.
+ * The unconfirmed badge and the TODO comments below track exactly which items
+ * are waiting on the client.
+ *
+ * Formatting note: POPLATKY.castka is already a pre-formatted string with hard
+ * spaces from cenik.ts, e.g. `7 Kč/kWh` (U+00A0 between 7 and Kč). Render it
+ * directly; do not pass it through formatKc(), which expects a plain number.
+ *
+ * Section band: --omitka. Previous section (Svátky) is --les.
+ *
+ * TODO(client) — docs/01-content.md §9 item 7:
+ *   · Electricity rate ("7 Kč/kWh" is from 2019 — the old site says
+ *     "momentálně", which is not a price).
+ *   · Municipal recreation fee (4 Kč/os/noc is low for 2026; must be confirmed
+ *     with the obec).
+ *   Both are marked `nepotvrzeno: true` in cenik.ts and shown as such here.
+ */
+import IconLucide from '../../IconLucide.astro';
+import { POPLATKY } from '../../../data/cenik';
+
+/*
+ * No `const NBSP` here, deliberately. Every string this section renders comes
+ * out of POPLATKY in src/data/cenik.ts, and that module already binds its own
+ * hard spaces — `7 Kč/kWh`, `2 000 Kč`. There is no free-typed numeral on this
+ * page for one to go in, and an unused constant is an invitation to start
+ * typing prices into the markup, which is the one thing this page must not do.
+ */
+---
+
+<section class="section poplatky" aria-labelledby="poplatky-nadpis">
+  <div class="wrap">
+
+    <div class="poplatky-head" data-reveal>
+      <h2 id="poplatky-nadpis">Co se připočítává</h2>
+      <p class="lead">
+        K ceně za pronájem se připočítávají tyto položky. Elektřina a voda se
+        účtují podle skutečné spotřeby, ne paušálem.
+      </p>
+    </div>
+
+    <ul class="poplatky-list" data-reveal data-reveal-delay="80">
+      {POPLATKY.map((p) => (
+        <li class="poplatek card">
+
+          <div class="poplatek-hlava">
+            <IconLucide name={p.icon} size={22} class="poplatek-ikona" />
+            <h3 class="poplatek-nazev">{p.nazev}</h3>
+          </div>
+
+          <div class="poplatek-castka-radek">
+            <span class="poplatek-castka">{p.castka}</span>
+            {p.nepotvrzeno && (
+              /*
+               * Unconfirmed rate. Shown as "orientačně" (approx.) rather than
+               * silently presented as a confirmed price. See the TODO(client) in
+               * the file header — both items must be confirmed before launch.
+               *
+               * docs/01-content.md §6.4: `momentálně 7 Kč/kWh` is "not a price".
+               * That is the reason this badge exists. A guest who gets a surprise
+               * electricity bill also loses trust in the calendar, the price list
+               * and everything else on the page.
+               */
+              <span class="badge-nepotvrzeno" aria-label="Orientační cena, čeká na potvrzení">
+                orientačně
+              </span>
+            )}
+          </div>
+
+          <p class="poplatek-popis">{p.popis}</p>
+
+        </li>
+      ))}
+    </ul>
+
+    {/*
+      The sauna and hot tub charge is listed above in POPLATKY. Surfacing it
+      again here would be redundant — but docs/01-content.md §4.7 requires that
+      the charge also appears on the /chalupa wellness section, next to the
+      description of the sauna itself. This page covers the fee; the other page
+      covers the context. That is the two-page agent's responsibility.
+    */}
+
+  </div>
+</section>
+
+<style>
+  /* ---- Section band ---------------------------------------------------- */
+
+  .poplatky {
+    background-color: var(--color-omitka);
+  }
+
+  /* ---- Head ------------------------------------------------------------ */
+
+  .poplatky-head {
+    max-width: var(--container-prose);
+  }
+
+  h2 {
+    /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .lead {
+    margin-top: 1rem;
+    font-size: var(--text-lead);
+    color: var(--color-kura);
+  }
+
+  /* ---- Fee list -------------------------------------------------------- */
+
+  .poplatky-list {
+    display: grid;
+    gap: 1rem;
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 48rem) {
+    .poplatky-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .poplatky-list {
+      /* Three across at laptop: the five items sit as 3+2, cleaner than 2+2+1. */
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ---- Individual fee card --------------------------------------------- */
+
+  /*
+   * Uses the global .card class: --omitka background, hairline border, stays
+   * still on hover (no lift, no glow — the card vocabulary here is a printed
+   * invoice, not a landing-page tile).
+   */
+  .poplatek {
+    gap: 0.75rem;
+  }
+
+  /* ---- Card head ------------------------------------------------------- */
+
+  .poplatek-hlava {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .poplatek-ikona {
+    flex: none;
+    /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
+    color: var(--color-mosaz-tmava);
+  }
+
+  /*
+   * Fee labels — UI labels, not display headings.
+   * docs/02-design-system.md §2.6: Fraunces "never for UI labels, never below
+   * 20 px". Same reasoning as Ubytovani's tbody th using --font-body.
+   */
+  .poplatek-nazev {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-semibold);
+    /* --les on --omitka = 15.45:1 ✓ */
+    color: var(--color-les);
+  }
+
+  /* ---- Amount row ------------------------------------------------------ */
+
+  .poplatek-castka-radek {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /*
+   * The amount is a string from cenik.ts that already contains tabular-spaced
+   * numerals and hard spaces (e.g. "7 Kč/kWh"). global.css sets tabular-nums
+   * on `table` but not on arbitrary elements; `.tabular` from global.css can be
+   * added, or we set it explicitly here.
+   */
+  .poplatek-castka {
+    font-size: var(--text-title-s);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-semibold);
+    /* --les on --omitka = 15.45:1 ✓ */
+    color: var(--color-les);
+    line-height: 1.3;
+  }
+
+  /* ---- Unconfirmed badge ----------------------------------------------- */
+
+  /*
+   * "orientačně" — approx. Distinguishes an unconfirmed figure from a confirmed
+   * price. Two items carry this at launch: electricity rate and the municipal
+   * recreation fee. Both must be confirmed with the client before the site goes
+   * live (docs/01-content.md §9 item 7).
+   *
+   * Styled as a quiet label rather than a warning — the information is still
+   * useful to the guest; it is just approximate, not wrong.
+   */
+  .badge-nepotvrzeno {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgb(140 99 24 / 0.35);
+    background-color: var(--color-kamen);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-normal);
+    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
+    color: var(--color-mosaz-tmava);
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+  }
+
+  /* ---- Description ---------------------------------------------------- */
+
+  .poplatek-popis {
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+    margin: 0;
+    max-width: none;
+    line-height: 1.5;
+  }
+</style>

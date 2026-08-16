@@ -15,9 +15,27 @@
 import { Image } from 'astro:assets';
 import { NAV } from '../data/site';
 import logo from '@img/logo3-inv.png';
+
+interface Props {
+  /**
+   * Start solid instead of transparent.
+   *
+   * ⚠ REQUIRED ON ANY PAGE WHOSE FIRST SCREEN IS LIGHT. The header is
+   * transparent at the top of the page so it can sit over a hero photograph, and
+   * everything in it — the logo raster, the nav, the burger — is WHITE. Over
+   * `--omitka` that is a header nobody can see: not dimmed, gone, with only the
+   * brass button left behind. The 404 found this the hard way.
+   *
+   * Pages with a photographic hero (the homepage, all four subpages via
+   * PageHero) leave it alone.
+   */
+  solid?: boolean;
+}
+
+const { solid = false } = Astro.props;
 ---
 
-<header class="site-header">
+<header class:list={['site-header', { 'is-solid': solid }]}>
   <div class="wrap header-inner">
     {/*
       The client's own logo, supplied white on transparent — so it works over the
@@ -109,6 +127,17 @@ import logo from '@img/logo3-inv.png';
   }
 
   /*
+   * The opt-out, for pages with no hero behind the header — see the `solid` prop.
+   *
+   * Flat --les, not the scrolled state's frosted 0.82: there is no photograph
+   * under it to blur, and a translucent header over a stone page is just a
+   * lighter green rectangle.
+   */
+  .site-header.is-solid {
+    background-color: var(--color-les);
+  }
+
+  /*
    * Progressive enhancement: where scroll timelines exist, start transparent
    * over the hero and settle into frosted glass as it scrolls away.
    * docs/02-design-system.md §5.1.
@@ -128,6 +157,19 @@ import logo from '@img/logo3-inv.png';
       animation-fill-mode: both;
       animation-timeline: scroll(root block);
       animation-range: 0 70vh;
+    }
+
+    /*
+     * ⚠ `animation-name: none` is the load-bearing half of this, not the colour.
+     * A declaration from a running animation beats a normal author declaration
+     * whatever its specificity, so the `.is-solid` rule above is overruled at 0%
+     * of `header-solid` — which is `transparent` — and the header vanishes again
+     * on exactly the pages that asked it not to. The animation has to be called
+     * off, not out-specified.
+     */
+    .site-header.is-solid {
+      animation-name: none;
+      background-color: var(--color-les);
     }
 
     @keyframes header-solid {

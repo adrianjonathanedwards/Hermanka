@@ -1,0 +1,218 @@
+﻿---
+/**
+ * Koupání v okolí — swimming near the cottage.
+ *
+ * Rewrites docs/01-content.md §7.2: eleven places in one comma-separated run,
+ * no distances, no order. "Needs distances and a sort by distance, or a cut to
+ * the nearest four."
+ *
+ * DATA: src/data/okoli.ts KOUPANI_BLIZKO + KOUPANI_DALSI. The data is already
+ * split into two arrays for exactly this reason — the two entries in BLIZKO have
+ * verified distances from the distance table (§5.2), the ten in DALSI do not.
+ * Neither sorting by distance nor cutting to the nearest four is possible without
+ * figures for the whole set.
+ *
+ * TODO(client) — docs/01-content.md §9 item 21. Once the client supplies
+ * distances for the KOUPANI_DALSI entries:
+ *   1. Add vzdalenost to each item in src/data/okoli.ts.
+ *   2. Merge the two arrays, sort ascending by vzdalenost.
+ *   3. Consider cutting the list to the four closest — eleven entries is long,
+ *      and past about four the incremental value of the next entry drops steeply.
+ *
+ * NULL DISTANCE RENDERING
+ * KOUPANI_DALSI names appear without chips. A missing distance is not a problem
+ * to paper over — it is the honest state of an entry nobody has given a number
+ * for. The secondary heading and the explanatory note below the list tell the
+ * reader why the chips are absent.
+ *
+ * Band: --kamen. Follows --jinovatka (lyzovani) and precedes --omitka (CtaBand).
+ */
+import { KOUPANI_BLIZKO, KOUPANI_DALSI } from '../../../data/okoli';
+import IconLucide from '../../IconLucide.astro';
+
+/* U+00A0 — non-breaking space. */
+const NBSP = '\u00A0';
+---
+
+<section class="koupani section" aria-labelledby="koupani-nadpis">
+  <div class="wrap">
+    <header class="koupani-header" data-reveal>
+      <h2 id="koupani-nadpis">Koupání v okolí</h2>
+      <p class="koupani-lead">
+        Nejbližší bazén je v Králíkách 3{NBSP}km odsud. Přehrada Pastviny je
+        17{NBSP}km — největší vodní plocha v bezprostředním okolí.
+      </p>
+    </header>
+
+    {/* ---- Primary: entries with verified distances ---- */}
+    <ul class="koupani-blizko" role="list" data-reveal>
+      {
+        KOUPANI_BLIZKO.map((k) => (
+          <li class="card koupani-karta">
+            <div class="koupani-ikona" aria-hidden="true">
+              <IconLucide name="waves" size={28} />
+            </div>
+            <h3 class="koupani-nazev">{k.nazev}</h3>
+            {k.vzdalenost && (
+              <div class="koupani-meta">
+                <span class="chip">
+                  <IconLucide name="ruler" size={14} />
+                  {k.vzdalenost}
+                </span>
+              </div>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    {/* ---- Secondary: remaining places (no distances) ---- */}
+    {
+      KOUPANI_DALSI.length > 0 && (
+        <div class="koupani-dalsi" data-reveal>
+          <h3 class="koupani-dalsi-nadpis">Další koupaliště a aquaparky v kraji</h3>
+          <p class="koupani-dalsi-pozn">
+            Vzdálenosti k níže uvedeným místům nejsou ověřeny. Jsou uvedena pouze jména.
+            {/*
+              TODO(client) — §9 item 21: supply distances so this list can be
+              sorted and cut to the nearest four.
+            */}
+          </p>
+          <ul class="koupani-seznam" role="list">
+            {KOUPANI_DALSI.map((nazev) => (
+              <li class="koupani-polozka">
+                <IconLucide name="waves" size={16} class="koupani-polozka-ikona" />
+                <span>{nazev}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .koupani {
+    background-color: var(--color-kamen);
+  }
+
+  h2 {
+    /* --mosaz-tmava on --kamen = 5.06:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  h3 {
+    /* --les on --kamen = 12.91:1 */
+    color: var(--color-les);
+  }
+
+  .koupani-lead {
+    margin-top: 1rem;
+    font-size: var(--text-lead);
+    max-width: 48ch;
+    /* --kura on --kamen = 9.96:1 */
+    color: var(--color-kura);
+  }
+
+  /* ---- Primary cards ----------------------------------------------------- */
+
+  .koupani-blizko {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 40rem) {
+    .koupani-blizko {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      max-width: 40rem;
+    }
+  }
+
+  .koupani-karta {
+    /* The global `.card` provides display:flex; flex-direction:column; padding;
+       border; background-color:--omitka. The omitka card lifts off the --kamen
+       section background for clear definition. */
+  }
+
+  .koupani-ikona {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+    margin-bottom: 0.875rem;
+    flex: none;
+  }
+
+  .koupani-nazev {
+    font-size: var(--text-title-s);
+    color: var(--color-les);
+    margin-bottom: 0;
+  }
+
+  .koupani-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-top: 1rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid rgb(62 50 38 / 0.1);
+  }
+
+  /* ---- Secondary list ---------------------------------------------------- */
+
+  .koupani-dalsi {
+    margin-top: 3.5rem;
+  }
+
+  .koupani-dalsi-nadpis {
+    font-size: var(--text-title-s);
+  }
+
+  .koupani-dalsi-pozn {
+    margin-top: 0.625rem;
+    font-size: var(--text-caption);
+    /* --kura on --kamen = 9.96:1 */
+    color: var(--color-kura);
+    max-width: 52ch;
+  }
+
+  .koupani-seznam {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 40rem) {
+    .koupani-seznam {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 64rem) {
+    .koupani-seznam {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .koupani-polozka {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-body);
+    /* --kura on --kamen = 9.96:1 */
+    color: var(--color-kura);
+  }
+
+  .koupani-polozka-ikona {
+    flex: none;
+    opacity: 0.5;
+    /* Muted: these entries are deliberately secondary because they have no data. */
+    color: var(--color-kura);
+  }
+</style>

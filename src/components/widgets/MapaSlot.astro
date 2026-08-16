@@ -1,0 +1,140 @@
+---
+/**
+ * Where the cottage is — THE RESERVED SLOT, NOT AN EMBEDDED MAP.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ DO NOT PUT AN INTERACTIVE MAP IN HERE.
+ *
+ * docs/04-pages.md, `/kontakt` item 4, in as many words: "Static map image
+ * linking out. **Not** an embedded interactive map — third-party bytes and a
+ * cookie problem for one pin."
+ *
+ * The old site embedded the Mapy.cz widget. That is roughly a third of a megabyte
+ * of third-party JavaScript, a set of cookies this site would then owe a consent
+ * banner for, and a live connection to Seznam on every page load — all to show a
+ * pin at a coordinate that fits in fourteen characters. The two things a guest
+ * actually needs from it are the coordinate, so they can paste it into whatever
+ * navigation they already use, and a link that opens a real map in a real map
+ * application. Both are here and both work with JavaScript off.
+ *
+ * WHAT IS STILL MISSING is the static image: a screenshot of the valley with the
+ * cottage marked, exported once, shipped as a WebP, wrapped in the link that is
+ * already below. TODO(client) — it needs to come from the client or from a
+ * licensed map export; scraping a tile from Mapy.cz and shipping it is a
+ * licensing problem, not a technical one. Until it arrives the panel is a real
+ * panel with the real address, coordinates and link in it, not a grey rectangle
+ * with "mapa" written on it.
+ *
+ * The coordinates are the ONLY copy of these numbers on the site — `SITE.gps` in
+ * src/data/site.ts. Never retype them into a page.
+ */
+import IconLucide from '../IconLucide.astro';
+import { SITE, mapyUrl } from '../../data/site';
+
+interface Props {
+  /** Heading level, so this can sit under an <h2> on one page and an <h3> elsewhere. */
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div class:list={['mapa card', className]}>
+  {/*
+    TODO(client): the static map export goes here, as
+    <a href={mapyUrl}><Image src={mapa} alt="…" …/></a> — a photograph of a map,
+    linked, with no script behind it. See the header of this file.
+  */}
+  <div class="mapa-plocha" aria-hidden="true">
+    <IconLucide name="map-pin" size={34} class="mapa-plocha-icon" />
+  </div>
+
+  <div class="mapa-udaje">
+    <p class="mapa-adresa">
+      <span class="mapa-nazev">{SITE.name}</span>
+      <span>{SITE.obec}</span>
+    </p>
+
+    <p class="mapa-gps">
+      <span class="mapa-gps-label">GPS</span>
+      <span class="tabular">{SITE.gps.label}</span>
+    </p>
+
+    {/*
+      Opens a map, embeds nothing. `rel="noopener"` because it is `target="_blank"`;
+      the span tells a screen reader the window is about to change, which is the
+      thing a new tab otherwise does silently.
+    */}
+    <p class="mapa-akce">
+      <a href={mapyUrl} class="btn btn-secondary" rel="noopener noreferrer" target="_blank">
+        Otevřít v mapě
+        <span class="sr-only"> (nové okno)</span>
+      </a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .mapa {
+    /* `.card` in global.css supplies the border, the ground and the radius. */
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /*
+   * The reserved area for the static export. It is deliberately NOT a grey box
+   * pretending to be a map: a stone panel with the site's own pin mark on it,
+   * which reads as a panel waiting for a picture rather than as a map that
+   * failed to load.
+   */
+  .mapa-plocha {
+    display: grid;
+    place-content: center;
+    /* 16:10 — the shape the export will be, so nothing reflows when it lands. */
+    aspect-ratio: 16 / 10;
+    background-color: var(--color-kamen);
+    border-bottom: 1px solid rgb(62 50 38 / 0.14);
+  }
+
+  .mapa-plocha-icon {
+    color: var(--color-mosaz);
+    opacity: 0.55;
+  }
+
+  .mapa-udaje {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .mapa-adresa {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .mapa-nazev {
+    font-family: var(--font-display);
+    font-size: var(--text-title-s);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.3;
+  }
+
+  .mapa-gps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: var(--color-kura);
+  }
+
+  .mapa-gps-label {
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .mapa-akce {
+    margin-top: 1.5rem;
+  }
+</style>

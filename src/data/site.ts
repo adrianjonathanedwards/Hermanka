@@ -8,7 +8,17 @@
 
 export const SITE = {
   name: 'Chalupa Heřmanka',
-  obec: 'Heřmanice u Králík',
+  /**
+   * ⚠ The space before `Králík` below is a HARD space, U+00A0, and it is
+   * invisible in every editor. Do not retype the line.
+   *
+   * `u` is a single-letter preposition, and docs/02-design-system.md §2.6 is
+   * explicit that one must never end a line — a Czech line ending in `u` reads
+   * as an error, not as a typographic nicety. This string is set in the footer
+   * and in a narrow contact card, both of which wrap on a phone, so it is one of
+   * the few places on the site where the break would actually happen.
+   */
+  obec: 'Heřmanice u Králík',
 
   /** Displayed in Czech convention; `telHref` is the dialable form. */
   telefon: '+420 603 285 524',

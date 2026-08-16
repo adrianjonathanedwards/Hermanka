@@ -1,0 +1,202 @@
+﻿---
+/**
+ * Výlety a atrakce — card grid from VYLETY data.
+ *
+ * Rewrites docs/01-content.md §7.1: "KEEP the content, REWRITE into cards with
+ * a distance and a season on each."
+ *
+ * NULL DISTANCE RULE
+ * A card whose `vzdalenost` is null shows no distance chip. The Králický Sněžník
+ * entry deliberately has null — the old copy says 14 km, the regional map says
+ * 17 km, and both cannot be right (docs/01-content.md §9 item 18). Naming either
+ * figure next to a map that contradicts it is worse than naming neither.
+ * TODO(client) — §9 item 18: confirm the trail distance, then fill in vzdalenost
+ * on the Sněžník entry in src/data/okoli.ts.
+ *
+ * HISTORIE A PAMÁTKY — DECISION
+ * docs/04-pages.md §/okoli section 6 asks whether to filter Klášter Hedeč,
+ * Vojenské muzeum Králíky and Králíky into their own "Historie a památky" section
+ * or to leave them in the main card set.
+ *
+ * KEPT IN THE MAIN CARD SET. Reasons:
+ *   1. All three relevant entries are already in VYLETY with their own distances
+ *      and the `landmark` icon — they are already distinct from the hiking entries.
+ *   2. A separate "Historie a památky" section would show the identical card data
+ *      a second time with only a heading change.
+ *   3. Six cards in one grid is a 2×3 desktop layout — clean and complete.
+ *   4. The regional map already shows Klášter Hedeč and Králíky as named places,
+ *      so the visual section above already covers the cultural geography angle.
+ *
+ * Band: --omitka. Cards use the global `.card` class (--omitka fill, hairline
+ * border) — on a --kamen section they would be fine too, but the alternation
+ * sequence already places --kamen on the map section above and below.
+ */
+import { VYLETY, type Sezonnost } from '../../../data/okoli';
+import IconLucide from '../../IconLucide.astro';
+import type { LucideName } from '../../IconLucide.astro';
+
+/* U+00A0 — non-breaking space. */
+const NBSP = '\u00A0';
+
+/* Czech display labels for the season field. */
+const SEZONA_LABEL: Record<Sezonnost, string> = {
+  zima: 'Zima',
+  leto: 'Léto',
+  celoročně: 'Celoročně',
+};
+
+/* Lucide icon for each season. All three names are in the LucideName union. */
+const SEZONA_ICON: Record<Sezonnost, LucideName> = {
+  zima: 'snowflake',
+  leto: 'sun',
+  celoročně: 'calendar-days',
+};
+---
+
+<section class="vylety section" aria-labelledby="vylety-nadpis">
+  <div class="wrap">
+    <header class="vylety-header" data-reveal>
+      <h2 id="vylety-nadpis">Výlety a atrakce</h2>
+      <p class="vylety-lead">
+        V nejbližším okolí se nachází příroda, lyžování, historické kláštery i vojenské
+        pevnosti. Většina destinací je dostupná autem do 20{NBSP}minut.
+      </p>
+    </header>
+
+    <ul class="vylety-grid" role="list" data-reveal>
+      {
+        VYLETY.map((v) => (
+          <li class="card vylety-karta">
+            <div class="vylety-ikona" aria-hidden="true">
+              <IconLucide name={v.icon} size={28} />
+            </div>
+
+            <h3 class="vylety-nazev">{v.nazev}</h3>
+
+            <p class="vylety-popis">{v.popis}</p>
+
+            {/*
+              Chips row. Rendered only when at least one piece of metadata is
+              available — no empty row, no placeholder dash.
+            */}
+            {(v.vzdalenost || v.cas || v.sezona) && (
+              <div class="vylety-meta">
+                {v.vzdalenost && (
+                  <span class="chip">
+                    <IconLucide name="ruler" size={14} />
+                    {v.vzdalenost}
+                  </span>
+                )}
+                {v.cas && (
+                  <span class="chip">
+                    <IconLucide name="clock" size={14} />
+                    {v.cas}
+                  </span>
+                )}
+                <span class="chip vylety-sezona">
+                  <IconLucide name={SEZONA_ICON[v.sezona]} size={14} />
+                  {SEZONA_LABEL[v.sezona]}
+                </span>
+              </div>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .vylety {
+    background-color: var(--color-omitka);
+  }
+
+  .vylety-header {
+    max-width: 48ch;
+  }
+
+  h2 {
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .vylety-lead {
+    margin-top: 1rem;
+    font-size: var(--text-lead);
+    color: var(--color-kura);
+  }
+
+  /* ---- Card grid --------------------------------------------------------- */
+
+  .vylety-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-top: 3rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (width >= 40rem) {
+    .vylety-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 64rem) {
+    .vylety-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* ---- Individual card --------------------------------------------------- */
+
+  .vylety-karta {
+    /* The global `.card` class sets display: flex; flex-direction: column;
+       padding; border; background. Styles below supplement it. */
+    gap: 0;
+  }
+
+  .vylety-ikona {
+    /* --mosaz-tmava on --omitka = 6.05:1. Not a fill — an icon's stroke. */
+    color: var(--color-mosaz-tmava);
+    margin-bottom: 0.875rem;
+    flex: none;
+  }
+
+  .vylety-nazev {
+    font-size: var(--text-title-s);
+    line-height: 1.3;
+    /* --les on --omitka = 15.45:1 */
+    color: var(--color-les);
+    margin-bottom: 0.625rem;
+  }
+
+  .vylety-popis {
+    font-size: var(--text-body);
+    /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+    flex: 1;
+    max-width: none;
+    text-wrap: pretty;
+  }
+
+  /* ---- Metadata chips ---------------------------------------------------- */
+
+  .vylety-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(62 50 38 / 0.1);
+  }
+
+  /*
+   * Season chip inherits the `.chip` class (brass underline, mosaz-tmava text).
+   * No colour override — the season is information, not decoration.
+   */
+  .vylety-sezona {
+    /* Same .chip styling as distance and time. */
+  }
+</style>

@@ -1,0 +1,205 @@
+---
+/**
+ * /kontakt/dekujeme — The form's 303 success target.
+ *
+ * The inquiry form in <PoptavkaForm> posts to the Cloudflare Worker
+ * (POPTAVKA_ENDPOINT in src/data/site.ts). On a successful submission the
+ * Worker responds with:
+ *   HTTP/1.1 303 See Other
+ *   Location: /kontakt/dekujeme
+ *
+ * TODO(worker): the Worker does not exist yet — worker/README.md and
+ * src/data/site.ts POPTAVKA_ENDPOINT. Until it is deployed, this page is
+ * reachable only by manually typing its URL; no form submission can land here.
+ * The markup and content are what this pass delivers.
+ *
+ * ---------------------------------------------------------------------------
+ * WHY THIS PAGE IS SHORT AND WHY --treeline-h IS OVERRIDDEN
+ *
+ * In global.css the footer's wood is sized for a page that has scrolled
+ * through many sections. On a two-paragraph page the bottom-clearance rule
+ * (`main > *:last-child` padding-bottom) reserves most of the screen for
+ * trees that are not that tall at the viewport centre. The 404 page has the
+ * same problem and solves it with `--treeline-h` override: shrinking the
+ * variable cuts the wood AND the clearance proportionally, because both are
+ * derived from the same token.
+ *
+ * `is:global` because a scoped style cannot reach `:root`, and the rule is
+ * unlayered so it beats global.css's own `:root` inside `@layer components`.
+ *
+ * ---------------------------------------------------------------------------
+ * SEO: noindex — this page must never appear in search results. It is a
+ * transient state, not a destination, and it carries no unique content.
+ *
+ * Zero client-side JavaScript. No <script> tag.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import IconLucide from '../../components/IconLucide.astro';
+import { SITE } from '../../data/site';
+---
+
+<BaseLayout
+  title="Děkujeme za poptávku"
+  description="Vaši poptávku jsme přijali. Ozveme se vám co nejdříve."
+  noindex
+>
+  <section class="dekuji" aria-labelledby="dekuji-nadpis">
+    <div class="wrap dekuji-inner">
+
+      {/* Success mark */}
+      <div class="dekuji-ikona" aria-hidden="true">
+        <IconLucide name="circle-check" size={48} class="dekuji-ikona-svg" />
+      </div>
+
+      <h1 id="dekuji-nadpis">Poptávka přijata</h1>
+
+      <p class="dekuji-lead">
+        Vaši zprávu jsme dostali. Ozveme se vám co nejdříve,
+        zpravidla do druhého pracovního dne.
+      </p>
+
+      <p class="dekuji-tel">
+        {/*
+          The {' '} is load-bearing — the same trap PoptavkaForm.astro documents.
+          JSX trims the newline between text and the following element, so
+          without it this rendered as `Jsme k dosažení na+420 603 285 524.`
+        */}
+        Raději zavoláte? Jsme k dosažení na{' '}
+        <a href={`tel:${SITE.telHref}`}>{SITE.telefon}</a>.
+      </p>
+
+      <div class="dekuji-akce">
+        <a href="/" class="btn btn-ghost">Zpět na úvod</a>
+        <a href="/terminy-a-ceny" class="btn btn-ghost">Termíny a ceny</a>
+      </div>
+
+    </div>
+  </section>
+
+  {/*
+    The clearing band. It looks like an empty div and it is — the footer draws
+    its wood into it from below. The height is deliberately generous so the
+    trees have room to stand at full height. See the treeline-h override below.
+  */}
+  <div class="dekuji-mysina" aria-hidden="true"></div>
+</BaseLayout>
+
+{/*
+  ⚠ THE ONE GLOBAL RULE ON THIS PAGE, AND IT IS DELIBERATE.
+
+  Mirrors the same pattern on 404.astro — read that file's comment for the
+  full explanation. In short: on a two-paragraph page the default
+  --treeline-h of up to 460px reserves most of the screen, which turns the
+  page into a field of dark forest with a message stranded above it.
+
+  Overriding to the same smaller value as 404 scales the wood and its
+  clearance together; nothing else on the page has to know.
+
+  is:global — a scoped style cannot reach :root.
+  Unlayered — beats global.css's own :root inside @layer components.
+*/}
+<style is:global>
+  :root {
+    --treeline-h: clamp(210px, 21vw, 300px);
+  }
+</style>
+
+<style>
+  /* ---- Dark confirmation panel ----------------------------------------- */
+
+  .dekuji {
+    display: grid;
+    align-content: center;
+    /*
+     * Not 100svh — like 404.astro, the panel is sized by its content, not
+     * the viewport. The wood below must be visible without scrolling on a
+     * laptop screen.
+     */
+    min-height: min(66svh, 38rem);
+    padding-block: 6.5rem 4.5rem;
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .dekuji-inner {
+    position: relative;
+    max-width: 40rem;
+  }
+
+  .dekuji-inner > * {
+    margin-inline: auto;
+  }
+
+  .dekuji-ikona {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-pill);
+    background-color: rgb(140 99 24 / 0.18);
+    margin-bottom: 1.5rem;
+  }
+
+  /* --mosaz-svetla on --les = 6.19:1 — passes for the icon fill */
+  .dekuji-ikona-svg {
+    color: var(--color-mosaz-svetla);
+  }
+
+  h1 {
+    color: var(--color-omitka);
+    margin-top: 0;
+  }
+
+  /*
+   * --kamen on --les = 12.91:1. Stone rather than frost: --jinovatka is a
+   * winter accent only (docs/02-design-system.md §1.3). Same reasoning as
+   * 404.astro and the page-hero lead.
+   */
+  .dekuji-lead {
+    margin-top: 1rem;
+    max-width: 36ch;
+    font-size: var(--text-lead);
+    color: var(--color-kamen);
+  }
+
+  .dekuji-tel {
+    margin-top: 1.5rem;
+    font-size: var(--text-caption);
+    color: var(--color-kamen);
+    max-width: none;
+  }
+
+  /* --mosaz-svetla on --les = 6.19:1 */
+  .dekuji-tel a {
+    color: var(--color-mosaz-svetla);
+    text-underline-offset: 0.25em;
+  }
+
+  .dekuji-akce {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  @media (width < 25rem) {
+    .dekuji-akce .btn {
+      width: 100%;
+    }
+  }
+
+  /* ---- The clearing band -----------------------------------------------
+   *
+   * Empty div sized to give the footer's treeline room to stand completely
+   * visible. Takes the full (overridden) --treeline-h plus a little sky above
+   * the canopy line. See 404.astro for the derivation of these numbers.
+   */
+  .dekuji-mysina {
+    min-height: calc(var(--treeline-h) + 2.5rem);
+    background-color: var(--color-kamen);
+  }
+</style>

@@ -1,0 +1,362 @@
+---
+/**
+ * Ceník — one table, seasons as rows, week and weekend as columns.
+ *
+ * docs/01-content.md §6.2: "REWRITE the presentation into one table with
+ * seasons as rows. Six near-identical cards to express four distinct prices
+ * is five cards too many."
+ *
+ * Every figure is drawn from src/data/cenik.ts through formatKc(). The word
+ * "every" is absolute: no price, no per-person figure and no currency amount
+ * may be typed into this file (docs/01-content.md §2 — the four-year-old
+ * hardcoded 311 Kč that stopped matching the price list is why this module
+ * exists at all).
+ *
+ * ⚠ PRESNE_HRANICE_CHYBI is true. "půlka března" is prose, not a date. The
+ * season boundary decides the price — 15. 3. and 31. 3. are 4 000 Kč apart
+ * for the same week. An exact boundary is launch-blocking: docs/01-content.md
+ * §9 item 5. Until the client answers, the table shows the prose periods the
+ * old site had, with a visible note that they are approximate.
+ *
+ * ⚠ The table must not force the page to scroll sideways (hard rule #13).
+ * `overflow-x: auto` on .tabulka-scroll means the PAGE body never scrolls;
+ * the table may scroll inside its own wrapper on very narrow viewports.
+ *
+ * Section band: --kamen. KalendarSlot above it is --omitka.
+ *
+ * TODO(client) — docs/01-content.md §9 item 5: exact season boundaries.
+ * "půlka března" and "půlka září" must become real dates. Once supplied,
+ * SEZONY gains od/do month-day pairs and sezonaProDatum() can be added;
+ * this component changes nothing.
+ *
+ * TODO(client) — docs/01-content.md §9 item 6: definition of "víkend".
+ * How many nights, which days, bank holidays? The table caption notes it
+ * as undefined until the answer arrives.
+ */
+import IconLucide from '../../IconLucide.astro';
+import { SEZONY, KAPACITA, formatKc, PRESNE_HRANICE_CHYBI } from '../../../data/cenik';
+
+/*
+ * U+00A0 — hard space. Written as a constant so it cannot be mistaken for
+ * an ordinary space in review or in edits. docs/02-design-system.md §2.6:
+ * required between a numeral and its unit and after single-letter prepositions.
+ */
+const NBSP = ' ';
+---
+
+<section class="section cenik" aria-labelledby="cenik-nadpis">
+  <div class="wrap">
+
+    <div class="cenik-head" data-reveal>
+      <p class="kapacita">
+        {/*
+          Hard spaces between every unit pair: "2 až 15 osob", "3 ložnice".
+          docs/02-design-system.md §2.6.
+        */}
+        2{NBSP}až{NBSP}{KAPACITA}{NBSP}osob · 3{NBSP}ložnice
+      </p>
+      <h2 id="cenik-nadpis">Ceník</h2>
+      <p class="lead">
+        Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění —
+        chalupa je k dispozici jako celek.
+      </p>
+    </div>
+
+    <div class="tabulka-obal" data-reveal data-reveal-delay="80">
+
+      {/*
+        This note is conditional on the build-time flag. When the client
+        supplies exact dates (item 5 above), PRESNE_HRANICE_CHYBI flips to
+        false and the note disappears without touching this template.
+      */}
+      {PRESNE_HRANICE_CHYBI && (
+        <div class="hranice-pozn" role="note">
+          <IconLucide name="info" size={16} class="hranice-ikona" />
+          <p>
+            Přesné hranice sezón ještě čekají na potvrzení od klienta{NBSP}—
+            zatím platí přibližné vymezení z původního ceníku.
+            {/* TODO(client) — docs/01-content.md §9 item 5 */}
+          </p>
+        </div>
+      )}
+
+      {/*
+        The table sits inside a scroll-safe wrapper. The page body never
+        scrolls sideways; the table may scroll inside this div on very narrow
+        viewports. min-width is set explicitly so the price columns do not
+        collapse to an unreadable width before the scroll kicks in.
+      */}
+      <div class="tabulka-scroll">
+        <table class="ceny" aria-describedby="cenik-pozn">
+          <caption>
+            Cena za celou chalupu
+            {/*
+              "Víkend" is still undefined — docs/01-content.md §9 item 6.
+              TODO(client): how many nights, Fri–Sun or Sat–Mon, bank holidays?
+              The note below the table surfaces this. Caption keeps it short.
+            */}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" class="col-sezona">Sezóna</th>
+              <th scope="col" class="col-cena">Týden</th>
+              <th scope="col" class="col-cena">Víkend</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SEZONY.map((s) => (
+              <tr class:list={[`sez-${s.klic}`]}>
+                <th scope="row">
+                  <span class="sezona-nazev">{s.nazev}</span>
+                  <span class="sezona-obdobi">{s.obdobi}</span>
+                </th>
+                <td>{formatKc(s.tyden)}</td>
+                <td>{formatKc(s.vikend)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="cenik-pozn" id="cenik-pozn">
+        K ceně se připočítává elektřina dle spotřeby, voda a rekreační poplatek
+        obci.{NBSP}Podrobnosti v{NBSP}přehledu poplatků níže.
+      </p>
+
+      {/*
+        The whole-weeks rule for Jan/Feb and Jul/Aug is already shown prominently
+        above by KalendarSlot — repeating it in full here would be redundant.
+        The "Víkend" column itself implies the rule: if your month is one of the
+        four, the weekend price simply does not apply.
+      */}
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---- Section band ---------------------------------------------------- */
+
+  .cenik {
+    background-color: var(--color-kamen);
+  }
+
+  /* ---- Head ------------------------------------------------------------ */
+
+  .cenik-head {
+    max-width: var(--container-prose);
+  }
+
+  /*
+   * "2 až 15 osob · 3 ložnice" — styled as an eyebrow label in brass.
+   * --mosaz-tmava on --kamen = 5.06:1 ✓ (docs/02-design-system.md §1.1)
+   */
+  .kapacita {
+    display: block;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mosaz-tmava);
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    /* --les on --kamen = 12.91:1 ✓ */
+    color: var(--color-les);
+  }
+
+  .lead {
+    margin-top: 1rem;
+    font-size: var(--text-lead);
+    color: var(--color-kura);
+  }
+
+  /* ---- Table wrapper --------------------------------------------------- */
+
+  .tabulka-obal {
+    margin-top: 2.5rem;
+  }
+
+  /*
+   * Horizontal scroll container. The page body never scrolls sideways — only
+   * this div does, and only when the table is too wide for the viewport.
+   * Hard rule #13 in the build instructions.
+   */
+  .tabulka-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-sm);
+    /*
+     * ⚠ CAPPED, AND NOT AT THE CONTAINER WIDTH.
+     *
+     * The table has three rows and four short cells per row. Left to fill the
+     * full 1280px container it put `Zimní sezona` at one edge of the screen and
+     * `30 000 Kč` at the other, with roughly 900px of nothing between them — so
+     * reading a row meant tracking a price back across half a metre of stone to
+     * the season it belongs to. That is the failure mode a wide table with few
+     * columns always has, and it is worse here because the whole point of
+     * choosing one table over the old six cards was that the prices line up and
+     * can be COMPARED.
+     *
+     * 52rem is about the width at which the four cells sit as a group rather
+     * than as four things at the corners. It is a ceiling, not a size: below it
+     * the table is fluid, and `overflow-x` still owns the phone case so the page
+     * body never scrolls sideways.
+     */
+    max-width: 52rem;
+  }
+
+  /* ---- Season-boundary note -------------------------------------------- */
+
+  /*
+   * Visible when PRESNE_HRANICE_CHYBI is true. Not an error badge — it is an
+   * honest statement of what the site does not yet know. Disappears the moment
+   * the client supplies exact dates and the flag flips.
+   */
+  .hranice-pozn {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.25rem;
+    background-color: var(--color-omitka);
+    border-left: 3px solid var(--color-mosaz);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+
+  .hranice-ikona {
+    flex: none;
+    margin-top: 0.1rem;
+    /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .hranice-pozn p {
+    margin: 0;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+    max-width: none;
+  }
+
+  /* ---- Price table ----------------------------------------------------- */
+
+  /*
+   * global.css already applies `font-variant-numeric: tabular-nums` to all
+   * `table` elements, so every price in this table lines up in columns
+   * automatically. No per-cell rule needed.
+   *
+   * min-width prevents the price columns from collapsing below their content
+   * width before the scroll wrapper takes over. 20rem (320px) is narrower than
+   * the ~340px the table needs at body size with 1rem cell padding, so the
+   * wrapper scrolls before the columns collapse.
+   */
+  .ceny {
+    width: 100%;
+    min-width: 20rem;
+    border-collapse: collapse;
+    background-color: var(--color-omitka);
+    text-align: left;
+  }
+
+  caption {
+    caption-side: top;
+    text-align: left;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    /* --kura on --kamen = 9.96:1 ✓ (caption sits above the table, on kamen) */
+    color: var(--color-kura);
+    padding-bottom: 0.75rem;
+  }
+
+  thead th {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-kura);
+    padding: 0.75rem 1rem;
+    /* Brass rule under the header row — the same device Ubytovani.astro uses. */
+    border-bottom: 2px solid var(--color-mosaz);
+    white-space: nowrap;
+  }
+
+  .col-sezona {
+    text-align: left;
+    width: 55%;
+  }
+
+  .col-cena {
+    text-align: right;
+    width: 22.5%;
+  }
+
+  tbody th {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-normal);
+    vertical-align: top;
+    padding: 1rem;
+    text-align: left;
+  }
+
+  tbody td {
+    text-align: right;
+    padding: 1.1rem 1rem 1rem 0;
+    white-space: nowrap;
+    vertical-align: top;
+    font-size: var(--text-body);
+  }
+
+  /* Hairline border between rows — 1px is the only raw px permitted. */
+  tbody tr + tr th,
+  tbody tr + tr td {
+    border-top: 1px solid var(--color-kamen);
+  }
+
+  /* Row hover — colour shift, nothing moves. */
+  @media (hover: hover) {
+    tbody tr {
+      transition: background-color 150ms var(--ease-out);
+    }
+
+    tbody tr:hover {
+      background-color: var(--color-kamen);
+    }
+  }
+
+  .sezona-nazev {
+    display: block;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .sezona-obdobi {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+  }
+
+  /*
+   * Winter season row: a faint frost tint to mark the cold months visually.
+   * --jinovatka as a winter accent on a table row is one of the explicitly
+   * permitted uses in docs/02-design-system.md §1 ("winter accent only").
+   * It is applied as a BACKGROUND fill at low opacity, never as text.
+   * Text on this row remains --les; --les on jinovatka = 12.17:1 ✓.
+   *
+   * color-mix() references the token directly so no raw hex is needed.
+   */
+  .sez-zimni {
+    background-color: color-mix(in srgb, var(--color-jinovatka) 22%, transparent);
+  }
+
+  /* ---- Note below the table -------------------------------------------- */
+
+  .cenik-pozn {
+    margin-top: 1rem;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+    max-width: 56ch;
+  }
+</style>

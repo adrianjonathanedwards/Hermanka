@@ -1,0 +1,81 @@
+---
+/**
+ * /chalupa — Ubytování, vybavení, video, wellness.
+ *
+ * Absorbuje staré /o-nas/, /ubytovani/ a /video/. Stránka pro někoho, kdo se
+ * rozhlédl na homepage a teď chce vědět, jestli chalupa pro jeho skupinu
+ * opravdu funguje. docs/04-pages.md.
+ *
+ * Pořadí komponent kopíruje pořadí sekcí ze specifikace:
+ *   1. Intro + ložnice + sociální zařízení   (#loznice)
+ *   2. Vybavení                              (#vybaveni)
+ *   3. Wellness                              (#wellness)
+ *   4. Vytápění                              (#vytapeni)
+ *   5. Video                                 (#video)
+ *   6. Doprava a parkování                   (#doprava)
+ *   7. Stravování
+ *   8. V okolí naleznete
+ *   9. Closing CTA → /terminy-a-ceny
+ *
+ * STŘÍDÁNÍ PÁSŮ (docs/02-design-system.md §3):
+ *   PageHero:           --les
+ *   IntroLozeZarizeni:  --omitka   ← první světlý pás za tmavým hero
+ *   VybaveniChalupa:    --kamen
+ *   WellnessChalupa:    --les      ← jediný tmavý pás stránky
+ *   Vytapeni:           --omitka
+ *   VideoChalupa:       --kamen
+ *   DopravaChalupa:     --omitka
+ *   StravovaniChalupa:  --kamen
+ *   DostupnostChalupa:  --omitka
+ *   CtaBand:            --kamen    ← poslední sekce musí být světlá ✓
+ *
+ * HERO PRELOAD — stejný vzor jako u každé podstránky. PAGE_HERO_PRELOAD_PROPS
+ * se předá do getImage() zde v frontmatteru A rozbalí v PageHero.astro přes
+ * PAGE_HERO_IMAGE_PROPS. Stejné props → stejný hash → jeden soubor, jedno
+ * stažení. Kdybychom použili jiný obrázek v <PageHero>, musíme rovněž
+ * sestavit vlastní getImage() volání.
+ */
+import { getImage } from 'astro:assets';
+import { PAGE_HERO_PRELOAD_PROPS, PAGE_HERO_SIZES } from '../data/pageHero';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+
+import IntroLozeZarizeni from '../components/pages/chalupa/IntroLozeZarizeni.astro';
+import VybaveniChalupa from '../components/pages/chalupa/VybaveniChalupa.astro';
+import WellnessChalupa from '../components/pages/chalupa/WellnessChalupa.astro';
+import Vytapeni from '../components/pages/chalupa/Vytapeni.astro';
+import VideoChalupa from '../components/pages/chalupa/VideoChalupa.astro';
+import DopravaChalupa from '../components/pages/chalupa/DopravaChalupa.astro';
+import StravovaniChalupa from '../components/pages/chalupa/StravovaniChalupa.astro';
+import DostupnostChalupa from '../components/pages/chalupa/DostupnostChalupa.astro';
+
+const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
+---
+
+<BaseLayout
+  title="Chalupa Heřmanka — ubytování, vybavení a wellness"
+  description="Popis chalupy Heřmanka v Heřmanicích u Králík. Tři ložnice pro 2 až 15 osob, venkovní sauna, vířivka, jezírko. Peletkový kotel, krb. 10 metrů do lesa."
+  heroPreload={{ src: hero.src, srcset: hero.srcSet.attribute, sizes: PAGE_HERO_SIZES }}
+>
+  <PageHero
+    title="Chalupa Heřmanka"
+    lead="Kompletně zrekonstruovaný dvoupodlažní objekt v zalesněném údolí pod Králickým Sněžníkem."
+  />
+  <IntroLozeZarizeni />
+  <VybaveniChalupa />
+  <WellnessChalupa />
+  <Vytapeni />
+  <VideoChalupa />
+  <DopravaChalupa />
+  <StravovaniChalupa />
+  <DostupnostChalupa />
+  <CtaBand
+    nadpis="Zaujala vás chalupa?"
+    text="Napište nám termín a počet osob. Ozveme se co nejdříve s dostupností a cenou."
+    href="/terminy-a-ceny"
+    cta="Zjistit volné termíny"
+    band="kamen"
+  />
+</BaseLayout>

@@ -49,7 +49,72 @@ import waves from 'lucide-static/icons/waves.svg?raw';
 import dog from 'lucide-static/icons/dog.svg?raw';
 import accessibility from 'lucide-static/icons/accessibility.svg?raw';
 
+/*
+ * ---- The subpage set -------------------------------------------------------
+ *
+ * Added when /chalupa, /terminy-a-ceny, /okoli and /kontakt were built. Those
+ * four pages are lists of facts — amenities, fees, distances, ways to arrive —
+ * and a list of facts is read by scanning, which is what a glyph in the margin
+ * is for.
+ *
+ * They cost NOTHING at runtime. `?raw` resolves at build time and the geometry
+ * is inlined into the HTML of whichever page names the icon; no sprite sheet, no
+ * client module, and an icon nobody uses never leaves node_modules. So the set
+ * is sized for the pages that exist rather than trimmed to the minimum, and a
+ * page needing one more does not have to edit this file under three other pages.
+ *
+ * All of them are drawn by the same hand at the same 1.5 stroke. That is the
+ * whole reason for preferring Lucide over bespoke glyphs here — see the note at
+ * the top of the file.
+ */
+import utensils from 'lucide-static/icons/utensils.svg?raw';
+import wifi from 'lucide-static/icons/wifi.svg?raw';
+import flame from 'lucide-static/icons/flame.svg?raw';
+import bath from 'lucide-static/icons/bath.svg?raw';
+import showerHead from 'lucide-static/icons/shower-head.svg?raw';
+import car from 'lucide-static/icons/car.svg?raw';
+import tv from 'lucide-static/icons/tv.svg?raw';
+import washingMachine from 'lucide-static/icons/washing-machine.svg?raw';
+import refrigerator from 'lucide-static/icons/refrigerator.svg?raw';
+import microwave from 'lucide-static/icons/microwave.svg?raw';
+import trees from 'lucide-static/icons/trees.svg?raw';
+import tentTree from 'lucide-static/icons/tent-tree.svg?raw';
+import mountainSnow from 'lucide-static/icons/mountain-snow.svg?raw';
+import cigaretteOff from 'lucide-static/icons/cigarette-off.svg?raw';
+import sofa from 'lucide-static/icons/sofa.svg?raw';
+import doorOpen from 'lucide-static/icons/door-open.svg?raw';
+import landmark from 'lucide-static/icons/landmark.svg?raw';
+import bike from 'lucide-static/icons/bike.svg?raw';
+import footprints from 'lucide-static/icons/footprints.svg?raw';
+import snowflake from 'lucide-static/icons/snowflake.svg?raw';
+import cableCar from 'lucide-static/icons/cable-car.svg?raw';
+import sun from 'lucide-static/icons/sun.svg?raw';
+import bus from 'lucide-static/icons/bus.svg?raw';
+import trainFront from 'lucide-static/icons/train-front.svg?raw';
+import store from 'lucide-static/icons/store.svg?raw';
+import shoppingCart from 'lucide-static/icons/shopping-cart.svg?raw';
+import mail from 'lucide-static/icons/mail.svg?raw';
+import phone from 'lucide-static/icons/phone.svg?raw';
+import mapPin from 'lucide-static/icons/map-pin.svg?raw';
+import banknote from 'lucide-static/icons/banknote.svg?raw';
+import wallet from 'lucide-static/icons/wallet.svg?raw';
+import creditCard from 'lucide-static/icons/credit-card.svg?raw';
+import receipt from 'lucide-static/icons/receipt.svg?raw';
+import zap from 'lucide-static/icons/zap.svg?raw';
+import droplets from 'lucide-static/icons/droplets.svg?raw';
+import calendarDays from 'lucide-static/icons/calendar-days.svg?raw';
+import moon from 'lucide-static/icons/moon.svg?raw';
+import clock from 'lucide-static/icons/clock.svg?raw';
+import key from 'lucide-static/icons/key.svg?raw';
+import info from 'lucide-static/icons/info.svg?raw';
+import circleCheck from 'lucide-static/icons/circle-check.svg?raw';
+import circleAlert from 'lucide-static/icons/circle-alert.svg?raw';
+import shieldCheck from 'lucide-static/icons/shield-check.svg?raw';
+import thermometerSun from 'lucide-static/icons/thermometer-sun.svg?raw';
+import ruler from 'lucide-static/icons/ruler.svg?raw';
+
 export type LucideName =
+  // The homepage facts strip.
   | 'users'
   | 'bed-double'
   | 'flame-kindling'
@@ -57,7 +122,57 @@ export type LucideName =
   | 'brick-wall-fire'
   | 'waves'
   | 'dog'
-  | 'accessibility';
+  | 'accessibility'
+  // Inside the cottage.
+  | 'utensils'
+  | 'wifi'
+  | 'flame'
+  | 'bath'
+  | 'shower-head'
+  | 'tv'
+  | 'washing-machine'
+  | 'refrigerator'
+  | 'microwave'
+  | 'sofa'
+  | 'door-open'
+  | 'cigarette-off'
+  | 'thermometer-sun'
+  // Outside it.
+  | 'trees'
+  | 'tent-tree'
+  | 'mountain-snow'
+  | 'snowflake'
+  | 'sun'
+  | 'cable-car'
+  | 'bike'
+  | 'footprints'
+  | 'landmark'
+  // Getting there and what is nearby.
+  | 'car'
+  | 'bus'
+  | 'train-front'
+  | 'store'
+  | 'shopping-cart'
+  | 'mail'
+  | 'phone'
+  | 'map-pin'
+  // Money, dates and terms.
+  | 'banknote'
+  | 'wallet'
+  | 'credit-card'
+  | 'receipt'
+  | 'zap'
+  | 'droplets'
+  | 'calendar-days'
+  | 'moon'
+  | 'clock'
+  | 'key'
+  | 'ruler'
+  // Interface.
+  | 'info'
+  | 'circle-check'
+  | 'circle-alert'
+  | 'shield-check';
 
 const SOURCES: Record<LucideName, string> = {
   users,
@@ -68,6 +183,51 @@ const SOURCES: Record<LucideName, string> = {
   waves,
   dog,
   accessibility,
+  utensils,
+  wifi,
+  flame,
+  bath,
+  'shower-head': showerHead,
+  tv,
+  'washing-machine': washingMachine,
+  refrigerator,
+  microwave,
+  sofa,
+  'door-open': doorOpen,
+  'cigarette-off': cigaretteOff,
+  'thermometer-sun': thermometerSun,
+  trees,
+  'tent-tree': tentTree,
+  'mountain-snow': mountainSnow,
+  snowflake,
+  sun,
+  'cable-car': cableCar,
+  bike,
+  footprints,
+  landmark,
+  car,
+  bus,
+  'train-front': trainFront,
+  store,
+  'shopping-cart': shoppingCart,
+  mail,
+  phone,
+  'map-pin': mapPin,
+  banknote,
+  wallet,
+  'credit-card': creditCard,
+  receipt,
+  zap,
+  droplets,
+  'calendar-days': calendarDays,
+  moon,
+  clock,
+  key,
+  ruler,
+  info,
+  'circle-check': circleCheck,
+  'circle-alert': circleAlert,
+  'shield-check': shieldCheck,
 };
 
 interface Props {

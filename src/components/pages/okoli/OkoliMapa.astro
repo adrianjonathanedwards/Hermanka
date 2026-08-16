@@ -1,0 +1,120 @@
+---
+/**
+ * Regional map — the illustrated aerial photograph.
+ *
+ * STATUS: raster-only, labels baked into pixels.
+ *
+ * docs/02-design-system.md §4 and docs/01-content.md §7.4 both call for this to
+ * be rebuilt as photograph + inline SVG <text> so the labels become real,
+ * searchable and screen-readable. That rebuild requires a clean aerial with no
+ * baked type — see TODO(client) below. Until that plate arrives, the raster is
+ * used as-is with a thorough Czech `alt` naming every place the map shows.
+ *
+ * ⚠ DISTANCE CONFLICTS IN THIS IMAGE
+ * The raster shows two distances that contradict the verified table in DOSTUPNOST:
+ *
+ *   - Králíky: map shows 7 km, distance table has 3 km (and that table is the
+ *     internally consistent source — docs/01-content.md §5.2 header note).
+ *   - Králický Sněžník trail: map shows 17 km / 4 h 15 min, the old
+ *     /tipy-na-vylety/ copy said 14 km, the data keeps null pending client
+ *     confirmation (docs/01-content.md §9 item 18).
+ *
+ * The alt text below names the places without repeating the contradicted figures.
+ * Do NOT add chips or labels next to this image that name either distance — it
+ * would put a different number alongside the one baked into the pixels.
+ *
+ * TODO(client) — §9 item 18: confirm the Sněžník trail distance (14 km or 17 km)
+ *   so the entry in VYLETY can be given a vzdalenost instead of null.
+ * TODO(client) — §7.4 / §4: supply a clean aerial photograph with no labels
+ *   baked in, so the map can be rebuilt as photograph + inline SVG <text>.
+ *
+ * Band: --kamen. Follows the --omitka intro section.
+ */
+import { Image } from 'astro:assets';
+import mapa from '@img/situace1-1.webp';
+---
+
+<section class="mapa section" aria-labelledby="mapa-nadpis">
+  <div class="wrap">
+    <div class="mapa-grid">
+      <header class="mapa-header" data-reveal>
+        <h2 id="mapa-nadpis">Poloha chalupy a okolí</h2>
+        <p class="mapa-lead">
+          Mapa ukazuje dosažitelné cíle od chalupy. Turistické stezky se dají chytit
+          přímo u dveří — jedna vede až na vrchol Králického Sněžníku.
+        </p>
+      </header>
+
+      <figure class="mapa-figure" data-reveal>
+        <div class="media-frame photo-frame">
+          <Image
+            src={mapa}
+            alt="Ilustrovaný letecký snímek okolí chalupy Heřmanka v Heřmanicích u Králík s vyznačenými destinacemi: Polsko a Międzygórze na severu se sjezdovkami 30–60 minut, hora Klepáč 1145 m n. m. jako rozvodí do trojice evropských moří, Králický Sněžník 1423 m n. m. nejvyšší hora Čech s pramenem řeky Moravy, lyžařské středisko Dolní Morava se Stezkou v oblacích a Sky Bridge 721, barokní klášter Hedeč mariánské poutní místo a město Králíky"
+            widths={[640, 960, 1280]}
+            sizes="(min-width: 64rem) 60vw, 100vw"
+            width={1280}
+            height={958}
+            format="webp"
+            quality={68}
+            loading="lazy"
+          />
+        </div>
+        {/*
+          No figcaption. The heading and lead above name the map; the <img> alt
+          names the places to a screen reader. A caption beneath would be the
+          third statement of the same thing.
+        */}
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  .mapa {
+    background-color: var(--color-kamen);
+  }
+
+  .mapa-grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media (width >= 64rem) {
+    .mapa-grid {
+      grid-template-columns: 1fr 2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+  }
+
+  h2 {
+    /* --mosaz-tmava on --kamen = 5.06:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .mapa-lead {
+    margin-top: 1.25rem;
+    font-size: var(--text-lead);
+    max-width: 38ch;
+    /* --kura on --kamen = 9.96:1 */
+    color: var(--color-kura);
+  }
+
+  .mapa-figure {
+    margin: 0;
+  }
+
+  .mapa-figure :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (width >= 64rem) {
+    .mapa-header {
+      /* Stick the text panel to the top of its grid cell while the image
+         column can grow as tall as it needs. */
+      position: sticky;
+      top: 7rem;
+    }
+  }
+</style>
