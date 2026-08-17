@@ -1,12 +1,12 @@
-/**
- * UI strings — chrome only. Navigation, buttons, form labels, anything that is not
+﻿/**
+ * UI strings   chrome only. Navigation, buttons, form labels, anything that is not
  * page content.
  *
  * Page CONTENT does not belong here; it belongs in content collections, so that a
  * price or a season date has one source of truth (docs/01-content.md §6.6).
  *
  * Czech copy is authoritative. Every string below is transcribed from the current
- * site or specified in docs/01-content.md — check there before inventing wording,
+ * site or specified in docs/01-content.md   check there before inventing wording,
  * and note which strings are still NEEDS CLIENT INPUT.
  */
 
@@ -25,10 +25,10 @@ export const ui = {
     'nav.menu': 'Menu',
     'nav.close': 'Zavřít',
 
-    // NEEDS CLIENT INPUT — final CTA wording (docs/01-content.md §3.1)
+    // NEEDS CLIENT INPUT   final CTA wording (docs/01-content.md §3.1)
     'cta.inquiry': 'Nezávazná poptávka',
 
-    // Availability calendar legend — the four states carried over from the
+    // Availability calendar legend   the four states carried over from the
     // e-chalupy widget being replaced (docs/01-content.md §6.5)
     'calendar.free': 'Volno',
     'calendar.booked': 'Obsazeno',
@@ -47,7 +47,7 @@ export const ui = {
     'form.message': 'Text zprávy',
     'form.copyToMe': 'Poslat mi na email kopii',
     'form.required': 'povinná položka',
-    // NEEDS CLIENT INPUT — final wording. The old button said "ODESLAT EMAIL",
+    // NEEDS CLIENT INPUT   final wording. The old button said "ODESLAT EMAIL",
     // which names the transport rather than the outcome.
     'form.submit': 'Odeslat poptávku',
     'form.success': 'Děkujeme, poptávku jsme přijali. Ozveme se vám co nejdříve.',
@@ -58,7 +58,7 @@ export const ui = {
 
   /**
    * German is a stub. `LIVE_LOCALES` does not include `de`, so nothing here is
-   * reachable yet — the keys exist so that adding the locale is a translation job
+   * reachable yet   the keys exist so that adding the locale is a translation job
    * with a visible checklist, not a hunt through components.
    */
   de: {

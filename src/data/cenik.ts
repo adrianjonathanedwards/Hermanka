@@ -1,14 +1,14 @@
-/**
+﻿/**
  * The price list, and every figure derived from it.
  *
  * This module exists so that no price is ever written into markup. The current
  * site hardcodes "311 Kč na noc za osobu" in the homepage, and that number stopped
- * matching the price list some years ago — against the rates below it should be
+ * matching the price list some years ago   against the rates below it should be
  * 285,71 Kč. Full post-mortem in docs/01-content.md §2.
  *
  * Rule: if a number about money appears on a page, it is computed here.
  *
- * TODO(client): several inputs are still unconfirmed —
+ * TODO(client): several inputs are still unconfirmed  
  *   - what `víkend` means (2 nights? Fri–Sun? 3 on a bank holiday?)
  *   - exact season boundaries; `půlka března` / `půlka září` are not dates
  *   - current electricity rate and municipal recreation fee
@@ -17,7 +17,7 @@
 
 import type { LucideName } from '../components/IconLucide.astro';
 
-/** Maximum occupancy. Authoritative figure — see docs/00-brief.md. */
+/** Maximum occupancy. Authoritative figure   see docs/00-brief.md. */
 export const KAPACITA = 15;
 
 /** Nights in a weekly booking, used to derive per-night figures. */
@@ -29,7 +29,7 @@ export const CENIK = {
   vikend: { zimni: 15_000, letni: 15_000, mimo: 13_000 },
 } as const;
 
-/** Cheapest weekend for the whole cottage — the honest "od" figure. */
+/** Cheapest weekend for the whole cottage   the honest "od" figure. */
 export const OD_VIKEND = Math.min(...Object.values(CENIK.vikend));
 
 /** Cheapest week for the whole cottage. */
@@ -72,7 +72,7 @@ export function formatKc(value: number): string {
 
 /**
  * U+00A0. Interpolated as `${NBSP}` rather than typed into each string, because
- * a literal hard space in source looks exactly like an ordinary one — which is
+ * a literal hard space in source looks exactly like an ordinary one   which is
  * how they go missing in review and in edits.
  *
  * docs/02-design-system.md §2.6 requires one between a numeral and its unit and
@@ -84,7 +84,7 @@ const NBSP = ' ';
 export interface Sezona {
   klic: 'zimni' | 'letni' | 'mimo';
   nazev: string;
-  /** Human-readable span. NOT a date, deliberately — see `PRESNE_HRANICE_CHYBI`. */
+  /** Human-readable span. NOT a date, deliberately   see `PRESNE_HRANICE_CHYBI`. */
   obdobi: string;
   tyden: number;
   vikend: number;
@@ -94,7 +94,7 @@ export interface Sezona {
  * ⚠ `obdobi` is prose because the underlying dates DO NOT EXIST YET.
  *
  * The price list says `prosinec-půlka března` and `červen-půlka září`. "Half of
- * March" is not a date, and the season boundary decides the price — 15. 3. and
+ * March" is not a date, and the season boundary decides the price   15. 3. and
  * 31. 3. are 4 000 Kč apart for the same week. docs/01-content.md §9 item 5
  * lists it as launch-blocking.
  *
@@ -153,7 +153,7 @@ export const PRAVIDLA: Pravidlo[] = [
   {
     icon: 'calendar-days',
     nazev: 'V lednu, únoru, červenci a srpnu jen celé týdny',
-    popis: `V těchto čtyřech měsících přijímáme objednávky pouze na celé týdny${NBSP}— víkend v${NBSP}nich rezervovat nejde.`,
+    popis: `V těchto čtyřech měsících přijímáme objednávky pouze na celé týdny${NBSP}  víkend v${NBSP}nich rezervovat nejde.`,
   },
 ];
 
@@ -178,14 +178,14 @@ export interface Svatek {
 /**
  * ⚠ THE DATES ARE NULL ON PURPOSE AND MUST NOT BE FILLED IN WITH A GUESS.
  *
- * The live site advertises `Vánoce 23.-26.12.2024` under the word `letos` — two
+ * The live site advertises `Vánoce 23.-26.12.2024` under the word `letos`   two
  * years stale at the time of writing, and the single clearest signal a visitor
  * gets that nobody is minding the site (docs/01-content.md §1 error #5, §6.3).
  * The fix is not to type in this year's dates; it is to make an absent date
  * *impossible to render as a current one*. `jeAktualni()` below enforces that:
  * no dates, no date shown.
  *
- * TODO(client) — LAUNCH-BLOCKING, docs/01-content.md §9 items 3 and 4: which
+ * TODO(client)   LAUNCH-BLOCKING, docs/01-content.md §9 items 3 and 4: which
  * three nights is Silvestr, and which nights are the Christmas block, for the
  * coming season.
  */
@@ -212,7 +212,7 @@ export const SVATKY: Svatek[] = [
 
 /**
  * Whether a holiday block has dates that have not yet passed. A block with no
- * dates is never "current" — it renders as "termín upřesníme", which is true,
+ * dates is never "current"   it renders as "termín upřesníme", which is true,
  * instead of as an offer for a year that has been and gone.
  *
  * Called at BUILD time. The site is static, so "today" is the day of the last
@@ -248,7 +248,7 @@ export const POPLATKY: Poplatek[] = [
     nazev: 'Elektřina',
     castka: `7${NBSP}Kč/kWh`,
     popis: 'Podle skutečné spotřeby, odečteno na konci pobytu.',
-    // TODO(client) — docs/01-content.md §9 item 7. The rate is from 2019 and the
+    // TODO(client)   docs/01-content.md §9 item 7. The rate is from 2019 and the
     // word on the old site is `momentálně`, which is not a price.
     nepotvrzeno: true,
   },
@@ -263,7 +263,7 @@ export const POPLATKY: Poplatek[] = [
     nazev: 'Rekreační poplatek obci',
     castka: `4${NBSP}Kč za osobu a noc`,
     popis: 'Poplatek z pobytu, který odvádíme obci.',
-    // TODO(client) — docs/01-content.md §9 item 7. Set by local ordinance; 4 Kč
+    // TODO(client)   docs/01-content.md §9 item 7. Set by local ordinance; 4 Kč
     // is low for 2026 and needs confirming with the obec.
     nepotvrzeno: true,
   },
@@ -292,7 +292,7 @@ export interface Podminka {
 
 /**
  * The terms that ARE known. Everything the old site says about payment,
- * rewritten as steps instead of a wall of text — no facts changed.
+ * rewritten as steps instead of a wall of text   no facts changed.
  *
  * ⚠ `CHYBEJICI_PODMINKY` below is the other half of this, and it is the more
  * important half. Do not delete it because the page looks tidier without it.
@@ -319,7 +319,7 @@ export const PODMINKY: Podminka[] = [
     icon: 'users',
     nazev: 'Menší skupina',
     popis: 'Při obsazení pod 10 osob je možná sleva. Napište nám, kolik vás bude.',
-    // TODO(client) — docs/01-content.md §9 item 8. The old homepage promises a
+    // TODO(client)   docs/01-content.md §9 item 8. The old homepage promises a
     // flat 10 %; the old price list says a discount "is possible". One of the
     // two is wrong and only the client knows which, so neither number is here.
   },
@@ -332,15 +332,15 @@ export const PODMINKY: Podminka[] = [
  * question the old site answers nowhere (docs/01-content.md §6.4), and bed linen
  * in particular is "the single most-asked question for a Czech chalupa let".
  * They are shown as *ask us* rather than silently omitted, because a guest who
- * cannot find the answer writes to us — which is the entire job of this site —
+ * cannot find the answer writes to us   which is the entire job of this site  
  * whereas a guest who does not know the question was askable books elsewhere.
  *
- * TODO(client) — docs/01-content.md §9 items 9–12. Each answer received deletes
+ * TODO(client)   docs/01-content.md §9 items 9–12. Each answer received deletes
  * one line here and adds one to PODMINKY above.
  */
 export const CHYBEJICI_PODMINKY: string[] = [
   'Čas příjezdu a odjezdu',
   'Storno podmínky',
-  'Co je v ceně — povlečení, ručníky, dřevo, pelety',
-  'Domácí mazlíčci — za jakých podmínek',
+  'Co je v ceně   povlečení, ručníky, dřevo, pelety',
+  'Domácí mazlíčci   za jakých podmínek',
 ];

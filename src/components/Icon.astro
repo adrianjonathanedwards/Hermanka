@@ -1,8 +1,8 @@
----
+﻿---
 /**
- * Functional line icons — the facts strip, the inquiry form, and the interface.
+ * Functional line icons   the facts strip, the inquiry form, and the interface.
  *
- * These are NOT the hand-drawn illustration language — that is a separate system
+ * These are NOT the hand-drawn illustration language   that is a separate system
  * (docs/02-design-system.md §4) and belongs to the decoration pass. These are plain
  * geometric line icons whose only job is to make a list scannable and a form field
  * recognisable at a glance.
@@ -12,7 +12,7 @@
  * be the only thing labelling a control.
  *
  * NO ANIMATION. A pass through here gave every icon a stroke that drew itself in
- * on scroll and, for some, a small idle loop — heat rising off the sauna stove,
+ * on scroll and, for some, a small idle loop   heat rising off the sauna stove,
  * the hearth flame leaning, the dog's ears twitching. Eight amenity glyphs
  * quietly moving on their own is a page decorating itself, and it was the
  * clearest single sign that nobody had chosen any of it. Both are gone, along
@@ -63,7 +63,7 @@ interface Props {
 /*
  * `rest` is not cosmetic. Astro hands a child component the parent's
  * `data-astro-cid-…` as a prop and expects the child to put it on its root
- * element — but a root that renders through `set:html` does not get it
+ * element   but a root that renders through `set:html` does not get it
  * automatically. Without the spread, a scoped rule like `.control-icon { … }`
  * in the calling component silently matches nothing.
  */
@@ -80,42 +80,42 @@ const paths: Record<IconName, string> = {
    * ---- Facts strip -----------------------------------------------------
    */
 
-  // Two figures — capacity.
+  // Two figures   capacity.
   osoby: `<circle cx="9" cy="8" r="3.2"/>
           <path d="M3.5 20a5.5 5.5 0 0 1 11 0"/>
           <circle cx="17" cy="9.5" r="2.4"/>
           <path d="M15 20a4.6 4.6 0 0 1 5.5-4.5"/>`,
-  // Bed with a pillow — bedrooms.
+  // Bed with a pillow   bedrooms.
   loznice: `<path d="M3 19v-9"/>
             <path d="M3 13h18v6"/>
             <path d="M21 19v-4"/>
             <path d="M6.5 13v-2.5A1.5 1.5 0 0 1 8 9h3a1.5 1.5 0 0 1 1.5 1.5V13"/>`,
-  // Stove with stones and rising heat — sauna.
+  // Stove with stones and rising heat   sauna.
   sauna: `<rect x="5" y="10" width="14" height="10" rx="1.5"/>
           <path d="M8.5 13.5h7"/>
           <path d="M9 7c0-1.2 1-1.6 1-2.6"/>
           <path d="M12 7c0-1.2 1-1.6 1-2.6"/>
           <path d="M15 7c0-1.2 1-1.6 1-2.6"/>`,
-  // Round tub with water and steam — hot tub.
+  // Round tub with water and steam   hot tub.
   virivka: `<path d="M4 12h16v4.5a3.5 3.5 0 0 1-3.5 3.5h-9A3.5 3.5 0 0 1 4 16.5V12Z"/>
             <path d="M7 15.5c1.2 0 1.2 1 2.4 1s1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1"/>
             <path d="M9 8.5c0-1.3 1.1-1.7 1.1-2.8"/>
             <path d="M14 8.5c0-1.3 1.1-1.7 1.1-2.8"/>`,
-  // Arched hearth with a flame — fireplaces.
+  // Arched hearth with a flame   fireplaces.
   krb: `<path d="M4 20V6.5A1.5 1.5 0 0 1 5.5 5h13A1.5 1.5 0 0 1 20 6.5V20"/>
         <path d="M8 20v-5a4 4 0 0 1 8 0v5"/>
         <path d="M12 17.5c-1 0-1.7-.8-1.7-1.7 0-1.2 1.7-2.3 1.7-3.6.9.7 1.7 1.9 1.7 3.3 0 1.1-.7 2-1.7 2Z"/>`,
-  // Water in an oval bank — pond.
+  // Water in an oval bank   pond.
   jezirko: `<path d="M3.2 12.5c0-3 3.9-5.4 8.8-5.4s8.8 2.4 8.8 5.4-3.9 5.4-8.8 5.4-8.8-2.4-8.8-5.4Z"/>
             <path d="M7 12c1 0 1 .9 2 .9s1-.9 2-.9 1 .9 2 .9 1-.9 2-.9"/>`,
-  // Dog's head — pets welcome.
+  // Dog's head   pets welcome.
   pes: `<path d="M6 7.5 4.5 4l3.6 1.7"/>
         <path d="M18 7.5 19.5 4l-3.6 1.7"/>
         <path d="M5.5 11.5a6.5 6.5 0 0 1 13 0v2.2c0 2.9-2.4 5.3-5.3 5.3h-2.4A5.3 5.3 0 0 1 5.5 13.7Z"/>
         <path d="M10 12h.01M14 12h.01"/>
         <path d="M12 15v1.2"/>`,
   /*
-   * Wheelchair glyph — step-free access. The rim is a closed circle: the first
+   * Wheelchair glyph   step-free access. The rim is a closed circle: the first
    * version had an open arc, which reads as a loading spinner.
    */
   bezbarierovy: `<circle cx="10.5" cy="4.2" r="1.7"/>
@@ -125,23 +125,23 @@ const paths: Record<IconName, string> = {
 
   /* ---- Inquiry form ---------------------------------------------------- */
 
-  // Envelope with an open flap — e-mail field.
+  // Envelope with an open flap   e-mail field.
   email: `<rect x="3" y="5.5" width="18" height="13" rx="2"/>
           <path d="m3.6 7.2 7.2 5.1a2 2 0 0 0 2.4 0l7.2-5.1"/>`,
-  // Single figure — name field.
+  // Single figure   name field.
   jmeno: `<circle cx="12" cy="8" r="3.4"/><path d="M5.2 20a6.8 6.8 0 0 1 13.6 0"/>`,
-  // Handset — phone field.
+  // Handset   phone field.
   telefon: `<path d="M8.4 3.8 10.1 7.7 8 9.4a12.4 12.4 0 0 0 6.6 6.6l1.7-2.1 3.9 1.7v2.9a2 2 0 0 1-2.2 2A17.5 17.5 0 0 1 3.5 6a2 2 0 0 1 2-2.2Z"/>`,
-  // Calendar leaf — the free-text date field.
+  // Calendar leaf   the free-text date field.
   kalendar: `<rect x="3.5" y="5.5" width="17" height="15" rx="2"/>
              <path d="M3.5 10.2h17"/><path d="M8 3.5v4M16 3.5v4"/>`,
-  // Small figure — children count.
+  // Small figure   children count.
   deti: `<circle cx="12" cy="6" r="2.6"/><path d="M12 8.8v5.4"/>
          <path d="M8.8 11.2h6.4"/><path d="m9.6 20.5 2.4-5 2.4 5"/>`,
-  // Speech bubble with two lines — message field.
+  // Speech bubble with two lines   message field.
   zprava: `<path d="M20.5 15.2a2 2 0 0 1-2 2H8.4L4.5 20.4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2Z"/>
            <path d="M8.5 8.8h8M8.5 12.2h5"/>`,
-  // Paper plane — submit.
+  // Paper plane   submit.
   odeslat: `<path d="M20.6 3.6 3.4 9.9l7 3.1 3.1 7 7.1-16.4Z"/><path d="m10.4 13-.4 4.3 2.6-2.3"/>`,
 
   /*
@@ -156,10 +156,10 @@ const paths: Record<IconName, string> = {
   dalsi: `<path d="M9 5l7 7-7 7"/>`,
   prehrat: `<path d="M8 5.2v13.6L19 12 8 5.2Z"/>`,
   zavrit: `<path d="M6 6l12 12"/><path d="M18 6L6 18"/>`,
-  // Four corner brackets — expand to the lightbox.
+  // Four corner brackets   expand to the lightbox.
   zvetsit: `<path d="M4 9V4h5"/><path d="M20 9V4h-5"/>
             <path d="M4 15v5h5"/><path d="M20 15v5h-5"/>`,
-  // A ridge with a snow line — the Sněžník massif, not a generic triangle.
+  // A ridge with a snow line   the Sněžník massif, not a generic triangle.
   hora: `<path d="M2 19l6.5-11 4 6 2.5-3.5L21 19Z"/>
          <path d="M6.2 13.2h4.6M13.6 13.2h3.4"/>`,
   pin: `<path d="M12 21s6.5-6 6.5-11a6.5 6.5 0 1 0-13 0C5.5 15 12 21 12 21Z"/>
@@ -168,7 +168,7 @@ const paths: Record<IconName, string> = {
          <path d="M4 16.5h16"/><path d="M5.5 13.5h13"/>
          <circle cx="7.5" cy="16.5" r="1.6"/>
          <circle cx="16.5" cy="16.5" r="1.6"/>`,
-  // Boot with a lace and a heel — on foot.
+  // Boot with a lace and a heel   on foot.
   pesky: `<path d="M7 4v8.5c0 1 .4 1.6 1.6 2.3l6.4 3.6c1.4.8 2.2 1.3 2.2 2.2v.4H5.5a1.5 1.5 0 0 1-1.5-1.5V4Z"/>
           <path d="M7 8h2.6M7 11.2h1.8"/>`,
 };

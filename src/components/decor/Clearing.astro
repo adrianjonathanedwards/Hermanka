@@ -1,7 +1,7 @@
----
+﻿---
 /**
  * Two small stands of spruce, one at each end of a section, with nothing between
- * them. The text sits in the gap — a clearing.
+ * them. The text sits in the gap   a clearing.
  *
  * WHY THIS EXISTS
  * It replaced a flat-vector scene of a house on a hillside in the O nás panel:
@@ -15,7 +15,7 @@
  * in the wood.
  *
  * ---------------------------------------------------------------------------
- * THE TREES ARE PREMADE — see pine-tree.ts for the source, the licence and the
+ * THE TREES ARE PREMADE   see pine-tree.ts for the source, the licence and the
  * reason the procedural ones were dropped. Short version: `makeSpruce` is built
  * for a hundred small trees massed along an edge, and this section stands three
  * of them alone at 400px, where the regularity of generated notching is all you
@@ -25,14 +25,14 @@
  *
  *  - **Scale.** Roughly 2 : 1 between the largest and the smallest here, which is
  *    a stand of different-aged trees rather than one tree at three sizes.
- *  - **Mirroring.** The silhouette is markedly asymmetric — the left flank is
- *    heavier than the right — so a horizontal flip genuinely reads as a second
+ *  - **Mirroring.** The silhouette is markedly asymmetric   the left flank is
+ *    heavier than the right   so a horizontal flip genuinely reads as a second
  *    tree, and the flips are set per tree below rather than alternating.
  *  - **The slope.** No two feet share a ground line. `y` lifts a tree up the
  *    hillside, which is both the oldest depth cue there is and what the
  *    paragraph beside it says: `zasazený do zalesněné stráně`.
  *  - **Two ranks.** The back rank is drawn at 45%, higher up the slope and
- *    smaller. There is no blur and no gradient — this stays a flat print.
+ *    smaller. There is no blur and no gradient   this stays a flat print.
  *
  * FILL AND WEIGHT. --kamen on --omitka, which is one tonal step: the trees read
  * as the paper's texture rather than as a picture, and never compete with the
@@ -42,7 +42,7 @@
  * ⚠ NOTHING HERE IS EVER CLIPPED, AND THAT IS ENFORCED RATHER THAN EYEBALLED.
  *
  * An earlier version hand-typed a viewBox and hand-placed the trees inside it,
- * and several of them crossed it — a whole flank of the tallest tree was being
+ * and several of them crossed it   a whole flank of the tallest tree was being
  * eaten by the SVG viewport at every width.
  *
  * Now: every tree's placed extent is computed from `PINE_BOX` (`placeAll`
@@ -53,7 +53,7 @@
  * does. ONas.astro caps that box to the gutter beside the measure so the trees
  * cannot reach the type either.
  *
- * Move a tree, resize it, add one — the box follows. That is the point.
+ * Move a tree, resize it, add one   the box follows. That is the point.
  */
 import { PINE_PATH, PINE_BOX } from './pine-tree';
 
@@ -73,7 +73,7 @@ type Tree = { x: number; h: number; y: number; flip?: boolean };
 /*
  * Left: one big tree at the page edge with a second in front of it and a third
  * behind, all three overlapping. Right: two, and the taller one is the outer
- * one, so the two stands are not each other's mirror — docs/02-design-system.md
+ * one, so the two stands are not each other's mirror   docs/02-design-system.md
  * §3, the asymmetry is deliberate.
  *
  * Kept few and large on purpose. A row of five reads as a border pattern; three
@@ -88,7 +88,7 @@ const LEFT = {
    * An earlier pass overlapped them by half: same fill, no outline, so they
    * merged into one silhouette with a tangle of white notches through the middle
    * and neither one read as a tree. Depth comes from the BACK rank being behind
-   * both — not from stacking the front ones.
+   * both   not from stacking the front ones.
    */
   front: [
     { x: 118, h: 470, y: 0 },
@@ -118,7 +118,7 @@ interface Stand {
  *
  * The inner `translate` is in the ARTWORK's coordinates and moves the box's
  * bottom-centre onto the origin; the outer one then puts that origin where the
- * tree stands. Order matters — swapping them mirrors the whole stand instead of
+ * tree stands. Order matters   swapping them mirrors the whole stand instead of
  * the one tree.
  */
 function place(t: Tree, ground: number) {

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Generates the self-hosted woff2 subsets in public/fonts/.
  *
@@ -38,7 +38,7 @@ const FACES = [
     // and holds the diacritics together. Verified side by side at 49px.
     //
     // Keeping opsz as a live axis instead would cost 44.6 kB against 23.7 kB
-    // pinned — nearly double, for a nuance CSS would never need to vary.
+    // pinned   nearly double, for a nuance CSS would never need to vary.
     //
     // SOFT and WONK are pinned to 0; the wonky forms are not the brand.
     variationAxes: { wght: { min: 400, max: 600 }, opsz: 24, SOFT: 0, WONK: 0 },
@@ -76,7 +76,7 @@ for (const face of FACES) {
   const ok = buf.length <= BUDGET_BYTES;
   if (!ok) over = true;
   console.log(
-    `${ok ? '✓' : '✗'} ${face.out.padEnd(24)} ${kb.padStart(6)} kB  (budget ${BUDGET_BYTES / 1024} kB)`
+    `${ok ? '✓' : '� '} ${face.out.padEnd(24)} ${kb.padStart(6)} kB  (budget ${BUDGET_BYTES / 1024} kB)`
   );
 }
 

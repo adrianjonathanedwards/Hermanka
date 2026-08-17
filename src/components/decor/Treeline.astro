@@ -1,16 +1,16 @@
----
+﻿---
 /**
- * Footer treeline — a full-width spruce wood in --les, five depth ranks.
+ * Footer treeline   a full-width spruce wood in --les, five depth ranks.
  *
  * Drawn to match the client's existing brand mark (visible on the aerial maps in
  * /img): a narrow spike leader, then three or four BOLDLY NOTCHED tiers, each one
  * running out-and-down to a point before the outline cuts back up and in. Not
- * smooth triangles — the deep notch is the whole signature, and a first attempt
+ * smooth triangles   the deep notch is the whole signature, and a first attempt
  * with shallow 10% notches read as generic vector clip-art at these scales.
  * docs/02-design-system.md §4.
  *
  * The brand mark itself is white OUTLINE line work. This is filled silhouette,
- * which is what the placement needs — it is the mass the footer rises out of, not
+ * which is what the placement needs   it is the mass the footer rises out of, not
  * an ornament laid over a photograph. The geometry carries the hand, not the
  * treatment.
  *
@@ -19,7 +19,7 @@
  * inside the footer is invisible by design, so the depth ranks are seen exactly
  * where they should be, against the lighter band.
  *
- * SIZE AND RANDOMNESS. The ranks are generated, not typed out — see forest.ts for
+ * SIZE AND RANDOMNESS. The ranks are generated, not typed out   see forest.ts for
  * why, and for the seeding rule. Trees are roughly a third taller than the first
  * pass and there are five ranks rather than four, so the edges read as a wood
  * with depth in it rather than as a decorative border.
@@ -34,34 +34,34 @@ import { plantRank, transformFor } from './forest';
 /*
  * ⚠ THIS WOOD IS --les ON A LIGHT BAND, AND IT DOES NOT INVERT.
  *
- * The 404 page tried it the other way round — a `fill` prop, the same drawing in
- * `--kamen`, hung along the bottom of a dark panel — and it failed for a reason
+ * The 404 page tried it the other way round   a `fill` prop, the same drawing in
+ * `--kamen`, hung along the bottom of a dark panel   and it failed for a reason
  * worth writing down rather than rediscovering. Five ranks at this density leave
  * more canopy than sky, so on a dark ground the light fill becomes the mass and
  * the gaps between the trees become the figure: the eye reads a bank of dark
  * spikes hanging DOWNWARD, not a wood. It is not a colour problem and no amount
  * of tuning the fill fixes it.
  *
- * The hero's old treeline was a separate component for exactly this reason — it
+ * The hero's old treeline was a separate component for exactly this reason   it
  * was drawn sparse and dissolved into the photograph behind a mask. If a light
  * wood on a dark ground is ever wanted again, that is the drawing to bring back,
  * not this one recoloured.
  */
 
 /*
- * Six hand-authored spruces. CROWN ONLY — no trunk. The skirt of the lowest tier
+ * Six hand-authored spruces. CROWN ONLY   no trunk. The skirt of the lowest tier
  * runs straight to the ground line at y=0 and the tree is closed there.
  *
  * A trunk is the wrong drawing for this: a wood seen from outside is a mass of
  * foliage, and the gap under each crown that a trunk implies is exactly what made
  * the first version read as a row of separate ornaments rather than as a forest.
- * The trunks were also invisible in practice — the solid foot on the front rank
- * covers that band — so they cost geometry and bought a worse silhouette.
+ * The trunks were also invisible in practice   the solid foot on the front rank
+ * covers that band   so they cost geometry and bought a worse silhouette.
  *
  * Tip at y=-112, centred on x=0, so `translate(x BASE) scale(s)` plants every tree
- * on the same ground line whatever its scale — and a negative x-scale mirrors it.
+ * on the same ground line whatever its scale   and a negative x-scale mirrors it.
  *
- * Every one is asymmetric — the left flank never mirrors the right. A: four even
+ * Every one is asymmetric   the left flank never mirrors the right. A: four even
  * tiers. B: broad, heavy lower skirt. C: five tiers, the finest stepping.
  * D: leaning, wide bottom tier. E: narrow sapling. F: the widest, most ragged.
  */
@@ -86,8 +86,8 @@ const BASE_Y = 322;
  * NO FADE. The ranks used to run 0.2 → 1 in opacity, which put atmospheric haze
  * on the far ones. They are all solid --les now: this is a silhouette against a
  * light band, and it is meant to read as one sharp cut edge rather than as a mist.
- * The ranks still earn their keep — five passes at different scales, gaps and
- * saddle depths are what make the canopy line dense and irregular — they just no
+ * The ranks still earn their keep   five passes at different scales, gaps and
+ * saddle depths are what make the canopy line dense and irregular   they just no
  * longer differ in weight.
  *
  * Scales never go below 0.45. Smaller than that the notches close up and the tree
@@ -117,7 +117,7 @@ const PLANTED = RANKS.map((r) =>
 
 {/*
   `slice`, paired with the min-height in global.css. Left to its intrinsic ratio
-  this wood is 65 px tall on a phone — the trees turn into a serrated line and the
+  this wood is 65 px tall on a phone   the trees turn into a serrated line and the
   point of drawing them is lost. Below ~600 px the min-height wins, the SVG scales
   up to cover, and the sides crop instead. One stretch of wood looks like any
   other, so the crop costs nothing.

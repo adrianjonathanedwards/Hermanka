@@ -1,4 +1,4 @@
-# Chalupa Heřmanka
+﻿# Chalupa Heřmanka
 
 Website for **Chalupa Heřmanka**, a holiday cottage in Heřmanice u Králík below the
 Králický Sněžník. Replaces the 2019 site at <https://www.chalupahermanka.cz/>.
@@ -8,7 +8,7 @@ service of that. Read [docs/00-brief.md](docs/00-brief.md) before writing anythi
 
 > **Status: documentation and scaffold only. No pages are built.**
 > `src/pages/` is empty on purpose. `npm run build` succeeds and produces zero
-> pages — that is the expected result at this stage.
+> pages   that is the expected result at this stage.
 
 ---
 
@@ -28,8 +28,8 @@ npm run dev          # http://localhost:4321
 | --- | --- |
 | `npm run dev` | Dev server with HMR |
 | `npm run build` | Static build into `dist/` |
-| `npm run preview` | Serve `dist/` locally — closest thing to production |
-| `npm run check` | `astro check` — types and templates. Must be clean before a PR. |
+| `npm run preview` | Serve `dist/` locally   closest thing to production |
+| `npm run check` | `astro check`   types and templates. Must be clean before a PR. |
 | `npm run build:fonts` | Regenerate the self-hosted font subsets (needs network) |
 | `npm run verify:fonts` | Verify the committed fonts cover the Czech alphabet |
 
@@ -53,13 +53,13 @@ Plus the component checklist in [docs/02-design-system.md](docs/02-design-system
 | Node version | 20 or later |
 | Production branch | `main` |
 
-Every pull request gets a preview URL. **Review on the preview, not locally** — it
+Every pull request gets a preview URL. **Review on the preview, not locally**   it
 is the only place `public/_redirects` and the real cache headers apply.
 
 Two Cloudflare Workers (inquiry form, availability feed) deploy **separately** with
 `wrangler` from [`worker/`](worker/). They are not part of the Pages build and
-neither is written yet. Their secrets — `RESEND_API_KEY`, `INQUIRY_TO`,
-`INQUIRY_FROM` — are set with `wrangler secret put` and never committed.
+neither is written yet. Their secrets   `RESEND_API_KEY`, `INQUIRY_TO`,
+`INQUIRY_FROM`   are set with `wrangler secret put` and never committed.
 
 ---
 
@@ -67,31 +67,31 @@ neither is written yet. Their secrets — `RESEND_API_KEY`, `INQUIRY_TO`,
 
 ```
 /img                    Source photography. Originals, mixed JPEG and WebP.
-                        NOT processed by the build — see below.
+                        NOT processed by the build   see below.
 /docs                   Project documentation. Start at 00-brief.md.
 /tools                  Build-time scripts (font subsetting and verification).
-/worker                 Cloudflare Workers. Placeholder — nothing built yet.
+/worker                 Cloudflare Workers. Placeholder   nothing built yet.
 
 /public                 Served verbatim at the site root. Never optimised.
   /fonts                Generated woff2 subsets + OFL licence. Do not hand-edit.
-  favicon.svg           Placeholder mark — awaiting the real logo vector.
+  favicon.svg           Placeholder mark   awaiting the real logo vector.
   robots.txt
   _redirects            301s from the old 2019 URLs. Do not delete these.
 
 /src
   /assets/img           Images the build imports. Optimised, fingerprinted, WebP.
-  /components           Astro components. Empty — see docs/02-design-system.md §6.
+  /components           Astro components. Empty   see docs/02-design-system.md §6.
   /i18n                 Locale config, UI strings, path helpers.
-  /layouts              BaseLayout.astro — owns <head>. The only layout.
+  /layouts              BaseLayout.astro   owns <head>. The only layout.
   /pages                Routes. Empty by design in this phase.
-  /styles/global.css    Tailwind v4 @theme — every design token lives here.
+  /styles/global.css    Tailwind v4 @theme   every design token lives here.
 ```
 
 ### Where images live
 
 Two places, and the difference matters.
 
-**`/img` at the repo root** holds the **source photography** — the originals as
+**`/img` at the repo root** holds the **source photography**   the originals as
 supplied by the client. Nothing in `/img` is served or processed. It is the archive.
 
 **`src/assets/img/`** holds images the site actually uses. They are imported into
@@ -118,7 +118,7 @@ is `loading="lazy"` except the hero. Full rules in
 ### Fonts
 
 Two self-hosted variable woff2 files, 40.7 kB together, subset to a Czech charset and
-**committed** — so a build needs no network. Regenerate with `npm run build:fonts`.
+**committed**   so a build needs no network. Regenerate with `npm run build:fonts`.
 
 There is a real trap here: Google's `latin-ext` subset does **not** contain the whole
 Czech alphabet, and subsetting to it alone renders `Heřmanka` in two different fonts.
@@ -141,14 +141,14 @@ licence conditions. Keep the credits with the code.
 
 | What | Where | Licence |
 | --- | --- | --- |
-| **Lucide** icons — the facts strip | `lucide-static`, inlined by [`src/components/IconLucide.astro`](src/components/IconLucide.astro) | ISC |
-| **"Pine tree"** by **Lorc**, [game-icons.net](https://game-icons.net/1x1/lorc/pine-tree.html) — the stands in the O nás clearing | [`src/components/decor/pine-tree.ts`](src/components/decor/pine-tree.ts) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
+| **Lucide** icons   the facts strip | `lucide-static`, inlined by [`src/components/IconLucide.astro`](src/components/IconLucide.astro) | ISC |
+| **"Pine tree"** by **Lorc**, [game-icons.net](https://game-icons.net/1x1/lorc/pine-tree.html)   the stands in the O nás clearing | [`src/components/decor/pine-tree.ts`](src/components/decor/pine-tree.ts) | [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) |
 
 CC BY requires the attribution above to stay published. If the spruce is ever
 replaced, change this table in the same commit.
 
-Everything else drawn on the site — the footer treeline, the sprig dividers, the
-roof mark, the form icons — was made for it and is generated or hand-authored in
+Everything else drawn on the site   the footer treeline, the sprig dividers, the
+roof mark, the form icons   was made for it and is generated or hand-authored in
 [`src/components/decor/`](src/components/decor/).
 
 ---
@@ -165,11 +165,11 @@ roof mark, the form icons — was made for it and is generated or hand-authored 
 
 ### Two things to read before building anything
 
-1. **[docs/01-content.md](docs/01-content.md) §9** — twenty-four questions the
+1. **[docs/01-content.md](docs/01-content.md) §9**   twenty-four questions the
    client has to answer. Fifteen of them block launch, including the room-by-room
    capacity (the old site's prose totals up to 19 people against a stated maximum of
    15) and an unverified `bezbariérové ubytování` accessibility claim.
-2. **[docs/03-tech.md](docs/03-tech.md) §3** — **there is no iCal feed yet.**
+2. **[docs/03-tech.md](docs/03-tech.md) §3**   **there is no iCal feed yet.**
    Availability on the current site is a third-party HTML iframe from `e-chalupy.cz`
    with no `.ics` export. The calendar cannot be built until a source is agreed;
    the recommendation is a private Google Calendar owned by the client.
@@ -180,16 +180,16 @@ roof mark, the form icons — was made for it and is generated or hand-authored 
 
 Created in this first phase:
 
-**Documentation** — `docs/00-brief.md`, `docs/01-content.md`,
+**Documentation**   `docs/00-brief.md`, `docs/01-content.md`,
 `docs/02-design-system.md`, `docs/03-tech.md`, `docs/04-pages.md`, this README.
 
-**Scaffold** — `astro.config.mjs` (static output, i18n routing for `cs`/`de`,
+**Scaffold**   `astro.config.mjs` (static output, i18n routing for `cs`/`de`,
 sitemap, prefetch off), `tsconfig.json`, `package.json`, `.gitignore`,
 `src/styles/global.css` (all tokens in `@theme`), `src/layouts/BaseLayout.astro`,
 `src/i18n/{config,ui,utils}.ts`, `public/_redirects`, `public/robots.txt`,
 `public/favicon.svg`, `worker/README.md`.
 
-**Font pipeline** — `tools/charset.mjs`, `tools/build-fonts.mjs`,
+**Font pipeline**   `tools/charset.mjs`, `tools/build-fonts.mjs`,
 `tools/verify-font-coverage.mjs`, and the two generated woff2 files in
 `public/fonts/`.
 

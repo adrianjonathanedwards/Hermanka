@@ -1,37 +1,70 @@
 ﻿---
 /**
- * Koupání v okolí — swimming near the cottage.
+ * Koupání v okolí   swimming near the cottage.
  *
  * Rewrites docs/01-content.md §7.2: eleven places in one comma-separated run,
  * no distances, no order. "Needs distances and a sort by distance, or a cut to
  * the nearest four."
  *
  * DATA: src/data/okoli.ts KOUPANI_BLIZKO + KOUPANI_DALSI. The data is already
- * split into two arrays for exactly this reason — the two entries in BLIZKO have
+ * split into two arrays for exactly this reason   the two entries in BLIZKO have
  * verified distances from the distance table (§5.2), the ten in DALSI do not.
  * Neither sorting by distance nor cutting to the nearest four is possible without
  * figures for the whole set.
  *
- * TODO(client) — docs/01-content.md §9 item 21. Once the client supplies
+ * TODO(client)   docs/01-content.md §9 item 21. Once the client supplies
  * distances for the KOUPANI_DALSI entries:
  *   1. Add vzdalenost to each item in src/data/okoli.ts.
  *   2. Merge the two arrays, sort ascending by vzdalenost.
- *   3. Consider cutting the list to the four closest — eleven entries is long,
- *      and past about four the incremental value of the next entry drops steeply.
+ *   3. Cut the list to the four closest   eleven entries is long, and past about
+ *      four the incremental value of the next entry drops steeply. The whole
+ *      section then collapses into the two-figure shape below with four cells.
  *
- * NULL DISTANCE RENDERING
- * KOUPANI_DALSI names appear without chips. A missing distance is not a problem
- * to paper over — it is the honest state of an entry nobody has given a number
- * for. The secondary heading and the explanatory note below the list tell the
- * reader why the chips are absent.
+ * ---------------------------------------------------------------------------
+ * THE SHAPE: TWO FIGURES, THEN A COLUMN OF NAMES
+ *
+ * The section is the last of three consecutive "some places, each with a
+ * distance" sections, so what it must NOT be is a third variation of the same
+ * arrangement. Above it are a catalogue of six rows and a single statement.
+ *
+ * So it is the only section on the page built as a top-and-bottom rather than a
+ * left-and-right: the two measured places run across the full measure as a pair
+ * of large figures   the same fact-box shape the opener's panel uses, and the
+ * only place on the page that shape is repeated, deliberately, as a rhyme that
+ * closes the sequence it opened   and the ten unmeasured names sit under them in
+ * three quiet columns.
+ *
+ * `column-count`, not a grid. A grid with `grid-auto-flow: row` fills ACROSS
+ * before it fills down, which puts consecutive entries beside each other rather
+ * than under each other and makes ten names read as a table with the headings
+ * missing. `column-count` fills each column to the bottom before starting the
+ * next, which is how a list of names is set in print.
+ *
+ * NULL DISTANCE RENDERING (unchanged)
+ * KOUPANI_DALSI names appear with no figure. A missing distance is not a problem
+ * to paper over   it is the honest state of an entry nobody has given a number
+ * for. The heading and the note above the list say why, in one sentence, once.
+ *
+ * ---- THE TILE ----
+ * No photograph exists of Bazén Králíky or Přehrada Pastviny   see the note on
+ * `Vylet.foto` in src/data/okoli.ts for why one is not invented   so both figure
+ * cells get the shared OkoliMedia icon placeholder (`waves`), small, beside the
+ * number rather than replacing it. The ten names below get the same icon inline,
+ * at the size OkoliLyzovani.astro's ski run uses, for the same reason: a tile
+ * each would promise data none of them have.
+ *
+ * `waves` is hardcoded per call rather than added as a per-entry field in
+ * src/data/okoli.ts   every entry in this whole section is a body of water, so a
+ * field that could only ever hold one value would be data pretending to vary.
  *
  * Band: --kamen. Follows --jinovatka (lyzovani) and precedes --omitka (CtaBand).
  */
 import { KOUPANI_BLIZKO, KOUPANI_DALSI } from '../../../data/okoli';
 import IconLucide from '../../IconLucide.astro';
+import OkoliMedia from './OkoliMedia.astro';
 
-/* U+00A0 — non-breaking space. */
-const NBSP = '\u00A0';
+/* U+00A0   non-breaking space. */
+const NBSP = ' ';
 ---
 
 <section class="koupani section" aria-labelledby="koupani-nadpis">
@@ -40,48 +73,49 @@ const NBSP = '\u00A0';
       <h2 id="koupani-nadpis">Koupání v okolí</h2>
       <p class="koupani-lead">
         Nejbližší bazén je v Králíkách 3{NBSP}km odsud. Přehrada Pastviny je
-        17{NBSP}km — největší vodní plocha v bezprostředním okolí.
+        17{NBSP}km   největší vodní plocha v bezprostředním okolí.
       </p>
     </header>
 
-    {/* ---- Primary: entries with verified distances ---- */}
-    <ul class="koupani-blizko" role="list" data-reveal>
+    {/*
+      The two with verified distances. NOT `aria-hidden`, unlike the figure pair
+      in the opener's panel: those two numbers are repeated from the sentence
+      above them, whereas `Bazén Králíky` and `Přehrada Pastviny` are named
+      nowhere else in this section. Hiding this would delete both places from the
+      accessibility tree. It is a real definition list.
+    */}
+    <dl class="koupani-fakta" data-reveal>
       {
         KOUPANI_BLIZKO.map((k) => (
-          <li class="card koupani-karta">
-            <div class="koupani-ikona" aria-hidden="true">
-              <IconLucide name="waves" size={28} />
+          <div class="koupani-fakt">
+            <OkoliMedia icon="waves" class="koupani-fakt-media" />
+            <div>
+              <dt>{k.vzdalenost}</dt>
+              <dd>{k.nazev}</dd>
             </div>
-            <h3 class="koupani-nazev">{k.nazev}</h3>
-            {k.vzdalenost && (
-              <div class="koupani-meta">
-                <span class="chip">
-                  <IconLucide name="ruler" size={14} />
-                  {k.vzdalenost}
-                </span>
-              </div>
-            )}
-          </li>
+          </div>
         ))
       }
-    </ul>
+    </dl>
 
-    {/* ---- Secondary: remaining places (no distances) ---- */}
+    {/* ---- The rest: names, and honestly nothing else ---- */}
     {
       KOUPANI_DALSI.length > 0 && (
         <div class="koupani-dalsi" data-reveal>
-          <h3 class="koupani-dalsi-nadpis">Další koupaliště a aquaparky v kraji</h3>
-          <p class="koupani-dalsi-pozn">
-            Vzdálenosti k níže uvedeným místům nejsou ověřeny. Jsou uvedena pouze jména.
-            {/*
-              TODO(client) — §9 item 21: supply distances so this list can be
-              sorted and cut to the nearest four.
-            */}
-          </p>
+          <div class="koupani-dalsi-header">
+            <h3 class="koupani-dalsi-nadpis">Další koupaliště a aquaparky v kraji</h3>
+            <p class="koupani-dalsi-pozn">
+              Vzdálenosti k těmto místům zatím nejsou ověřeny, a proto zde nejsou uvedeny.
+              {/*
+                TODO(client)   §9 item 21: supply distances so this list can be
+                sorted and cut to the nearest four.
+              */}
+            </p>
+          </div>
           <ul class="koupani-seznam" role="list">
             {KOUPANI_DALSI.map((nazev) => (
-              <li class="koupani-polozka">
-                <IconLucide name="waves" size={16} class="koupani-polozka-ikona" />
+              <li>
+                <IconLucide name="waves" size={13} class="koupani-seznam-ikona" />
                 <span>{nazev}</span>
               </li>
             ))}
@@ -107,64 +141,94 @@ const NBSP = '\u00A0';
     color: var(--color-les);
   }
 
+  .koupani-header {
+    max-width: 48ch;
+  }
+
   .koupani-lead {
     margin-top: 1rem;
     font-size: var(--text-lead);
-    max-width: 48ch;
     /* --kura on --kamen = 9.96:1 */
     color: var(--color-kura);
   }
 
-  /* ---- Primary cards ----------------------------------------------------- */
-
-  .koupani-blizko {
+  /* ---- The two verified figures ------------------------------------------
+   * One brass rule over both, the figure large in the display face and the place
+   * name small underneath it. No box, no icon, no border.
+   */
+  /*
+   * A grid of equal cells, not a wrapping flex row. Flex packs each cell to its
+   * own content width, so `17 km` started wherever `Bazén Králíky` happened to
+   * end and the two figures did not line up as a pair   which is the one thing a
+   * pair of figures under a shared rule has to do.
+   */
+  .koupani-fakta {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-    margin-top: 2.5rem;
-    padding: 0;
-    list-style: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem 2rem;
+    max-width: 34rem;
+    margin: 2.5rem 0 0;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--color-mosaz);
   }
 
-  @media (width >= 40rem) {
-    .koupani-blizko {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      max-width: 40rem;
+  .koupani-fakt {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .koupani-fakt-media {
+    width: 3.25rem;
+  }
+
+  @media (width >= 48rem) {
+    .koupani-fakt-media {
+      width: 4rem;
     }
   }
 
-  .koupani-karta {
-    /* The global `.card` provides display:flex; flex-direction:column; padding;
-       border; background-color:--omitka. The omitka card lifts off the --kamen
-       section background for clear definition. */
-  }
-
-  .koupani-ikona {
-    /* --mosaz-tmava on --omitka = 6.05:1 */
+  .koupani-fakta dt {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-title-m);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    /* --mosaz-tmava on --kamen = 5.06:1 */
     color: var(--color-mosaz-tmava);
-    margin-bottom: 0.875rem;
-    flex: none;
   }
 
-  .koupani-nazev {
-    font-size: var(--text-title-s);
+  @media (width >= 48rem) {
+    .koupani-fakta dt {
+      font-size: var(--text-title-l);
+    }
+  }
+
+  .koupani-fakta dd {
+    margin: 0.5rem 0 0;
+    font-size: var(--text-body);
+    line-height: 1.4;
+    /* --les on --kamen = 12.91:1 */
     color: var(--color-les);
-    margin-bottom: 0;
   }
 
-  .koupani-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.625rem;
-    margin-top: 1rem;
-    padding-top: 0.875rem;
-    border-top: 1px solid rgb(62 50 38 / 0.1);
-  }
-
-  /* ---- Secondary list ---------------------------------------------------- */
+  /* ---- The rest ---------------------------------------------------------- */
 
   .koupani-dalsi {
     margin-top: 3.5rem;
+  }
+
+  /*
+   * The rule is on the HEADER, not on the note. On the note it stopped at the
+   * note's own measure   a hairline ending two thirds of the way across, which
+   * reads as a mistake rather than as a heading rule.
+   */
+  .koupani-dalsi-header {
+    padding-bottom: 1rem;
+    /* A hairline, not the 2px brass above: this list is subordinate to the two
+       figures, and the weight of the rule is what says so. */
+    border-bottom: 1px solid rgb(22 36 28 / 0.14);
   }
 
   .koupani-dalsi-nadpis {
@@ -172,46 +236,48 @@ const NBSP = '\u00A0';
   }
 
   .koupani-dalsi-pozn {
-    margin-top: 0.625rem;
+    margin-top: 0.5rem;
     font-size: var(--text-caption);
+    max-width: 56ch;
     /* --kura on --kamen = 9.96:1 */
     color: var(--color-kura);
-    max-width: 52ch;
   }
 
   .koupani-seznam {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    margin-top: 1.25rem;
+    margin: 1.5rem 0 0;
     padding: 0;
     list-style: none;
   }
 
   @media (width >= 40rem) {
     .koupani-seznam {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-count: 2;
+      column-gap: 3rem;
     }
   }
 
   @media (width >= 64rem) {
     .koupani-seznam {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-count: 3;
     }
   }
 
-  .koupani-polozka {
+  .koupani-seznam li {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding-block: 0.6rem;
     font-size: var(--text-body);
     /* --kura on --kamen = 9.96:1 */
     color: var(--color-kura);
+    border-bottom: 1px solid rgb(22 36 28 / 0.09);
+    /* A name must never be split across the column break. */
+    break-inside: avoid;
   }
 
-  .koupani-polozka-ikona {
+  .koupani-seznam-ikona {
     flex: none;
-    opacity: 0.5;
+    opacity: 0.55;
     /* Muted: these entries are deliberately secondary because they have no data. */
     color: var(--color-kura);
   }

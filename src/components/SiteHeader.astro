@@ -1,10 +1,10 @@
----
+﻿---
 /**
  * Site header. Transparent over the hero, frosted --les once scrolled.
  * Mobile navigation is a <details> disclosure, so it works with JavaScript off.
  *
  * The brand is the client's supplied logo. It replaced a text lockup with a
- * drawn spruce that stood in while no artwork existed — see RoofMark.astro for
+ * drawn spruce that stood in while no artwork existed   see RoofMark.astro for
  * the roof from that same logo rebuilt as vector paths, which the section
  * dividers and the favicon use.
  *
@@ -22,7 +22,7 @@ interface Props {
    *
    * ⚠ REQUIRED ON ANY PAGE WHOSE FIRST SCREEN IS LIGHT. The header is
    * transparent at the top of the page so it can sit over a hero photograph, and
-   * everything in it — the logo raster, the nav, the burger — is WHITE. Over
+   * everything in it   the logo raster, the nav, the burger   is WHITE. Over
    * `--omitka` that is a header nobody can see: not dimmed, gone, with only the
    * brass button left behind. The 404 found this the hard way.
    *
@@ -38,7 +38,7 @@ const { solid = false } = Astro.props;
 <header class:list={['site-header', { 'is-solid': solid }]}>
   <div class="wrap header-inner">
     {/*
-      The client's own logo, supplied white on transparent — so it works over the
+      The client's own logo, supplied white on transparent   so it works over the
       hero photograph and over the frosted --les header with no second asset and
       no colour variant. WebP keeps the alpha; the source PNG is 36 kB against
       about 4 kB here.
@@ -127,7 +127,7 @@ const { solid = false } = Astro.props;
   }
 
   /*
-   * The opt-out, for pages with no hero behind the header — see the `solid` prop.
+   * The opt-out, for pages with no hero behind the header   see the `solid` prop.
    *
    * Flat --les, not the scrolled state's frosted 0.82: there is no photograph
    * under it to blur, and a translucent header over a stone page is just a
@@ -142,7 +142,7 @@ const { solid = false } = Astro.props;
    * over the hero and settle into frosted glass as it scrolls away.
    * docs/02-design-system.md §5.1.
    *
-   * ⚠ LONGHANDS ONLY — do not rewrite these five lines as `animation: … `.
+   * ⚠ LONGHANDS ONLY   do not rewrite these five lines as `animation: … `.
    * The CSS minifier folds a neighbouring `animation-timeline` into the shorthand
    * (`animation: linear both header-solid scroll(root)`), which Chromium rejects
    * as invalid, so `animation-name` computes to `none` and the header stays
@@ -163,7 +163,7 @@ const { solid = false } = Astro.props;
      * ⚠ `animation-name: none` is the load-bearing half of this, not the colour.
      * A declaration from a running animation beats a normal author declaration
      * whatever its specificity, so the `.is-solid` rule above is overruled at 0%
-     * of `header-solid` — which is `transparent` — and the header vanishes again
+     * of `header-solid`   which is `transparent`   and the header vanishes again
      * on exactly the pages that asked it not to. The animation has to be called
      * off, not out-specified.
      */
@@ -233,7 +233,7 @@ const { solid = false } = Astro.props;
    * wordmark smaller than it looks on paper.
    *
    * Widths are picked against the header's own height, not chosen freely. At
-   * 110px the logo is 89px tall in an 88px bar — it fills it edge to edge with
+   * 110px the logo is 89px tall in an 88px bar   it fills it edge to edge with
    * no air and the header reads as cramped. 78/96 leaves a few pixels top and
    * bottom at both breakpoints.
    */
@@ -332,7 +332,7 @@ const { solid = false } = Astro.props;
     }
   }
 
-  /* ---- Mobile nav — <details>, no JavaScript -------------------------- */
+  /* ---- Mobile nav   <details>, no JavaScript -------------------------- */
 
   .nav-mobile {
     position: relative;
@@ -371,11 +371,25 @@ const { solid = false } = Astro.props;
 
   /* ---- Hamburger → close ---------------------------------------------- */
 
+  /*
+   * ⚠ `transform-box: fill-box` is load-bearing, not decoration.
+   *
+   * Per the CSS Transforms spec the default `transform-box` for an SVG child is
+   * `view-box`   percentages and the `center` keyword resolve against the whole
+   * 24� 24 viewBox, not against the line's own geometry. That is wrong here: the
+   * top and bottom lines have to rotate around THEIR OWN centres   (12,7) and
+   * (12,17)   so that after `translateY` moves them onto the middle line's row
+   * they meet at (12,12) and form a symmetric X. Rotating around the shared
+   * viewBox centre instead sends both diagonals past each other off-axis, which
+   * is the "off-balance" cross a spec-conformant browser was rendering.
+   * `fill-box` restores the per-line bounding box as the rotation origin.
+   */
   .burger line {
+    transform-box: fill-box;
+    transform-origin: center;
     transition:
       transform 320ms var(--ease-spring),
       opacity 160ms var(--ease-out);
-    transform-origin: center;
   }
 
   .nav-mobile[open] .burger-top {
@@ -391,54 +405,61 @@ const { solid = false } = Astro.props;
     transform: translateY(-5px) rotate(-45deg);
   }
 
-  /* ---- Mobile panel ---------------------------------------------------- */
-
+  /* ---- Mobile panel ----------------------------------------------------
+   *
+   * A flat, edge-to-edge sheet hung directly off the header rather than a
+   * floating rounded card. The card version carried a brass top border, a
+   * frosted blur, a drop shadow AND rounded bottom corners all at once, which
+   * is four separate devices doing the one job of "this is a panel"   here a
+   * single flat plane of --les does it, and it reads as part of the header
+   * dropping down rather than as a tooltip that happened to open under it.
+   */
   .nav-mobile-panel {
-    position: absolute;
-    right: -1.5rem;
-    top: calc(100% + 0.5rem);
-    min-width: 16rem;
-    padding: 1rem 1.5rem 1.5rem;
-    /*
-     * 0.97, not 0.9. The blur is the look, but it must not be the thing keeping
-     * the menu readable: Safari drops backdrop-filter under Low Power Mode and
-     * some Android WebViews never composite it at all, and on those the panel
-     * falls back to whatever this alpha alone gives. At 0.97 over --kura that is
-     * still --omitka at 11.6:1; at 0.9 the hero photograph starts showing
-     * through the labels.
-     */
-    background-color: rgb(62 50 38 / 0.97);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
-    border-top: 2px solid var(--color-mosaz);
-    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    position: fixed;
+    inset-inline: 0;
+    top: 4.5rem;
+    padding: 0.5rem 1.5rem 2rem;
+    background-color: var(--color-les);
+    border-top: 1px solid rgb(251 250 248 / 0.12);
     box-shadow: var(--shadow-float);
-    transform-origin: top right;
+    transform-origin: top center;
   }
 
+  /*
+   * Capped and centred rather than stretched full width. The sheet's
+   * background still runs edge to edge; only the list and the button hold to a
+   * column, which is what stops a link on a tablet-width phone reading as one
+   * word lost at the far left of a very wide row.
+   */
   .nav-mobile-panel ul {
+    max-width: 26rem;
+    margin: 0 auto 1.5rem;
     list-style: none;
-    margin: 0 0 1.25rem;
     padding: 0;
   }
 
   .nav-mobile-panel li + li {
-    border-top: 1px solid rgb(255 255 255 / 0.12);
+    border-top: 1px solid rgb(251 250 248 / 0.1);
   }
 
   .nav-mobile-panel a:not(.btn) {
     display: block;
-    padding-block: 0.875rem;
+    padding-block: 1.125rem;
     color: var(--color-omitka);
+    font-size: var(--text-lead);
     text-decoration: none;
     transition: color 200ms var(--ease-out);
   }
 
-  .nav-mobile-panel a:not(.btn):hover {
+  .nav-mobile-panel a:not(.btn):hover,
+  .nav-mobile-panel a:not(.btn):focus-visible {
     color: var(--color-mosaz-svetla);
   }
 
   .nav-mobile-cta {
+    display: block;
+    max-width: 26rem;
     width: 100%;
+    margin-inline: auto;
   }
 </style>

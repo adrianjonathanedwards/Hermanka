@@ -1,11 +1,11 @@
----
+﻿---
 /**
  * Dolní Morava. Photograph bleeding left, text right.
  *
  * The original copy is one subordinate clause with no main verb, and it spells
  * `bobový dráha` (should be `bobová`) and `Sky bridge` (the attraction is
  * `Sky Bridge 721`, spelled correctly on the old /tipy-na-vylety/ page).
- * Rewritten here into three sentences — same facts, correct Czech.
+ * Rewritten here into three sentences   same facts, correct Czech.
  * docs/01-content.md §4.8.
  *
  * ---------------------------------------------------------------------------
@@ -18,8 +18,8 @@
  * each is doing a job rather than decorating:
  *
  *   1. FROST GROUND. The copy panel is --jinovatka instead of --omitka.
- *      docs/02-design-system.md §1 reserves that colour for exactly this — snow,
- *      ski content, the cold months — and forbids it everywhere else, so this is
+ *      docs/02-design-system.md §1 reserves that colour for exactly this   snow,
+ *      ski content, the cold months   and forbids it everywhere else, so this is
  *      the one section on the site where it may appear at all. It is also what
  *      stops the panel reading as a repeat of the Wellness split two screens up.
  *      Measured on it: --les 12.17:1, --kura 9.39:1, --mosaz-tmava 4.81:1. All
@@ -27,7 +27,7 @@
  *
  *   2. THE WOOD. Two spruce at the near edge of the photograph, the outer one
  *      running off the left of the screen, so the resort is something seen from
- *      inside the wood the cottage stands in — which is the actual relationship
+ *      inside the wood the cottage stands in   which is the actual relationship
  *      between the two places, and the thing "12 minutes away" is trying to say.
  *
  *      This was PhotoWood.astro, a generated rank of small trees banded across
@@ -55,7 +55,7 @@ import { makeRng } from '../decor/forest';
 const NBSP = ' ';
 
 /*
- * Snow. Seeded for the same reason the treelines are — this runs at BUILD time,
+ * Snow. Seeded for the same reason the treelines are   this runs at BUILD time,
  * and `Math.random()` here would re-roll every flake on every build: changed
  * HTML and a missed cache on every deploy, for an effect nobody could see had
  * moved.
@@ -93,6 +93,8 @@ const FLAKES = Array.from({ length: 16 }, () => ({
       quality={64}
       loading="lazy"
       class="dm-img"
+      data-drift
+      style="--drift-scale: 1.12; --drift-shift: 5%"
     />
 
     <div class="dm-snow" aria-hidden="true">
@@ -133,7 +135,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
       {/*
         Decorative: both figures are stated in the copy and in the okolí list.
 
-        Was two `.chip`s side by side — a caption in brass with a hairline under
+        Was two `.chip`s side by side   a caption in brass with a hairline under
         it, twice, which at this size reads as two loose underlined fragments
         rather than as figures. Set as a pair of numbers under one rule instead,
         the way a printed guide sets a fact box: the figure large in the display
@@ -171,7 +173,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
    *
    * Both halves used to end on exactly the same two lines, because the copy is
    * what sets the row height and the photograph stretches to meet it. Two slabs
-   * of identical height butted together is the flattest thing a split can do —
+   * of identical height butted together is the flattest thing a split can do  
    * it reads as a table cell, and it is the one shape §3 keeps telling this site
    * not to make.
    *
@@ -179,7 +181,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
    * the margin is shared equally top and bottom, the photograph stretches past
    * the panel at both ends, and the page ground shows through in two strips. The
    * frost stops being the right-hand column and becomes a panel laid against the
-   * picture — which is what it is.
+   * picture   which is what it is.
    *
    * ⚠ Height is never set here. The panel is as tall as its copy plus its
    * padding, whatever the copy grows to; the 3rem is the only fixed figure, and
@@ -213,7 +215,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
    *
    * One hairline over both, and the pair set on a two-column grid so the
    * captions sit under their own figure rather than trailing after it. The rule
-   * is the only chrome — no fill, no border box, nothing that turns two numbers
+   * is the only chrome   no fill, no border box, nothing that turns two numbers
    * into two badges.
    *
    * `max-width` keeps the pair narrower than the measure above it, so the second
@@ -257,10 +259,19 @@ const FLAKES = Array.from({ length: 16 }, () => ({
     position: relative;
     /*
      * Unconditional. `.photo-frame` only clips inside `@media (hover: hover)`,
-     * and the drift below has to be clipped on a touch device too, or the
-     * photograph slides out across the section boundary.
+     * and the drift has to be clipped on a touch device too, or the photograph
+     * slides out across the section boundary.
+     *
+     * ⚠ `clip`, NOT `hidden`, and the difference is the whole effect. This was
+     * `overflow: hidden`, which creates a scroll container   so `view()` on the
+     * photograph inside it resolved against THIS box instead of the viewport,
+     * the timeline never advanced, progress sat at 0.500, and the drift on the
+     * one section this site had it on never moved a pixel from the day it was
+     * written. It looked completely correct while doing nothing, because 0.500
+     * is the middle of the range. The full write-up is over `[data-drift]` in
+     * global.css. Do not change this back.
      */
-    overflow: hidden;
+    overflow: clip;
     min-height: 22rem;
     background-color: var(--color-les);
   }
@@ -279,7 +290,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
 
   /*
    * Absolute, not in flow. `height: 100%` on an in-flow image resolves against a
-   * parent with no definite height — `min-height` is not one — so it fell back
+   * parent with no definite height   `min-height` is not one   so it fell back
    * to the intrinsic ratio and left the bottom of the panel empty. Taken out of
    * flow it covers whatever height the grid gives the column, and the drift
    * below has a box to move inside.
@@ -293,40 +304,17 @@ const FLAKES = Array.from({ length: 16 }, () => ({
   }
 
   /*
-   * The drift. ±5 % inside a frame that does not move.
+   * The drift is `[data-drift]` in global.css now   ±5 % inside a frame that does
+   * not move, set with the two variables on the <Image> above.
    *
-   * The scale lives in the KEYFRAMES and not in the base rule, which is what
-   * makes the skip graceful: with no scroll timeline the photograph is an
-   * ordinary `object-fit: cover` image at 1:1, correctly framed and perfectly
-   * still. Only while the animation is actually running is it oversized enough
-   * to have anywhere to go.
-   *
-   * ⚠ LONGHANDS ONLY — never fold these into `animation:`. The CSS minifier
-   * pulls a neighbouring `animation-timeline` into the shorthand, Chromium
-   * rejects the result as invalid grammar, `animation-name` computes to `none`,
-   * and the effect dies silently in the production build alone. This has already
-   * bitten this codebase twice. docs/02-design-system.md §5.1.
+   * It used to be a `dm-drift` keyframe block right here, which is why §5.3's ban
+   * on parallax was breakable in the first place: one bespoke effect in one
+   * component. The rule is shared with the /okoli opener now, so the drift is a
+   * device the site has rather than a thing this section does. The terms of the
+   * exception, the minifier trap and the graceful-skip contract are all written
+   * out over the primitive; do not restate them here and do not reintroduce a
+   * local keyframe block.
    */
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      .dm-img {
-        animation-name: dm-drift;
-        animation-timing-function: linear;
-        animation-fill-mode: both;
-        animation-timeline: view();
-        animation-range: cover 0% cover 100%;
-      }
-    }
-  }
-
-  @keyframes dm-drift {
-    from {
-      transform: scale(1.12) translateY(-5%);
-    }
-    to {
-      transform: scale(1.12) translateY(5%);
-    }
-  }
 
   /* ---- The wood ---------------------------------------------------------
    *
@@ -335,8 +323,8 @@ const FLAKES = Array.from({ length: 16 }, () => ({
    * photograph however tall the section turns out to be. `width: auto` lets the
    * drawing's own aspect set the rest; the crop is already inside its viewBox.
    *
-   * 64% leaves the ridge, the Sky Walk and the top of the pistes — the reason
-   * the photograph is here — standing in open sky above the crowns.
+   * 64% leaves the ridge, the Sky Walk and the top of the pistes   the reason
+   * the photograph is here   standing in open sky above the crowns.
    *
    * No scrim under it, deliberately. A --les gradient would give the silhouettes
    * something softer to sit against and would cost them their edge: solid trees
@@ -383,7 +371,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
        surface, and over photography is its other legitimate home. */
     background-color: var(--color-linka);
     /*
-     * The halo is not decoration — without it there is no snow.
+     * The halo is not decoration   without it there is no snow.
      *
      * The photograph underneath is a snowfield: white dots on it are invisible
      * over more than half the frame, which is the whole problem with putting
@@ -408,7 +396,7 @@ const FLAKES = Array.from({ length: 16 }, () => ({
 
   /*
    * Under `reduce`, the global clamp would freeze sixteen dots partway down the
-   * photograph — worse than no snow at all. Take them out entirely: reduced
+   * photograph   worse than no snow at all. Take them out entirely: reduced
    * motion means reduced, and a still photograph is what reduced looks like here.
    */
   @media (prefers-reduced-motion: reduce) {

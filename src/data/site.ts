@@ -1,5 +1,5 @@
-/**
- * Contact and identity constants. One source of truth — nothing below may be
+﻿/**
+ * Contact and identity constants. One source of truth   nothing below may be
  * retyped into a component.
  *
  * Everything here is transcribed from the current site's /kontakt/ page
@@ -13,7 +13,7 @@ export const SITE = {
    * invisible in every editor. Do not retype the line.
    *
    * `u` is a single-letter preposition, and docs/02-design-system.md §2.6 is
-   * explicit that one must never end a line — a Czech line ending in `u` reads
+   * explicit that one must never end a line   a Czech line ending in `u` reads
    * as an error, not as a typographic nicety. This string is set in the footer
    * and in a narrow contact card, both of which wrap on a phone, so it is one of
    * the few places on the site where the break would actually happen.
@@ -26,7 +26,7 @@ export const SITE = {
 
   /**
    * TODO(client): there is NO published email address anywhere on the current
-   * site — only a third-party form. Launch-blocking, docs/01-content.md §9 item 13.
+   * site   only a third-party form. Launch-blocking, docs/01-content.md §9 item 13.
    */
   email: null as string | null,
 
@@ -41,7 +41,7 @@ export const SITE = {
 export const mapyUrl = `https://mapy.com/zakladni?q=${SITE.gps.lat}%2C${SITE.gps.lon}`;
 
 /**
- * TODO(worker): the inquiry form posts here. The Worker is not written yet —
+ * TODO(worker): the inquiry form posts here. The Worker is not written yet  
  * see worker/README.md and docs/03-tech.md §2. Until it exists the form will
  * fail to submit; the markup, labels and no-JS behaviour are what this pass
  * delivers.
@@ -50,7 +50,7 @@ export const POPTAVKA_ENDPOINT = '/api/poptavka';
 
 /** Primary navigation. Used by both the header and the footer. */
 export const NAV = [
-  { href: '/chalupa', label: 'Chalupa' },
+  { href: '/ubytovani', label: 'Ubytování' },
   { href: '/terminy-a-ceny', label: 'Termíny a ceny' },
   { href: '/okoli', label: 'Okolí' },
   { href: '/galerie', label: 'Galerie' },

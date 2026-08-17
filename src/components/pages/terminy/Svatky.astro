@@ -1,19 +1,19 @@
----
+﻿---
 /**
- * Silvestr a Vánoce — holiday blocks with self-expiring dates.
+ * Silvestr a Vánoce   holiday blocks with self-expiring dates.
  *
  * ⚠ THE DATES ARE NULL AND MUST STAY NULL UNTIL THE CLIENT CONFIRMS THEM.
  *
- * The live site shows "Vánoce 23.-26.12.2024" next to the word "letos" — two
+ * The live site shows "Vánoce 23.-26.12.2024" next to the word "letos"   two
  * years stale at the time of writing. That is error #5 in docs/01-content.md §1,
  * and the clearest possible signal that a static date string in a heading will
  * eventually rot. The fix here is `jeAktualni()`: if `s.do` is null or in the
- * past, the block renders as an inquiry ("termín upřesníme — napište nám") and
+ * past, the block renders as an inquiry ("termín upřesníme   napište nám") and
  * no date appears at all. A stale offer is impossible to render. When the client
  * confirms dates for the coming season, set `od` and `do` in SVATKY in cenik.ts
  * and this template changes nothing.
  *
- * Prices ARE shown regardless of date status — they are confirmed figures from
+ * Prices ARE shown regardless of date status   they are confirmed figures from
  * the data module, and showing them helps the guest plan. But the specific dates
  * and (for Vánoce) the number of nights are TBD.
  *
@@ -21,7 +21,7 @@
  * Text on --les uses --omitka (15.45:1 ✓). Brass text uses --mosaz-svetla
  * (6.19:1 on --les ✓). Cards use --kura ground (secondary dark).
  *
- * TODO(client) — docs/01-content.md §9 items 3 and 4 (LAUNCH-BLOCKING):
+ * TODO(client)   docs/01-content.md §9 items 3 and 4 (LAUNCH-BLOCKING):
  *   item 3: Which nights for Vánoce in the coming season?
  *   item 4: Which three nights for Silvestr in the coming season?
  * Set od/do in cenik.ts once confirmed. Nothing here changes.
@@ -30,7 +30,7 @@ import IconLucide from '../../IconLucide.astro';
 import { SVATKY, jeAktualni, formatKc } from '../../../data/cenik';
 
 /*
- * U+00A0 — hard space. Typed as a constant so it cannot disappear in review.
+ * U+00A0   hard space. Typed as a constant so it cannot disappear in review.
  * docs/02-design-system.md §2.6.
  */
 const NBSP = ' ';
@@ -61,7 +61,7 @@ const today = new Date();
             </div>
 
             {/*
-              Price is shown even when dates are pending — the figure is confirmed
+              Price is shown even when dates are pending   the figure is confirmed
               data from cenik.ts and helps the guest plan their budget. Duration is
               shown only when it is known (Silvestr has "3 noci", Vánoce does not
               yet). No number about money is written here; all values come through
@@ -89,11 +89,11 @@ const today = new Date();
                 <IconLucide name="calendar-days" size={16} class="termin-ikona" />
                 {/*
                   TODO: when dates are first supplied in cenik.ts, add a Czech
-                  date formatter here — ISO strings like "2025-12-28" are not
+                  date formatter here   ISO strings like "2025-12-28" are not
                   user-friendly in Czech. Format as "28. 12. 2025" before launch.
                 */}
                 {/*
-                  `datetime`, lowercase. Astro's <time> is plain HTML, not JSX —
+                  `datetime`, lowercase. Astro's <time> is plain HTML, not JSX  
                   the React-style `dateTime` type-errors and would have shipped
                   a <time> element with no machine-readable value on it.
                 */}
@@ -109,7 +109,7 @@ const today = new Date();
                */
               <div class="svatek-bez-terminu">
                 <p class="upres">
-                  Termín pro tuto sezonu upřesníme — napište{NBSP}nám.
+                  Termín pro tuto sezonu upřesníme   napište{NBSP}nám.
                 </p>
                 <a href="#poptavka" class="btn btn-ghost">Napsat poptávku</a>
               </div>
@@ -183,7 +183,7 @@ const today = new Date();
     flex-direction: column;
     gap: 1rem;
     padding: 1.5rem;
-    /* Hairline border in white at low opacity — 1px is permitted. */
+    /* Hairline border in white at low opacity   1px is permitted. */
     border: 1px solid rgb(251 250 248 / 0.14);
     border-radius: var(--radius-sm);
     background-color: var(--color-kura);
@@ -205,7 +205,7 @@ const today = new Date();
 
   .svatek-ikona {
     flex: none;
-    /* --mosaz-svetla on --kura = 4.77:1 ✓ — meets the 4.5:1 floor */
+    /* --mosaz-svetla on --kura = 4.77:1 ✓   meets the 4.5:1 floor */
     color: var(--color-mosaz-svetla);
   }
 
@@ -220,7 +220,7 @@ const today = new Date();
   /*
    * Price at a prominent size. --mosaz-svetla on --kura = 4.77:1 ✓.
    * At --text-title-s (25px) this qualifies as "large text" under WCAG,
-   * whose threshold is 18.66px / 14pt bold — 4.77:1 > 4.5:1 ✓.
+   * whose threshold is 18.66px / 14pt bold   4.77:1 > 4.5:1 ✓.
    * tabular-nums is already on the table element; this is a <p>, so we
    * apply it explicitly here.
    */
@@ -235,7 +235,7 @@ const today = new Date();
 
   .svatek-delka {
     font-size: var(--text-body);
-    /* --jinovatka on --kura = 9.39:1 ✓ — legitimate winter accent on dark */
+    /* --jinovatka on --kura = 9.39:1 ✓   legitimate winter accent on dark */
     color: var(--color-jinovatka);
     font-weight: var(--font-weight-normal);
   }
@@ -244,7 +244,7 @@ const today = new Date();
 
   .svatek-text {
     font-size: var(--text-body);
-    /* --kamen on --kura: kamen = #E8E6E0, kura = #3E3226 — measured 9.96:1 ✓ */
+    /* --kamen on --kura: kamen = #E8E6E0, kura = #3E3226   measured 9.96:1 ✓ */
     color: var(--color-kamen);
     margin: 0;
     max-width: none;
@@ -272,7 +272,7 @@ const today = new Date();
 
   /*
    * This is the state both blocks are in at launch. It is not a placeholder
-   * or a "coming soon" badge — it is a true statement that invites the guest
+   * or a "coming soon" badge   it is a true statement that invites the guest
    * to write. The prior art (the live site's stale 2024 dates) is the reason
    * this branch exists.
    */

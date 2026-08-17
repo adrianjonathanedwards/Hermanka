@@ -1,42 +1,78 @@
 ﻿---
 /**
- * Výlety a atrakce — card grid from VYLETY data.
+ * Výlety a atrakce   the catalogue.
  *
- * Rewrites docs/01-content.md §7.1: "KEEP the content, REWRITE into cards with
- * a distance and a season on each."
+ * ---------------------------------------------------------------------------
+ * THE SHAPE, AND WHY IT IS THIS ONE
  *
- * NULL DISTANCE RULE
- * A card whose `vzdalenost` is null shows no distance chip. The Králický Sněžník
- * entry deliberately has null — the old copy says 14 km, the regional map says
+ * Two shapes have been tried here and both were wrong in the same way. Six
+ * `.card`s in a 3 �  2 grid said "these six things are the same kind of thing",
+ * which they are not, and put a border around eight words six times. A route
+ * line with rings down the left said "these six things are stops in an order",
+ * which they also are not   there is no journey here, they are six separate
+ * places you might drive or walk to on six different days, and the ring-and-line
+ * device belongs to the homepage's `od dveří` trail where the order genuinely is
+ * the information.
+ *
+ * What they ARE is a catalogue: a set of named places, each with a description
+ * and a figure. So it is set the way a catalogue or a book's contents page is
+ * set, and the layout carries the page's whole thesis in its geometry  
+ *
+ *   NAME (large, display face)  |  what it is (body)  |  HOW FAR (figures)
+ *
+ *   three columns, hairline between rows, no borders and no boxes anywhere. The
+ * figures are right-aligned and set at the same size as the names, so they form
+ * a second column of display type running down the right edge of the page, the
+ * way page numbers do in a contents list. docs/04-pages.md's rule for this page
+ * is "every entry needs a distance and a travel time"; this makes the distances
+ * the second thing the eye lands on rather than a chip at the bottom of a card.
+ *
+ * ---- THE TWO GROUPS ----
+ * Split on `doprava`, and walking comes first. docs/01-content.md §5.2 calls the
+ * walking distances "quietly the most useful content on the site" and
+ * `Les   10 metrů, hned za chalupou` "the best line on the entire website"; a
+ * page that opens its trip list with a nine-kilometre drive has buried the only
+ * thing here no competitor can copy. Within each group, nearest first.
+ *
+ * ---- THE TILE ----
+ * Every row now carries a visual   a photograph where a real one exists (the two
+ * Dolní Morava entries; see the note on `Vylet.foto` in src/data/okoli.ts), the
+ * entry's own Lucide icon on a flat tile everywhere else. OkoliMedia.astro is the
+ * shared component; its own header comment carries the full reasoning for why a
+ * placeholder tile beats inventing a photo. `keep the text format simple`   the
+ * name / description / figures shape is unchanged, the tile sits beside it.
+ *
+ * ---- NULL DISTANCE RULE (unchanged) ----
+ * An entry whose `vzdalenost` is null shows an EMPTY figures column   no dash,
+ * no placeholder, no "vzdálenost neuvedena". This layout makes that gap more
+ * visible than the card version did, and that is correct: Králický Sněžník
+ * deliberately has null because the old copy says 14 km, the regional map says
  * 17 km, and both cannot be right (docs/01-content.md §9 item 18). Naming either
  * figure next to a map that contradicts it is worse than naming neither.
- * TODO(client) — §9 item 18: confirm the trail distance, then fill in vzdalenost
- * on the Sněžník entry in src/data/okoli.ts.
+ * TODO(client)   §9 item 18: confirm the trail distance, then fill in vzdalenost
+ * on the Sněžník entry in src/data/okoli.ts and the column fills itself in.
  *
- * HISTORIE A PAMÁTKY — DECISION
- * docs/04-pages.md §/okoli section 6 asks whether to filter Klášter Hedeč,
- * Vojenské muzeum Králíky and Králíky into their own "Historie a památky" section
- * or to leave them in the main card set.
+ * ⚠ DO NOT "FIX" THE GAP WITH A HOVER-ONLY OR CSS-ONLY LABEL either. The empty
+ * cell is the honest rendering and the season mark below it keeps the row from
+ * looking broken.
  *
- * KEPT IN THE MAIN CARD SET. Reasons:
- *   1. All three relevant entries are already in VYLETY with their own distances
- *      and the `landmark` icon — they are already distinct from the hiking entries.
- *   2. A separate "Historie a památky" section would show the identical card data
- *      a second time with only a heading change.
- *   3. Six cards in one grid is a 2×3 desktop layout — clean and complete.
- *   4. The regional map already shows Klášter Hedeč and Králíky as named places,
- *      so the visual section above already covers the cultural geography angle.
+ * ---- HISTORIE A PAMÁTKY   DECISION (unchanged) ----
+ * docs/04-pages.md §/okoli section 6 asks whether Klášter Hedeč, Vojenské muzeum
+ * Králíky and Králíky want their own section. They do not: all three are `autem`
+ * entries with their own distances, so they already sit together in the second
+ * group's run. A separate section would print the same three rows again under a
+ * different heading.
  *
- * Band: --omitka. Cards use the global `.card` class (--omitka fill, hairline
- * border) — on a --kamen section they would be fine too, but the alternation
- * sequence already places --kamen on the map section above and below.
+ * Band: --omitka. Between the --kamen map above and the --jinovatka ski section
+ * below.
  */
-import { VYLETY, type Sezonnost } from '../../../data/okoli';
+import { VYLETY, type Sezonnost, type Vylet } from '../../../data/okoli';
 import IconLucide from '../../IconLucide.astro';
 import type { LucideName } from '../../IconLucide.astro';
+import OkoliMedia from './OkoliMedia.astro';
 
-/* U+00A0 — non-breaking space. */
-const NBSP = '\u00A0';
+/* U+00A0   non-breaking space. */
+const NBSP = ' ';
 
 /* Czech display labels for the season field. */
 const SEZONA_LABEL: Record<Sezonnost, string> = {
@@ -51,6 +87,38 @@ const SEZONA_ICON: Record<Sezonnost, LucideName> = {
   leto: 'sun',
   celoročně: 'calendar-days',
 };
+
+/**
+ * Nearest first, and entries with no verified distance last.
+ *
+ * ⚠ Sorts on the LEADING INTEGER of `vzdalenost`, which is safe only because
+ * every non-null value in VYLETY is a whole number of kilometres. If a `500 m`
+ * ever lands in that array this comparator will file it after `11 km`, and the
+ * fix is a numeric field in the data   not a cleverer parse here.
+ */
+function podleVzdalenosti(a: Vylet, b: Vylet): number {
+  if (a.vzdalenost === null) return b.vzdalenost === null ? 0 : 1;
+  if (b.vzdalenost === null) return -1;
+  return parseInt(a.vzdalenost, 10) - parseInt(b.vzdalenost, 10);
+}
+
+const SKUPINY = [
+  {
+    klic: 'pesky' as const,
+    nadpis: 'Pěšky od dveří',
+    popis: 'Turistické značky se dají chytit přímo u chalupy   do lesa je to deset metrů.',
+    icon: 'footprints' as LucideName,
+  },
+  {
+    klic: 'autem' as const,
+    nadpis: 'Autem, do dvaceti minut',
+    popis: 'Všechno ostatní je otázka krátké cesty údolím.',
+    icon: 'car' as LucideName,
+  },
+].map((s) => ({
+  ...s,
+  polozky: VYLETY.filter((v) => v.doprava === s.klic).sort(podleVzdalenosti),
+}));
 ---
 
 <section class="vylety section" aria-labelledby="vylety-nadpis">
@@ -63,46 +131,51 @@ const SEZONA_ICON: Record<Sezonnost, LucideName> = {
       </p>
     </header>
 
-    <ul class="vylety-grid" role="list" data-reveal>
-      {
-        VYLETY.map((v) => (
-          <li class="card vylety-karta">
-            <div class="vylety-ikona" aria-hidden="true">
-              <IconLucide name={v.icon} size={28} />
-            </div>
+    {
+      SKUPINY.map((skupina) => (
+        <section class="vylety-skupina" aria-labelledby={`skupina-${skupina.klic}`}>
+          <header class="vylety-skupina-header" data-reveal>
+            <h3 id={`skupina-${skupina.klic}`} class="vylety-skupina-nadpis">
+              <IconLucide name={skupina.icon} size={22} class="vylety-skupina-ikona" />
+              {skupina.nadpis}
+            </h3>
+            <p class="vylety-skupina-popis">{skupina.popis}</p>
+          </header>
 
-            <h3 class="vylety-nazev">{v.nazev}</h3>
+          {/*
+            An <ol>: the order IS information   nearest first   and an entry with
+            no verified distance is deliberately last in its group.
+          */}
+          <ol class="vylety-seznam" role="list">
+            {skupina.polozky.map((v) => (
+              <li class="vylety-radek" data-reveal>
+                <OkoliMedia icon={v.icon} foto={v.foto} class="vylety-media" />
 
-            <p class="vylety-popis">{v.popis}</p>
+                <div class="vylety-body">
+                  <h4 class="vylety-nazev">{v.nazev}</h4>
 
-            {/*
-              Chips row. Rendered only when at least one piece of metadata is
-              available — no empty row, no placeholder dash.
-            */}
-            {(v.vzdalenost || v.cas || v.sezona) && (
-              <div class="vylety-meta">
-                {v.vzdalenost && (
-                  <span class="chip">
-                    <IconLucide name="ruler" size={14} />
-                    {v.vzdalenost}
-                  </span>
-                )}
-                {v.cas && (
-                  <span class="chip">
-                    <IconLucide name="clock" size={14} />
-                    {v.cas}
-                  </span>
-                )}
-                <span class="chip vylety-sezona">
-                  <IconLucide name={SEZONA_ICON[v.sezona]} size={14} />
-                  {SEZONA_LABEL[v.sezona]}
-                </span>
-              </div>
-            )}
-          </li>
-        ))
-      }
-    </ul>
+                  <p class="vylety-popis">{v.popis}</p>
+
+                  {/*
+                    The figures column. Empty of numbers when the distance is
+                    unverified   see the null rule in the header comment. The
+                    season is always here, so the cell is never blank.
+                  */}
+                  <div class="vylety-cisla">
+                    {v.vzdalenost && <span class="vylety-km">{v.vzdalenost}</span>}
+                    {v.cas && <span class="vylety-cas">{v.cas}</span>}
+                    <span class="vylety-sezona">
+                      <IconLucide name={SEZONA_ICON[v.sezona]} size={14} />
+                      <span>{SEZONA_LABEL[v.sezona]}</span>
+                    </span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
   </div>
 </section>
 
@@ -126,77 +199,226 @@ const SEZONA_ICON: Record<Sezonnost, LucideName> = {
     color: var(--color-kura);
   }
 
-  /* ---- Card grid --------------------------------------------------------- */
+  /* ---- Group heading -----------------------------------------------------
+   *
+   * The rule under a group heading is the HEAVY one   2px brass   and the rules
+   * between rows are hairlines. That difference is the only thing telling the
+   * reader where one group ends and the next begins, since nothing here is
+   * boxed, so it must not be flattened to match.
+   */
+  .vylety-skupina {
+    margin-top: 3.5rem;
+  }
 
-  .vylety-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-    margin-top: 3rem;
+  .vylety-skupina-header {
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-mosaz);
+  }
+
+  .vylety-skupina-nadpis {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: var(--text-title-s);
+    /* --les on --omitka = 15.45:1 */
+    color: var(--color-les);
+  }
+
+  .vylety-skupina-ikona {
+    flex: none;
+    /* --mosaz-tmava on --omitka = 6.05:1. A stroke, not a fill. */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .vylety-skupina-popis {
+    margin-top: 0.5rem;
+    font-size: var(--text-caption);
+    max-width: 56ch;
+    color: var(--color-kura);
+  }
+
+  /* ---- The rows ----------------------------------------------------------
+   *
+   * A row is now a flex pair   the tile, and everything else. `.vylety-body`
+   * carries the layout the row used to carry directly: on a phone it is one
+   * column with the reading order name → figures → description, which is NOT the
+   * DOM order (name → description → figures). `order` on its grid children does
+   * that, and it is safe here precisely because all three are static content in
+   * one row: nothing is focusable, so there is no tab order to desynchronise
+   * from the visual order. Do not add a link inside a row without revisiting
+   * this.
+   */
+  .vylety-seznam {
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (width >= 40rem) {
-    .vylety-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .vylety-radek {
+    display: flex;
+    gap: 1.125rem;
+    align-items: flex-start;
+    padding-block: 1.75rem;
+    border-bottom: 1px solid rgb(62 50 38 / 0.14);
   }
 
-  @media (width >= 64rem) {
-    .vylety-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+  /*
+   * ⚠ Sized here, not in OkoliMedia.astro   the component fills whatever box it
+   * is given (see its header comment). 3.5rem on a phone keeps the tile smaller
+   * than the name beside it; the tile only becomes a genuine second column at
+   * 64rem, where its own rule below takes over.
+   */
+  .vylety-media {
+    width: 3.5rem;
   }
 
-  /* ---- Individual card --------------------------------------------------- */
-
-  .vylety-karta {
-    /* The global `.card` class sets display: flex; flex-direction: column;
-       padding; border; background. Styles below supplement it. */
-    gap: 0;
-  }
-
-  .vylety-ikona {
-    /* --mosaz-tmava on --omitka = 6.05:1. Not a fill — an icon's stroke. */
-    color: var(--color-mosaz-tmava);
-    margin-bottom: 0.875rem;
-    flex: none;
+  .vylety-body {
+    display: grid;
+    gap: 0.5rem 0;
+    min-width: 0;
+    flex: 1;
   }
 
   .vylety-nazev {
     font-size: var(--text-title-s);
-    line-height: 1.3;
+    line-height: 1.2;
     /* --les on --omitka = 15.45:1 */
     color: var(--color-les);
-    margin-bottom: 0.625rem;
+    order: 1;
   }
 
   .vylety-popis {
     font-size: var(--text-body);
+    max-width: 60ch;
     /* --kura on --omitka = 11.92:1 */
     color: var(--color-kura);
-    flex: 1;
-    max-width: none;
     text-wrap: pretty;
+    order: 3;
   }
 
-  /* ---- Metadata chips ---------------------------------------------------- */
-
-  .vylety-meta {
+  /* ---- The figures -------------------------------------------------------
+   *
+   * On a phone they are an inline brass run under the name; from 64rem they
+   * become the right-hand column, right-aligned, and `--text-title-m` on the
+   * distance puts a second column of display type down the edge of the page.
+   */
+  .vylety-cisla {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgb(62 50 38 / 0.1);
+    align-items: baseline;
+    align-content: flex-start;
+    gap: 0.35rem 0.875rem;
+    order: 2;
+  }
+
+  .vylety-km {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-title-s);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    /* --mosaz-tmava on --omitka = 6.05:1 */
+    color: var(--color-mosaz-tmava);
+  }
+
+  .vylety-cas {
+    font-size: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--color-kura);
   }
 
   /*
-   * Season chip inherits the `.chip` class (brass underline, mosaz-tmava text).
-   * No colour override — the season is information, not decoration.
+   * The season is a `.chip` in everything but name   the caption in brass with a
+   * hairline under it that this site uses for every figure. It is not the `.chip`
+   * class itself because that one has no way to be pushed onto its own line at
+   * the end of a right-aligned column.
    */
   .vylety-sezona {
-    /* Same .chip styling as distance and time. */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-bottom: 0.15rem;
+    border-bottom: 1px solid rgb(140 99 24 / 0.4);
+    font-size: var(--text-caption);
+    line-height: 1.3;
+    white-space: nowrap;
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* ---- Three columns from 64rem ------------------------------------------ */
+
+  @media (width >= 64rem) {
+    .vylety-radek {
+      gap: 1.75rem;
+      padding-block: 2rem;
+    }
+
+    .vylety-media {
+      /* The tile becomes a genuine column at this width   big enough to read as
+         a picture (or a deliberate lack of one), not a bullet. */
+      width: 6.5rem;
+    }
+
+    .vylety-body {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) 11rem;
+      column-gap: 3rem;
+    }
+
+    .vylety-nazev {
+      /* The catalogue's own voice. Big enough that six of them down a page are
+         the thing you see first, which is the point of a contents list. */
+      font-size: var(--text-title-m);
+      /* Optical: the display face sits high in its line box, and without this
+         the name's baseline lands above the body text beside it. */
+      margin-top: -0.15rem;
+    }
+
+    .vylety-popis {
+      max-width: none;
+    }
+
+    .vylety-cisla {
+      /*
+       * `column`, not `row`: the three figures stack, right-aligned, so the
+       * distances line up in a single tabular column down the page edge.
+       */
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.4rem;
+      text-align: right;
+    }
+
+    .vylety-km {
+      font-size: var(--text-title-m);
+      margin-top: -0.15rem;
+    }
+
+    /* DOM order is the visual order again once there are three columns. */
+    .vylety-nazev,
+    .vylety-popis,
+    .vylety-cisla {
+      order: 0;
+    }
+  }
+
+  /*
+   * The whole hover vocabulary for a row: the ground tints. Pointer devices only
+   *   a touch device must never be left holding a hover state (§5.2). The tint is
+   * `--kamen`, the band this section is NOT on, so it reads as the row lifting
+   * rather than as a new colour. Negative margin + matching padding so the tint
+   * runs past the text into the gutter instead of stopping at the measure.
+   */
+  @media (hover: hover) {
+    .vylety-radek {
+      margin-inline: -1rem;
+      padding-inline: 1rem;
+      transition: background-color 180ms var(--ease-out);
+    }
+
+    .vylety-radek:hover {
+      background-color: var(--color-kamen);
+    }
   }
 </style>

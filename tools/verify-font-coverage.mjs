@@ -1,9 +1,9 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 /**
  * Fails if any self-hosted font is missing a Czech character.
  *
  * Parses the font's `cmap` table directly rather than trusting the subsetter's
- * report — the point is to check the bytes we are about to ship. Accepts .ttf/.otf
+ * report   the point is to check the bytes we are about to ship. Accepts .ttf/.otf
  * and .woff2 (decompressed first).
  *
  *   npm run verify:fonts
@@ -15,7 +15,7 @@
 import { readFileSync } from 'node:fs';
 import { CZECH_REQUIRED } from './charset.mjs';
 
-const PUNCTUATION_REQUIRED = '–—‘’‚“„…§';
+const PUNCTUATION_REQUIRED = '– ‘’‚“„…§';
 
 function readTableDirectory(buf) {
   const numTables = buf.readUInt16BE(4);
@@ -105,7 +105,7 @@ async function loadFont(path) {
     wawoff2 = await import('wawoff2');
   } catch {
     throw new Error(
-      'woff2 input needs the `wawoff2` dev dependency — run `npm install` (or pass a .ttf)'
+      'woff2 input needs the `wawoff2` dev dependency   run `npm install` (or pass a .ttf)'
     );
   }
   return Buffer.from(await wawoff2.decompress(raw));
@@ -116,7 +116,7 @@ const files = process.argv.slice(2).filter((f) => /\.(woff2|ttf|otf)$/i.test(f))
 if (files.length === 0) {
   console.error(
     'No font files given.\n' +
-      'Fonts are generated, not committed by hand — run `npm run build:fonts` first.\n' +
+      'Fonts are generated, not committed by hand   run `npm run build:fonts` first.\n' +
       'See public/fonts/README.md.'
   );
   process.exit(1);
@@ -130,7 +130,7 @@ for (const file of files) {
   try {
     mapped = mappedCodepoints(await loadFont(file));
   } catch (err) {
-    console.error(`✗ ${name} — could not read: ${err.message}`);
+    console.error(`�  ${name}   could not read: ${err.message}`);
     failed = true;
     continue;
   }
@@ -139,10 +139,10 @@ for (const file of files) {
   const missingPunct = [...PUNCTUATION_REQUIRED].filter((c) => !mapped.has(c.codePointAt(0)));
 
   if (missingCzech.length === 0 && missingPunct.length === 0) {
-    console.log(`✓ ${name.padEnd(24)} ${String(mapped.size).padStart(4)} glyphs — Czech complete`);
+    console.log(`✓ ${name.padEnd(24)} ${String(mapped.size).padStart(4)} glyphs   Czech complete`);
   } else {
     failed = true;
-    console.error(`✗ ${name.padEnd(24)} ${String(mapped.size).padStart(4)} glyphs`);
+    console.error(`�  ${name.padEnd(24)} ${String(mapped.size).padStart(4)} glyphs`);
     if (missingCzech.length) console.error(`    missing Czech:       ${missingCzech.join(' ')}`);
     if (missingPunct.length) console.error(`    missing punctuation: ${missingPunct.join(' ')}`);
   }

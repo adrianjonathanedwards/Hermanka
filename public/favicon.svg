@@ -1,6 +1,6 @@
-<!--
+﻿<!--
   Favicon: the roof from the client's logo, traced from img/logo3-inv.png and
-  kept in sync with src/components/decor/RoofMark.astro — same three paths, same
+  kept in sync with src/components/decor/RoofMark.astro   same three paths, same
   coordinates, just centred in a square with the deep-spruce ground behind it.
 
   The chimney is dropped here. At 16px it closes into a blob against the left
@@ -10,8 +10,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Chalupa Heřmanka">
   <rect width="32" height="32" rx="4" fill="#16241C"/>
   <!--
-    The roof artwork is 510×256. Scaled by 0.045 it is 23×11.5, centred at
-    (4.5, 10.5) — sitting slightly above centre so the mark looks optically
+    The roof artwork is 510� 256. Scaled by 0.045 it is 23� 11.5, centred at
+    (4.5, 10.5)   sitting slightly above centre so the mark looks optically
     balanced in the rounded square rather than mathematically centred.
   -->
   <g fill="#FBFAF8" transform="translate(4.5 10.5) scale(0.045)">

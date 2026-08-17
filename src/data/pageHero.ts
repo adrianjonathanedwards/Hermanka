@@ -1,9 +1,9 @@
-/**
+﻿/**
  * The subpage header photograph, in one place.
  *
  * Same contract as src/data/hero.ts: `PAGE_HERO_IMAGE_PROPS` is spread into BOTH
  * the <Image> in PageHero.astro and the `getImage()` call each page makes to feed
- * `heroPreload` on BaseLayout. They must describe *exactly* the same transform —
+ * `heroPreload` on BaseLayout. They must describe *exactly* the same transform  
  * any divergence produces a different file hash, and the browser then preloads
  * one file and renders another, downloading the header image twice.
  *

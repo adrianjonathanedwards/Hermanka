@@ -1,10 +1,10 @@
----
+﻿---
 /**
- * The inquiry section — a band, a heading, and the form.
+ * The inquiry section   a band, a heading, and the form.
  *
  * The form itself moved to PoptavkaForm.astro when the subpages were built: it is
  * on `/`, `/terminy-a-ceny` and `/kontakt`, and docs/04-pages.md requires those
- * last two to use the same component. This file is what stays page-shaped — the
+ * last two to use the same component. This file is what stays page-shaped   the
  * band colour and the words above the card, which are the parts that legitimately
  * differ between "here is the whole homepage argument, now write to us" and "you
  * have just read the price list, now write to us".
@@ -22,7 +22,7 @@ interface Props {
   nadpis?: string;
   /** One or two sentences under it. */
   lead?: string;
-  /** Anchor id. `#poptavka` is linked from the footer on every page — keep it. */
+  /** Anchor id. `#poptavka` is linked from the footer on every page   keep it. */
   id?: string;
   /** Which band this sits on. Never the same as the section directly above. */
   band?: 'kamen' | 'omitka';

@@ -1,23 +1,23 @@
----
+﻿---
 /**
- * Okolí — the illustrated regional map, and what the map cannot tell you.
+ * Okolí   the illustrated regional map, and what the map cannot tell you.
  *
  * THE MAP'S LABELS ARE NOW ONLY IN THE MAP
  * ----------------------------------------
  * Every label on this map is baked into the raster: place names, descriptions,
  * distances, travel modes. The column beside it used to restate all five
  * destinations as real text, and then a collapsed <details> under the figure did.
- * Both are gone by decision — the duplication was not wanted on the page in any
+ * Both are gone by decision   the duplication was not wanted on the page in any
  * form. The figcaption under it ("Poloha chalupy a nejbližší cíle v okolí.")
  * went the same way for the same reason: the heading and the lead beside the map
  * already say what the map is, and the <img> alt says it to a screen reader. The
- * <figure> is kept — it is still a figure, it simply no longer has a caption.
+ * <figure> is kept   it is still a figure, it simply no longer has a caption.
  *
  * What that costs, so nobody has to rediscover it: `Klepáč`, `Klášter Hedeč`,
  * `Międzygórze` and the rest are no longer machine-readable anywhere except the
  * <img> alt below, which names the places but not their distances or
  * descriptions. If those need to be indexed again, the fix is the one
- * docs/01-content.md §7.4 always wanted — redraw the labels as inline SVG <text>
+ * docs/01-content.md §7.4 always wanted   redraw the labels as inline SVG <text>
  * over the photograph, so they are the map AND the text at once, rather than a
  * second copy printed underneath it.
  *
@@ -26,8 +26,8 @@
  * The map answers "where can we go from here", in kilometres of driving. It has
  * nothing to say about the thing that actually sells a cottage in a valley: how
  * little of it needs a car. Every figure in the trail below is from the distance
- * table in docs/01-content.md §5.2 — the one the content audit calls "quietly the
- * most useful content on the site" — including `Les, 10 metrů, hned za chalupou`,
+ * table in docs/01-content.md §5.2   the one the content audit calls "quietly the
+ * most useful content on the site"   including `Les, 10 metrů, hned za chalupou`,
  * which it calls the best line on the whole website. It is on no map.
  *
  * Two distances are deliberately absent because the sources disagree and the
@@ -44,7 +44,7 @@ import mapa from '@img/situace1-1.webp';
 const NBSP = ' ';
 
 /**
- * Outward from the front door. Ordered by distance — that order is the whole
+ * Outward from the front door. Ordered by distance   that order is the whole
  * point, so this is an <ol>.
  */
 const odDveri: { vzdalenost: string; co: string }[] = [
@@ -81,7 +81,7 @@ const odDveri: { vzdalenost: string; co: string }[] = [
 
         {/*
           The trail. The dashed line and the ring markers are the map's own line
-          work — it draws a dashed track and rings every place it names — brought
+          work   it draws a dashed track and rings every place it names   brought
           off the photograph and into the type.
         */}
         <ol class="trail">
@@ -179,7 +179,7 @@ const odDveri: { vzdalenost: string; co: string }[] = [
 
   /*
    * Two columns, not a wrapping row. The distances have to line up under each
-   * other like a timetable — and a long label has to wrap inside its own column
+   * other like a timetable   and a long label has to wrap inside its own column
    * rather than dropping underneath the number it belongs to.
    */
   .trail li {
@@ -220,14 +220,14 @@ const odDveri: { vzdalenost: string; co: string }[] = [
    *
    * The line grows from nothing and each ring lands as it arrives. Hung off
    * `.is-revealed`, the class src/scripts/motion.ts already puts on every
-   * `[data-reveal]` when its observer fires — so this adds no JavaScript.
+   * `[data-reveal]` when its observer fires   so this adds no JavaScript.
    *
    * Everything here is additive. No JS, a dead chunk or reduced motion means
    * `.js-motion` is never on the page, none of these rules match, and the trail
    * renders complete and still. docs/02-design-system.md §5.1.
    *
    * ⚠ `:global()` on `.js-motion` is load-bearing. Astro scopes EVERY compound in
-   * a selector, not just the last one — without it this compiles to
+   * a selector, not just the last one   without it this compiles to
    * `.js-motion[data-astro-cid-…]`, which asks for the cid on <html>, an element
    * that will never have it. The rule then matches nothing, silently, and the
    * trail just sits there fully drawn with no way to tell why.
@@ -265,7 +265,7 @@ const odDveri: { vzdalenost: string; co: string }[] = [
     }
   }
 
-  /* No `to` — the missing half is the element's own computed height. */
+  /* No `to`   the missing half is the element's own computed height. */
   @keyframes trail-draw {
     from {
       height: 0;

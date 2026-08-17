@@ -1,0 +1,218 @@
+﻿---
+/**
+ * `Ložnice a pokoje` + `Sociální zařízení`   the first section of /ubytovani.
+ *
+ * COPY IS THE OLD SITE'S, VERBATIM. This rebuild changes the design, not the
+ * words. The two paragraphs below are the 2019 `/ubytovani/` page's own, with
+ * `koupena` → `koupelna` fixed twice (docs/01-content.md §1 error #8) and
+ * nothing else touched.
+ *
+ * DESIGN: the full-bleed split from the homepage   photograph running to one
+ * viewport edge, prose holding its measure on the other. `.split` /
+ * `.split--media-right` / `.split-media` / `.split-body` are the primitives in
+ * global.css and this section adds no layout of its own beyond the bathroom
+ * cards. Compare src/components/sections/Wellness.astro, which is the same
+ * move mirrored. Alternating sides down the page is the point of it
+ * (docs/02-design-system.md §3)   this one is media-right, so the next section
+ * is media-left.
+ *
+ * The photograph is the living room, because the first sentence of the copy is
+ * about the living room. That is the whole rule for picture choice on this page.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ TWO CONTRADICTIONS ARE REPRODUCED HERE ON PURPOSE. DO NOT SILENTLY FIX.
+ *
+ * 1. **The capacities do not add up to 15.** These paragraphs give 2+1, then
+ *    3–4 plus 2, then 6–8 plus 2   up to nineteen people, against the `2 až 15
+ *    osob` printed at the top of this very page and everywhere else on the
+ *    site. docs/01-content.md §9 item 1, launch-blocking, still unanswered.
+ *
+ *    An earlier pass "solved" this by replacing the prose with a tidy table
+ *    reading 2 / 2+3 / 6+2 = 15, taken from the site-plan graphic. That is not
+ *    a design decision, it is picking a winner in a factual dispute nobody has
+ *    settled   so it is gone, and the client's own sentences are back. The
+ *    contradiction is the client's to resolve; our job is not to hide it.
+ *
+ * 2. `1. NP` / `2. NP` here versus `první patro` / `druhé patro` in the
+ *    bathroom paragraph, for the same two floors (§5.4). The prose is left
+ *    alone; only the two CARD LABELS below were brought onto the `NP` scheme,
+ *    so a reader is not asked to work out that `2. NP` and `druhé patro` are
+ *    the same place. That is a label, which is design.
+ */
+import { Image } from 'astro:assets';
+import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
+import SprigDivider from '../../decor/SprigDivider.astro';
+import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
+---
+
+<section id="loznice" class="loznice" aria-labelledby="loznice-nadpis">
+  <div class="split split--media-right">
+    <div class="split-media">
+      <Image
+        src={obyvak}
+        alt="Obývací pokoj chalupy Heřmanka s krbem a dlouhým jídelním stolem pod dřevěným trámovým stropem, propojený s kuchyní"
+        widths={[640, 960, 1280]}
+        sizes="(min-width: 64rem) 50vw, 100vw"
+        width={1920}
+        height={1282}
+        format="webp"
+        quality={62}
+        loading="lazy"
+      />
+    </div>
+
+    <div class="split-body">
+      <div data-reveal="up">
+        <h2 id="loznice-nadpis">Ložnice a&nbsp;pokoje</h2>
+        <p>
+          V&nbsp;1.&nbsp;NP se nachází prostorný obývací pokoj s&nbsp;krbem spojený
+          dohromady s&nbsp;prostornou kuchyní. Dále je zde menší pokoj (sousedící
+          přímo s&nbsp;krytou terasou) s&nbsp;kapacitou 2&nbsp;dospělé osoby
+          s&nbsp;dítětem. V&nbsp;přízemí se nachází samostatné WC a&nbsp;koupelna
+          se sprchovým koutem.
+        </p>
+        <p>
+          2.&nbsp;NP obsahuje jednu menší mezonetovou ložnici s&nbsp;kapacitou
+          3&nbsp;až 4&nbsp;osoby dole a&nbsp;2&nbsp;osoby v&nbsp;horním patře. Tato
+          ložnice má vstup na venkovní nekrytou terasu. Dále je zde větší
+          mezonetová ložnice s&nbsp;kapacitou 6&nbsp;až 8&nbsp;osob dole
+          a&nbsp;2&nbsp;osoby v&nbsp;horním patře. V&nbsp;tomto patře se nachází
+          i&nbsp;koupelna s&nbsp;prostornou vanou, samostatné WC a&nbsp;prací
+          a&nbsp;sušicí kout.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  {/*
+    The bathrooms sit under the split rather than inside it. They are a
+    comparison   the same three things on two floors   and a comparison wants
+    two columns side by side, not a sentence that makes the reader hold one
+    floor in their head while they read the other.
+  */}
+  <div class="wrap zarizeni">
+    {/*
+      Bilberry, not chamomile, and the two are alternated deliberately down the
+      page so the ornament reads as a pair of local plants rather than as one
+      motif stamped twice. BoruvkaSprig was drawn for the hero, lost its place
+      when the hero was stripped back, and had been sitting unused since.
+    */}
+    <SprigDivider rostlina="boruvka" class="zarizeni-divider" />
+
+    <h3 id="zarizeni-nadpis" data-reveal="up">Sociální zařízení</h3>
+
+    <ul class="zarizeni-grid" role="list" data-reveal="up" data-reveal-delay="80">
+      {
+        SOCIALNI_ZARIZENI.map((z, i) => (
+          <li class="card zarizeni-karta">
+            <p class="zarizeni-patro">{i === 0 ? '1. NP' : '2. NP'}</p>
+            <ul role="list">
+              {z.polozky.map((p) => <li>{p}</li>)}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .loznice {
+    background-color: var(--color-omitka);
+  }
+
+  h2 {
+    /* --mosaz-tmava on --omitka = 6.05:1. Plain --mosaz as text would be a
+       fill used as type, which §1.2 forbids. */
+    color: var(--color-mosaz-tmava);
+  }
+
+  /*
+   * `p` carries no margin at all in global.css   the reset is deliberate and
+   * every component supplies its own rhythm. So this is not a tweak: without
+   * it the first paragraph sits directly on the baseline of the heading.
+   */
+  .split-body p {
+    margin-top: 1.25rem;
+  }
+
+  /* ---- Bathrooms ------------------------------------------------------- */
+
+  /*
+   * The top padding is load-bearing. The split above runs its photograph to the
+   * full height of its row and the picture's bottom edge is the section's own
+   * edge, so without this the `Sociální zařízení` heading starts hard against
+   * it and reads as a caption on the photograph rather than as a new heading.
+   */
+  .zarizeni {
+    padding-block: 3rem 4rem;
+  }
+
+  @media (width >= 48rem) {
+    .zarizeni {
+      padding-block: 4.5rem 6rem;
+    }
+  }
+
+  /* The divider does the separating now, so the heading sits closer under it
+     than it did under bare padding. */
+  .zarizeni-divider {
+    margin-bottom: 2.5rem;
+  }
+
+  h3 {
+    font-size: var(--text-title-m);
+    color: var(--color-les);
+  }
+
+  .zarizeni-grid {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    /* The measure rule still applies: two cards of short lines do not need the
+       full 1280, and at full width the pair reads as two distant columns. */
+    max-width: 48rem;
+  }
+
+  @media (width >= 40rem) {
+    .zarizeni-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  .zarizeni-patro {
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .zarizeni-karta ul {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .zarizeni-karta li + li {
+    margin-top: 0.4rem;
+  }
+
+  /* An en dash, not a disc: the same marker the old site used for its lists. */
+  .zarizeni-karta li {
+    position: relative;
+    padding-left: 1rem;
+    color: var(--color-kura);
+  }
+
+  .zarizeni-karta li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    /* Brass AS TEXT, so the darker step (§1.2). */
+    color: var(--color-mosaz-tmava);
+  }
+</style>

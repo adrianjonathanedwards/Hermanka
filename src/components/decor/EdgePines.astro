@@ -1,9 +1,9 @@
----
+﻿---
 /**
  * Two spruce standing at the near edge of a photograph, the outer one running off
  * the frame.
  *
- * Same drawing as the O nás clearing — the premade Lorc silhouette in
+ * Same drawing as the O nás clearing   the premade Lorc silhouette in
  * pine-tree.ts, at two sizes with the smaller one set back. What is different is
  * the contract. Clearing.astro exists to guarantee that NOTHING is ever clipped:
  * it fits its viewBox to the union of its trees and scales the lot down to fit
@@ -63,7 +63,7 @@ const GROUND = 480;
  * two crowns meet on a single line and no further: at these heights the drawing
  * is 323 and 171 units across, so 118 and 366 put the big tree's right edge and
  * the small one's left edge both at 281. An earlier pass had them overlapping by
- * a third, and two flat silhouettes of the same fill do not overlap — they merge
+ * a third, and two flat silhouettes of the same fill do not overlap   they merge
  * into one shape with a tangle of notches through the middle and neither one
  * reads as a tree. The failure is recorded at length in Clearing.astro; this is
  * the same trap with two trees instead of three.
@@ -76,7 +76,7 @@ const TREES: Tree[] = [
 /**
  * How much of the drawing's left side the frame eats, in the stand's own units.
  * The big tree is about 323 units across, so 96 takes a little under a third of
- * it — enough to be unmistakably cut, not so much that it stops being a tree.
+ * it   enough to be unmistakably cut, not so much that it stops being a tree.
  */
 const CROP = 96;
 
@@ -88,7 +88,7 @@ const round = (n: number) => Math.round(n * 100) / 100;
  *
  * The inner `translate` is in the ARTWORK's coordinates and moves its box's
  * bottom-centre onto the origin; the outer one puts that origin where the tree
- * stands. Order matters — swap them and the whole stand mirrors instead of the
+ * stands. Order matters   swap them and the whole stand mirrors instead of the
  * one tree.
  */
 function place(t: Tree) {
@@ -125,7 +125,7 @@ const viewBox = `${round(x0)} ${round(y0)} ${round(x1 - x0)} ${round(GROUND - y0
 {/*
   `meet`, pinned to the bottom-left: the drawing scales down uniformly into
   whatever box it is given, the feet stay on the frame's lower edge and the cut
-  flank stays on its left edge. Never `slice` — this box is already the crop.
+  flank stays on its left edge. Never `slice`   this box is already the crop.
 */}
 <svg
   class={className}

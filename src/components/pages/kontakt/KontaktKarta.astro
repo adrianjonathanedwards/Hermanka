@@ -1,13 +1,13 @@
----
+﻿---
 /**
- * Contact card — the opening section of /kontakt.
+ * Contact card   the opening section of /kontakt.
  *
  * Left column: name, phone (tel: link) and email note.
- * Right column: <MapaSlot /> — carries the address, GPS and outbound map link
+ * Right column: <MapaSlot />   carries the address, GPS and outbound map link
  * so those details are not repeated here.
  *
  * The email is SITE.email, which is null on the current site: no email address
- * has ever been published. This is launch-blocking — docs/01-content.md §9 item 13.
+ * has ever been published. This is launch-blocking   docs/01-content.md §9 item 13.
  * Until supplied, the reader is directed to the form below or the phone above.
  *
  * Missing from SITE and also blocked: owner name, house number, postcode, IČO.
@@ -31,21 +31,21 @@ import { SITE } from '../../../data/site';
 
         <ul class="karta-seznam" role="list">
 
-          {/* Name and village — house number, postcode and IČO blocked */}
+          {/* Name and village   house number, postcode and IČO blocked */}
           <li class="karta-polozka">
             <IconLucide name="map-pin" size={22} class="karta-ikona" />
             <div class="karta-sloupec">
               {/*
                 TODO(client): owner name, house number, postcode and IČO are all
                 missing from the current site. Only SITE.name and SITE.obec are
-                known — docs/01-content.md §8.1.
+                known   docs/01-content.md §8.1.
               */}
               <span class="karta-nazev">{SITE.name}</span>
               <span class="karta-hodnota">{SITE.obec}</span>
             </div>
           </li>
 
-          {/* Phone — the primary contact method */}
+          {/* Phone   the primary contact method */}
           <li class="karta-polozka">
             <IconLucide name="phone" size={22} class="karta-ikona" />
             <div class="karta-sloupec">
@@ -56,7 +56,7 @@ import { SITE } from '../../../data/site';
             </div>
           </li>
 
-          {/* E-mail — null until the client supplies an address */}
+          {/* E-mail   null until the client supplies an address */}
           <li class="karta-polozka">
             <IconLucide name="mail" size={22} class="karta-ikona" />
             <div class="karta-sloupec">
@@ -66,7 +66,7 @@ import { SITE } from '../../../data/site';
               ) : (
                 /*
                  * TODO(client): no email address has been published on the current
-                 * site — launch-blocking, docs/01-content.md §9 item 13.
+                 * site   launch-blocking, docs/01-content.md §9 item 13.
                  * Until supplied, point the reader to the form below or the phone.
                  */
                 <span class="karta-hodnota">
@@ -155,7 +155,7 @@ import { SITE } from '../../../data/site';
     color: var(--color-les);
   }
 
-  /* Uppercase eyebrow label — for "Telefon", "E-mail". */
+  /* Uppercase eyebrow label   for "Telefon", "E-mail". */
   .karta-popisek {
     font-size: var(--text-caption);
     font-weight: var(--font-weight-semibold);
@@ -164,7 +164,7 @@ import { SITE } from '../../../data/site';
     color: var(--color-mosaz-tmava);
   }
 
-  /* Secondary text — village name, email fallback. --kura on --omitka = 11.92:1 */
+  /* Secondary text   village name, email fallback. --kura on --omitka = 11.92:1 */
   .karta-hodnota {
     color: var(--color-kura);
   }

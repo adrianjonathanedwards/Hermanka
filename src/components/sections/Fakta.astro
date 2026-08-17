@@ -1,4 +1,4 @@
----
+﻿---
 /**
  * Facts strip. The eight things that decide it, in one row.
  *
@@ -8,7 +8,7 @@
  * becomes a carousel: one track, drifting left at reading pace, seamless.
  *
  * This is by request, and it is a knowing exception to docs/02-design-system.md
- * §5.3 — the same exception the hero carousel already runs under. What the rule
+ * §5.3   the same exception the hero carousel already runs under. What the rule
  * is protecting against is content nobody can reach: a marquee that hides half
  * its items behind a swipe most people never make. This one cannot, because
  * nothing is behind anything. Every fact comes past on its own, in order, and
@@ -23,7 +23,7 @@
  * The list is rendered twice inside one flex track and the track is translated
  * by exactly -50%, so the moment the first copy has left the frame the second is
  * standing precisely where the first began and the animation restarts with
- * nothing to see. The second copy is `aria-hidden` — it is the same eight facts,
+ * nothing to see. The second copy is `aria-hidden`   it is the same eight facts,
  * and a screen reader must be read them once.
  *
  * ⚠ The -50% only lands if the two copies are the SAME WIDTH, which is why the
@@ -32,7 +32,7 @@
  * not after the second one, and half of that gap would show up as a stutter at
  * every seam.
  *
- * Icons are Lucide (see IconLucide.astro), not the drawn set — a premade family
+ * Icons are Lucide (see IconLucide.astro), not the drawn set   a premade family
  * of eight is internally consistent in a way eight bespoke glyphs were not.
  */
 import IconLucide, { type LucideName } from '../IconLucide.astro';
@@ -47,13 +47,13 @@ const fakta: { icon: LucideName; label: string }[] = [
   { icon: 'brick-wall-fire', label: `2${NBSP}krby` },
   { icon: 'waves', label: 'Jezírko' },
   // TODO(client): pets are listed as allowed in the old amenity list but the
-  // terms are silent — any charge, any limit? docs/01-content.md §9 item 12.
+  // terms are silent   any charge, any limit? docs/01-content.md §9 item 12.
   { icon: 'dog', label: 'Pes vítán' },
-  // TODO(client) — LAUNCH-BLOCKING, docs/01-content.md §9 item 2.
+  // TODO(client)   LAUNCH-BLOCKING, docs/01-content.md §9 item 2.
   // `bezbariérové ubytování` is claimed in the old amenity list for a two-storey
   // cottage on a forested slope with two mezzanine bedrooms. The ground floor does
   // have a bedroom, a WC and a shower, so there may be a narrower claim that is
-  // true — but it must be stated precisely, not as a tick-box. A wrong access
+  // true   but it must be stated precisely, not as a tick-box. A wrong access
   // claim on a booking site ends with someone at a door they cannot get through.
   { icon: 'accessibility', label: 'Bezbariérový přístup' },
 ];
@@ -75,7 +75,7 @@ const fakta: { icon: LucideName; label: string }[] = [
         }
       </ul>
 
-      {/* The seam. Same eight, announced once — see the note at the top. */}
+      {/* The seam. Same eight, announced once   see the note at the top. */}
       <ul class="fakta-list fakta-klon" aria-hidden="true">
         {
           fakta.map((f) => (
@@ -143,7 +143,7 @@ const fakta: { icon: LucideName; label: string }[] = [
 
     .fakta-track {
       display: flex;
-      /* Both copies at their natural width — never the frame's. */
+      /* Both copies at their natural width   never the frame's. */
       width: max-content;
       animation-name: fakta-drift;
       animation-duration: 46s;
@@ -155,7 +155,7 @@ const fakta: { icon: LucideName; label: string }[] = [
      * The list's own padding IS the gap over the seam: 0.5rem off the end of one
      * copy plus 1.5rem off the start of the next makes the same 2rem that
      * separates every other pair. Split that way rather than 2rem on one side,
-     * because the 1.5rem is doing a second job — it is the page gutter, so the
+     * because the 1.5rem is doing a second job   it is the page gutter, so the
      * first fact starts level with every other section's text on the first paint
      * instead of already half inside the fade.
      */
@@ -186,7 +186,7 @@ const fakta: { icon: LucideName; label: string }[] = [
 
   /*
    * Reduced motion. The global clamp in global.css would run the drift once in
-   * 0.01ms and drop the track back at the start — not broken, but then the last
+   * 0.01ms and drop the track back at the start   not broken, but then the last
    * five facts would be unreachable, so the row is handed over to the reader
    * instead: same single row, swiped rather than driven, snapping as it goes.
    *
@@ -197,7 +197,7 @@ const fakta: { icon: LucideName; label: string }[] = [
     .fakta-viewport {
       overflow-x: auto;
       scroll-snap-type: x proximity;
-      /* No scrollbar under a row of icons — the fade is the affordance. */
+      /* No scrollbar under a row of icons   the fade is the affordance. */
       scrollbar-width: none;
     }
 

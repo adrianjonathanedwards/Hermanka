@@ -1,11 +1,11 @@
-/**
+﻿/**
  * The site's only JavaScript.
  *
  * WHY THERE IS A LIBRARY HERE AT ALL
  * ----------------------------------
  * The original motion system was `animation-timeline: view()`, which is
- * Chromium-only. On Safari and Firefox — between them most of this site's phone
- * traffic — every scroll reveal did precisely nothing, and the page that shipped
+ * Chromium-only. On Safari and Firefox   between them most of this site's phone
+ * traffic   every scroll reveal did precisely nothing, and the page that shipped
  * was not the page that was designed. Motion (motion.dev) drives the same
  * effects from IntersectionObserver, so they run everywhere, and its WAAPI
  * animations run off the main thread.
@@ -59,7 +59,7 @@ const DURATION = 0.62;
 
 /**
  * ONE reveal: a fade and eight pixels. The from-state MUST match the
- * `.js-motion [data-reveal]` rule in global.css — CSS owns the resting state so
+ * `.js-motion [data-reveal]` rule in global.css   CSS owns the resting state so
  * nothing flashes before this file runs, and this only replays it forwards.
  *
  * There were five variants and a per-child stagger. A page where every block
@@ -75,7 +75,7 @@ function reveal(el: HTMLElement): void {
 
   /*
    * Land the element on its finished state FIRST. If the animation is then
-   * cancelled, dropped or never composited, it is already correct — the
+   * cancelled, dropped or never composited, it is already correct   the
    * animation is only ever the nice-to-have on top of it.
    */
   el.style.opacity = '1';
@@ -101,14 +101,14 @@ function setUpReveals(): void {
    *
    * The `.js-motion` failsafe in <head> is cancelled the moment this module
    * loads, so from then on the only thing that un-hides a `[data-reveal]` is its
-   * observer firing. Anything the observer never reports is invisible for good —
+   * observer firing. Anything the observer never reports is invisible for good  
    * and there are real ways for that to happen: a target clipped to zero area, a
    * zero-height box, an ancestor with `overflow: hidden` and no scroll, a
    * `content-visibility` skip.
    *
    * So once loading has settled, sweep for anything still unrevealed that is
    * already at or above the fold and reveal it outright. Below-fold elements are
-   * left alone — they are legitimately waiting their turn.
+   * left alone   they are legitimately waiting their turn.
    */
   const sweep = (): void => {
     document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
@@ -123,7 +123,7 @@ function setUpReveals(): void {
 /* ==========================================================================
    Mobile navigation
 
-   The panel is a <details>, which cannot be transitioned open — the browser
+   The panel is a <details>, which cannot be transitioned open   the browser
    flips `display` in a single frame. Animating the panel on `toggle` gets the
    motion without giving up the no-JavaScript behaviour: without this file the
    disclosure still opens, just instantly.
@@ -233,6 +233,87 @@ function setUpLightbox(): void {
 }
 
 /* ==========================================================================
+   Gallery filmstrips
+
+   /galerie lays each group out as a native horizontal scroller with CSS scroll
+   snapping. It already swipes, snaps, and scrolls with the keyboard on its own,
+   because the track carries `tabindex="0"` and a browser scrolls a focused
+   scroll container with the arrow keys.
+
+   This adds the two round arrows and nothing else. They carry `hidden` in the
+   markup and are un-hidden here, so a failed chunk leaves a strip that still
+   scrolls rather than two buttons that do nothing. Same contract as the hero
+   controls above.
+   ========================================================================== */
+
+function setUpGalerieStrips(): void {
+  document.querySelectorAll<HTMLElement>('.pas').forEach((pas) => {
+    const track = pas.querySelector<HTMLElement>('[data-pas-stopa]');
+    const controls = pas.querySelector<HTMLElement>('[data-pas-ovladace]');
+    const prev = pas.querySelector<HTMLButtonElement>('[data-pas-zpet]');
+    const next = pas.querySelector<HTMLButtonElement>('[data-pas-dalsi]');
+    if (!track || !controls || !prev || !next) return;
+
+    const tiles = Array.from(track.children) as HTMLElement[];
+    if (tiles.length < 2) return;
+
+    /* Earned it: the arrows do something now, so they may be seen. */
+    controls.hidden = false;
+
+    /*
+     * One tile per press, not one viewport: the tiles are different widths
+     * (every photograph keeps its own aspect ratio) so there is no fixed page to
+     * scroll by, and landing between two pictures is the one outcome to avoid.
+     *
+     * The 2px tolerance absorbs sub-pixel scroll positions, which otherwise make
+     * the "next" tile the one already on screen and the button appear dead.
+     */
+    const goTo = (direction: 1 | -1): void => {
+      /*
+       * Measured, not computed from offsetLeft. `offsetLeft` is relative to the
+       * nearest positioned ancestor, which here is the strip wrapper rather than
+       * the track, and the track carries a negative margin and a matching
+       * padding so the two only agree by coincidence. Rectangles cannot drift.
+       */
+      const trackLeft =
+        track.getBoundingClientRect().left +
+        parseFloat(getComputedStyle(track).paddingInlineStart);
+
+      const target =
+        direction === 1
+          ? tiles.find((tile) => tile.getBoundingClientRect().left > trackLeft + 2)
+          : [...tiles].reverse().find((tile) => tile.getBoundingClientRect().left < trackLeft - 2);
+      if (!target) return;
+
+      track.scrollTo({
+        left: track.scrollLeft + (target.getBoundingClientRect().left - trackLeft),
+        behavior: reducedMotion.matches ? 'auto' : 'smooth',
+      });
+    };
+
+    /*
+     * Disabled at the ends. `scrollWidth - clientWidth` is the maximum scroll
+     * position; the 2px tolerance covers fractional layout widths, which
+     * otherwise leave "next" enabled forever at the right-hand end.
+     */
+    const syncArrows = (): void => {
+      const max = track.scrollWidth - track.clientWidth;
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= max - 2;
+    };
+
+    prev.addEventListener('click', () => goTo(-1));
+    next.addEventListener('click', () => goTo(1));
+    track.addEventListener('scroll', syncArrows, { passive: true });
+    window.addEventListener('resize', syncArrows, { passive: true });
+
+    syncArrows();
+    /* Widths settle only once the lazy images have their boxes; re-check then. */
+    window.addEventListener('load', syncArrows, { once: true });
+  });
+}
+
+/* ==========================================================================
    Hero carousel
 
    Five photographs behind the headline. The project documentation argues against
@@ -241,14 +322,14 @@ function setUpLightbox(): void {
 
    Everything below is an ENHANCEMENT of markup that already works. Without this
    function the hero is slide one with a headline on it, the other four slides are
-   transparent by a plain CSS rule, and the controls are `hidden` in the markup —
+   transparent by a plain CSS rule, and the controls are `hidden` in the markup  
    so a failed chunk leaves a static hero rather than a blank one or a row of dots
    that do nothing. Never invert that by hiding slide one in CSS.
    ========================================================================== */
 
 /*
  * How long each slide is held. The crossfade duration deliberately does NOT live
- * here — it is a CSS transition on `.hero-slide`, so JavaScript never needs to
+ * here   it is a CSS transition on `.hero-slide`, so JavaScript never needs to
  * know about it and the two cannot fall out of step.
  */
 const SLIDE_MS = 5500;
@@ -270,14 +351,14 @@ function setUpHeroCarousel(): void {
   let timer = 0;
   /*
    * Two separate reasons to not be advancing, and they must not overwrite each
-   * other: `paused` is now set by ONE thing only — `prefers-reduced-motion` —
+   * other: `paused` is now set by ONE thing only   `prefers-reduced-motion`  
    * and once set it stays set; `held` is a pointer resting on the hero or focus
    * inside it, and is released again on leave. Collapsing them into one flag is
    * how a carousel ends up permanently stopped after one hover.
    *
    * ⚠ There is no pause button any more: the carousel autoplays by request, see
    * the note beside the controls in Hero.astro. `paused` is what is left of the
-   * WCAG 2.2.2 mechanism and it is the reduced-motion path — do not fold it into
+   * WCAG 2.2.2 mechanism and it is the reduced-motion path   do not fold it into
    * `held` on the grounds that nothing sets it.
    */
   let paused = reducedMotion.matches;
@@ -289,7 +370,7 @@ function setUpHeroCarousel(): void {
     slides.forEach((slide, i) => {
       const current = i === index;
       slide.toggleAttribute('data-current', current);
-      /* Only the visible photograph is in the accessibility tree — otherwise a
+      /* Only the visible photograph is in the accessibility tree   otherwise a
          screen reader meets five long alt strings before reaching the headline. */
       if (current) slide.removeAttribute('aria-hidden');
       else slide.setAttribute('aria-hidden', 'true');
@@ -332,8 +413,8 @@ function setUpHeroCarousel(): void {
   });
 
   /*
-   * Hover and focus hold it. A courtesy rather than a real stop mechanism — a
-   * keyboard user reading the headline touches neither of these — and with the
+   * Hover and focus hold it. A courtesy rather than a real stop mechanism   a
+   * keyboard user reading the headline touches neither of these   and with the
    * pause button removed it is all that is on offer to anyone not running
    * reduced motion.
    */
@@ -370,7 +451,7 @@ function setUpHeroCarousel(): void {
     dots[(next + slides.length) % slides.length].focus();
   });
 
-  /* Turning reduced motion on mid-session stops it, and it stays stopped — the
+  /* Turning reduced motion on mid-session stops it, and it stays stopped   the
      one-way door is deliberate, a preference switched on mid-visit is a clearer
      signal than one switched back off. */
   reducedMotion.addEventListener('change', () => {
@@ -390,7 +471,7 @@ function setUpHeroCarousel(): void {
 
 function boot(): void {
   if (reducedMotion.matches) {
-    /* Nothing to orchestrate — drop the gate so the CSS never hides anything. */
+    /* Nothing to orchestrate   drop the gate so the CSS never hides anything. */
     root.classList.remove('js-motion');
   } else {
     setUpReveals();
@@ -398,6 +479,9 @@ function boot(): void {
 
   setUpMobileNav();
   setUpLightbox();
+  /* Outside the reduced-motion branch for the same reason as the hero controls:
+     the arrows must work either way, they simply do not glide. */
+  setUpGalerieStrips();
   /* Outside the reduced-motion branch: the controls must work either way, they
      simply do not advance on their own. */
   setUpHeroCarousel();

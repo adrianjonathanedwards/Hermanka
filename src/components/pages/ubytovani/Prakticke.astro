@@ -1,0 +1,101 @@
+﻿---
+/**
+ * `Doprava, parkování` and `Stravování`   the fourth section of /ubytovani.
+ *
+ * COPY IS THE OLD SITE'S, VERBATIM, both paragraphs.
+ *
+ * DESIGN / CONTENT PLACEMENT: on the old page these were two separate headed
+ * paragraphs, one under the other, in a single narrow column running the length
+ * of the page. They are the only two blocks on the page that answer "what
+ * happens when we actually arrive", they are both short, and neither has a
+ * photograph   so they are set side by side under one band instead of stacked.
+ *
+ * Both keep their own `<h2>`. That is deliberate and it is an SEO decision as
+ * much as a reading one: `Doprava, parkování` and `Stravování` are the headings
+ * the old page has been indexed under for years, and merging them under one
+ * invented heading would throw that away for nothing.
+ *
+ * ⚠ `3 až 4 auta` here versus `4 auta` in the O nás paragraph on the homepage.
+ * The old site says both, on two different pages, and this is the page that
+ * says `3 až 4`. Reproduced as written; it is the client's number to settle.
+ */
+import IconLucide from '../../IconLucide.astro';
+---
+
+{/*
+  ⚠ A <div>, not a <section>, and there is no wrapper heading.
+
+  The first version had one   a visually hidden `Příjezd a stravování`   so the
+  outer <section> would have an accessible name. It produced a broken document
+  outline: three sibling <h2>s where the first is really the parent of the other
+  two, which is what a screen reader's heading list and a crawler both read.
+
+  A band is not a topic. There is nothing here to name that the two headings do
+  not already name, so the outer element carries no heading and is not a
+  landmark; the two real sections inside it are, each named by its own <h2>.
+*/}
+<div id="doprava" class="section prakticke">
+  <div class="wrap">
+    <div class="prakticke-grid">
+      <section class="blok" aria-labelledby="doprava-nadpis" data-reveal="up">
+        <IconLucide name="car" size={30} class="blok-ikona" />
+        <h2 id="doprava-nadpis">Doprava, parkování</h2>
+        <p>
+          K&nbsp;objektu vede příjezdová cesta dimenzovaná i&nbsp;na nákladní
+          automobil. Přímo u&nbsp;objektu je parkoviště pro 3&nbsp;až 4&nbsp;auta.
+          Dále je možné auta zaparkovat na příjezdové cestě, kam se vejdou další
+          4&nbsp;osobní automobily.
+        </p>
+      </section>
+
+      <section
+        class="blok"
+        aria-labelledby="stravovani-nadpis"
+        data-reveal="up"
+        data-reveal-delay="100"
+      >
+        <IconLucide name="utensils" size={30} class="blok-ikona" />
+        <h2 id="stravovani-nadpis">Stravování</h2>
+        <p>
+          Přímo v&nbsp;obci 5&nbsp;minut chůze se nachází farma, kde se denně
+          prodává čerstvé mléko a&nbsp;sýry. Ještě blíže se nachází penzion, kde se
+          vaří. Doporučujeme restauraci Kačenka u&nbsp;Kláštera Hedeč
+          s&nbsp;vynikající domácí kuchyní.
+        </p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<style>
+  .prakticke {
+    background-color: var(--color-omitka);
+  }
+
+  .prakticke-grid {
+    display: grid;
+    gap: 3rem;
+  }
+
+  @media (width >= 48rem) {
+    .prakticke-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4rem;
+    }
+  }
+
+  .blok-ikona {
+    color: var(--color-mosaz);
+  }
+
+  .blok h2 {
+    margin-top: 1rem;
+    font-size: var(--text-title-m);
+    color: var(--color-mosaz-tmava);
+  }
+
+  .blok p {
+    margin-top: 1rem;
+    color: var(--color-kura);
+  }
+</style>

@@ -8,24 +8,42 @@
 # are using a handful. Splats (:splat) are supported.
 
 # --- old page structure --------------------------------------------------
-/o-nas                  /chalupa         301
-/o-nas/                 /chalupa         301
-/ubytovani              /chalupa         301
-/ubytovani/             /chalupa         301
-/video                  /chalupa#video   301
-/video/                 /chalupa#video   301
-/volne-terminy-a-ceny   /terminy-a-ceny  301
-/volne-terminy-a-ceny/  /terminy-a-ceny  301
-/tipy-na-vylety         /okoli           301
-/tipy-na-vylety/        /okoli           301
+#
+# ⚠ /ubytovani IS A REAL PAGE AGAIN AND MUST NOT APPEAR ON THE LEFT HERE.
+#
+# It briefly redirected to an invented /chalupa. The rename was reverted — the
+# path has been indexed since 2019 and the client calls the page `Ubytování` —
+# so the rule is gone. If you ever put `/ubytovani` back in the left column
+# pointing at a page that then points back, you have built a redirect loop and
+# the page will be unreachable rather than merely wrong. Rules match top to
+# bottom, so a stale rule here would shadow the real route.
+#
+# /o-nas goes to the HOMEPAGE, not to /ubytovani, and that is deliberate: the
+# old About page held the intro paragraph and the `V okolí naleznete` distance
+# list, and both of those are now homepage sections. A redirect should land on
+# the content, not on the page with the most similar name.
+/o-nas                  /                   301
+/o-nas/                 /                   301
+/video                  /ubytovani#video    301
+/video/                 /ubytovani#video    301
+/volne-terminy-a-ceny   /terminy-a-ceny     301
+/volne-terminy-a-ceny/  /terminy-a-ceny     301
+/tipy-na-vylety         /okoli              301
+/tipy-na-vylety/        /okoli              301
+
+# The short-lived /chalupa URL. It existed only between two builds of this
+# rebuild and was never linked from anywhere public, but it may sit in a
+# bookmark or a crawl queue, so it is retired properly rather than 404ed.
+/chalupa                /ubytovani          301
+/chalupa/               /ubytovani          301
 
 # --- trailing slashes on surviving routes --------------------------------
 # astro.config.mjs sets trailingSlash: 'never'; keep one canonical URL per page.
-/kontakt/               /kontakt         301
-/galerie/               /galerie         301
-/chalupa/               /chalupa         301
-/terminy-a-ceny/        /terminy-a-ceny  301
-/okoli/                 /okoli           301
+/kontakt/               /kontakt            301
+/galerie/               /galerie            301
+/ubytovani/             /ubytovani          301
+/terminy-a-ceny/        /terminy-a-ceny     301
+/okoli/                 /okoli              301
 
 # --- WordPress leftovers -------------------------------------------------
 # The old site was WordPress. These paths are probed constantly by bots and are

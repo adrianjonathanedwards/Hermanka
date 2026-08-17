@@ -1,4 +1,4 @@
----
+﻿---
 /**
  * The property plan, made live.
  *
@@ -7,7 +7,7 @@
  * `situace2.webp` is the client's aerial with every label painted into the
  * pixels: `Hot Tube`, `Jezírko`, `Mezonetová ložnice 2+3 os.` and a dozen more.
  * docs/01-content.md §9 flags that as launch-blocking, and §4 of the design
- * system asks for the fix in as many words — "Rebuild them as photograph +
+ * system asks for the fix in as many words   "Rebuild them as photograph +
  * inline SVG … the map as a whole gets a <title> and a text alternative listing
  * what it shows."
  *
@@ -25,12 +25,12 @@
  *
  *   - it works with scripting off, like the rest of the site;
  *   - arrow keys walk the group, so the whole map is keyboard-navigable and the
- *     panel follows the focus — genuinely the nicest way to read it;
+ *     panel follows the focus   genuinely the nicest way to read it;
  *   - a screen reader announces it as what it is, a group of places to choose
  *     between, and the <legend> names the group.
  *
  * The `<fieldset>` is what gives the group its accessible name. It has to be
- * reset hard — browsers give it a border, padding and a `min-width: min-content`
+ * reset hard   browsers give it a border, padding and a `min-width: min-content`
  * that breaks grid children.
  *
  * ⚠ THE RADIOS MUST COME FIRST IN THE MARKUP. Everything that reacts to a
@@ -58,7 +58,7 @@ interface Spot {
   /** Position of the marker over the photograph, as a percentage of its box. */
   x: number;
   y: number;
-  /** Optional — six of the fourteen places have a photograph of their own. */
+  /** Optional   six of the fourteen places have a photograph of their own. */
   foto?: ImageMetadata;
   alt?: string;
   /** Shown as a small brass figure on the card. Capacities, counts, distances. */
@@ -191,7 +191,7 @@ const SPOTS: Spot[] = [
 /*
  * The rules that tie each radio to its marker and its card.
  *
- * These are GENERATED and emitted `is:inline`, which means unscoped — Astro's
+ * These are GENERATED and emitted `is:inline`, which means unscoped   Astro's
  * scoped `<style>` blocks are static text and cannot be looped over, and there
  * is no way to correlate the nth input with the nth card in plain CSS. Every
  * selector below is anchored on an id, and ids are unique per document, so
@@ -260,7 +260,7 @@ const LINKS = SPOTS.map(
               {/*
                 The label's text is the radio's accessible name, so it carries
                 the place name even though the marker shows only a dot. The
-                visible tip is aria-hidden — it would otherwise say it twice.
+                visible tip is aria-hidden   it would otherwise say it twice.
               */}
               <span class="sr-only">{s.nazev}</span>
               <span class="plan-dot" aria-hidden="true" />
@@ -349,8 +349,8 @@ const LINKS = SPOTS.map(
   }
 
   /*
-   * Hard reset. A <fieldset> ships with a border, 0.35em/0.75em of padding and —
-   * the one that actually breaks things — `min-inline-size: min-content`, which
+   * Hard reset. A <fieldset> ships with a border, 0.35em/0.75em of padding and  
+   * the one that actually breaks things   `min-inline-size: min-content`, which
    * stops it shrinking and blows the grid out on a phone.
    */
   .plan-grid {
@@ -540,8 +540,8 @@ const LINKS = SPOTS.map(
   /*
    * Eight of the fourteen places have no photograph of their own, and their
    * cards are a third the height of the ones that do. The grid stack already
-   * stops the panel resizing — it is always as tall as the tallest card, so
-   * choosing a place never moves the page under the cursor — but it leaves the
+   * stops the panel resizing   it is always as tall as the tallest card, so
+   * choosing a place never moves the page under the cursor   but it leaves the
    * short cards sitting at the top of a tall empty box.
    *
    * Centring them vertically makes that space read as deliberate rather than as
@@ -556,11 +556,11 @@ const LINKS = SPOTS.map(
    *
    * Two problems at 390 px, and they compound. The map is a quarter of the size
    * it is on a laptop, and four of the markers are interior rooms clustered on
-   * one roof — at that scale their 44 px targets overlap each other and half the
+   * one roof   at that scale their 44 px targets overlap each other and half the
    * outdoor markers as well.
    *
    * So: let the photograph go edge to edge for the extra width, and drop the
-   * four interior markers. Nothing is lost — the rooms are still in the text
+   * four interior markers. Nothing is lost   the rooms are still in the text
    * alternative, still reachable with the arrow keys, and their capacities are
    * set out properly in the bed table one section up. They are also the least
    * spatial things on the plan: knowing the 6+2 room is *over there* on a roof

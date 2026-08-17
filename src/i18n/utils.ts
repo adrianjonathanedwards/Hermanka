@@ -15,8 +15,8 @@ export function getLocaleFromUrl(url: URL): Locale {
  * Prefixes a site-root path with the locale. The default locale is never
  * prefixed, matching `routing.prefixDefaultLocale: false` in astro.config.mjs.
  *
- *   localePath('/chalupa', 'cs') → '/chalupa'
- *   localePath('/chalupa', 'de') → '/de/chalupa'
+ *   localePath('/ubytovani', 'cs') → '/ubytovani'
+ *   localePath('/ubytovani', 'de') → '/de/ubytovani'
  */
 export function localePath(path: string, locale: Locale = DEFAULT_LOCALE): string {
   const clean = '/' + path.replace(/^\/+/, '').replace(/\/+$/, '');

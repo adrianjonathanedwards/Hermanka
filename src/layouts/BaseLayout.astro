@@ -1,8 +1,8 @@
----
+﻿---
 /**
  * The only layout. Every page wraps in this.
  *
- * It owns <head>, the site header and the site footer — the three landmarks every
+ * It owns <head>, the site header and the site footer   the three landmarks every
  * page shares. Page content goes in the <main> slot.
  */
 import { getLocaleFromUrl, localePath, stripLocale } from '../i18n/utils';
@@ -14,7 +14,7 @@ import Lightbox from '../components/Lightbox.astro';
 import '../styles/global.css';
 
 interface Props {
-  /** Page title, without the site name — that is appended here. */
+  /** Page title, without the site name   that is appended here. */
   title: string;
   /** Meta description. Czech. Aim for 140–160 characters. */
   description: string;
@@ -29,7 +29,7 @@ interface Props {
   heroPreload?: { src: string; srcset?: string; sizes?: string };
   /**
    * Social share image. Absolute or site-root path.
-   * TODO: /og-default.webp does not exist yet — it needs a 1200×630 crop once
+   * TODO: /og-default.webp does not exist yet   it needs a 1200� 630 crop once
    * the photography is chosen (docs/01-content.md §10).
    */
   ogImage?: string;
@@ -40,8 +40,8 @@ interface Props {
    *
    * ⚠ Required on any page whose FIRST SCREEN IS LIGHT. The header is white type
    * on nothing until the hero scrolls away; over `--omitka` it is invisible. See
-   * the `solid` prop on SiteHeader.astro. Pages with a photographic hero — the
-   * homepage and everything using PageHero — leave this alone.
+   * the `solid` prop on SiteHeader.astro. Pages with a photographic hero   the
+   * homepage and everything using PageHero   leave this alone.
    */
   headerSolid?: boolean;
 }
@@ -76,7 +76,7 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
     {/*
       Fonts are preloaded before anything else in <head> so the request starts on
       the first byte of HTML. Two files, 40.7 kB together, both subset to a Czech
-      charset — see docs/02-design-system.md §2.3.
+      charset   see docs/02-design-system.md §2.3.
       `crossorigin` is required on font preloads even for same-origin, or the
       browser fetches the file twice.
     */}
@@ -146,8 +146,8 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
       meant the client's icon never rendering in the browsers that matter.
       public/favicon.svg is now unreferenced and safe to delete.
 
-      32×32 is the only size supplied, so there is no apple-touch-icon (that
-      wants 180×180) and it will be resampled on a high-DPI tab. A 180 px source
+      32� 32 is the only size supplied, so there is no apple-touch-icon (that
+      wants 180� 180) and it will be resampled on a high-DPI tab. A 180 px source
       would fix both.
     */}
     <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
@@ -160,8 +160,8 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
 
       Adding `.js-motion` is what arms every `opacity: 0` rule in global.css.
       The timer is what guarantees they can never stick: if src/scripts/motion.ts
-      does not check in within 2 s — chunk 404, parse error, blocked script,
-      anything — the class comes off and the page renders complete.
+      does not check in within 2 s   chunk 404, parse error, blocked script,
+      anything   the class comes off and the page renders complete.
       docs/02-design-system.md §5.1.
     */}
     <script is:inline>

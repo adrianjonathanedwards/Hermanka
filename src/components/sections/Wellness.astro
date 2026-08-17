@@ -1,11 +1,11 @@
----
+﻿---
 /**
  * Wellness.
  *
  * The current site sets this copy in white over an underexposed winter photograph
  * and it is effectively unreadable. Not reproduced: the text sits on a solid --les
  * panel beside the photograph instead, giving --omitka on --les at 15.45:1 against
- * the 4.5:1 floor — no scrim, no gradient, nothing that depends on which part of a
+ * the 4.5:1 floor   no scrim, no gradient, nothing that depends on which part of a
  * photograph happens to be behind a given line.
  */
 import { Image } from 'astro:assets';
@@ -47,7 +47,7 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
    *
    * The photograph is inset 4rem from the top of this section (see below), and
    * that strip was showing page white directly under the stone band the section
-   * above ends with — a colour change on the section line, which is the one
+   * above ends with   a colour change on the section line, which is the one
    * place it gets noticed. So the stone is painted on for the first 8rem of this
    * section instead. Nothing moves: the change now happens at 8rem, which is
    * 4rem BEHIND the top edge of the photograph, where nothing can see it.
@@ -56,7 +56,7 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
    * edge would leave it to subpixel rounding whether a hairline of one colour or
    * the other shows at that line.
    *
-   * The bottom strip is left as page white deliberately — it runs into the page
+   * The bottom strip is left as page white deliberately   it runs into the page
    * ground the next section sits on, so there is no change to hide there.
    */
   .wellness {
@@ -90,7 +90,7 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
      * By decision, and it costs one thing worth knowing: the section above ends
      * in the stone band, so the top strip puts a band of page white between that
      * stone and the top of the photograph. Deliberate. Do not "fix" it by
-     * dropping the top margin — the symmetry is the point.
+     * dropping the top margin   the symmetry is the point.
      *
      * `align-self: stretch` is what gives the photograph column a definite
      * height, and that is load-bearing twice over: it is what the margins
@@ -140,7 +140,7 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
    * --text-display, the h1 step, and the paragraph to --text-title-s.
    *
    * ⚠ Both are steps ON the scale in docs §2.4, not numbers picked to look right.
-   * That is the only legal way to resize type here — a `clamp()` full of magic
+   * That is the only legal way to resize type here   a `clamp()` full of magic
    * rem values is what the rule exists to stop.
    *
    * ≥64rem only. Below it the heading already fills the measure at the default
@@ -150,7 +150,7 @@ import virivka from '@img/DSC_4684-scaled-1.jpg';
    * set for 39px and 20px, and left alone they read as gaps at 49 and 25.
    *
    * ⚠ THIS BLOCK MUST STAY BELOW THE TWO RULES ABOVE. It was written into the
-   * earlier `@media (width >= 64rem)`, which sits above them — and a media query
+   * earlier `@media (width >= 64rem)`, which sits above them   and a media query
    * adds no specificity, so the plain `p` rule's `font-size: var(--text-lead)`
    * simply won on source order and the paragraph never moved. The heading did,
    * which is exactly the sort of half-working that takes a while to spot.

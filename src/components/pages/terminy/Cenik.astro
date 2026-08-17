@@ -1,6 +1,6 @@
----
+﻿---
 /**
- * Ceník — one table, seasons as rows, week and weekend as columns.
+ * Ceník   one table, seasons as rows, week and weekend as columns.
  *
  * docs/01-content.md §6.2: "REWRITE the presentation into one table with
  * seasons as rows. Six near-identical cards to express four distinct prices
@@ -8,12 +8,12 @@
  *
  * Every figure is drawn from src/data/cenik.ts through formatKc(). The word
  * "every" is absolute: no price, no per-person figure and no currency amount
- * may be typed into this file (docs/01-content.md §2 — the four-year-old
+ * may be typed into this file (docs/01-content.md §2   the four-year-old
  * hardcoded 311 Kč that stopped matching the price list is why this module
  * exists at all).
  *
  * ⚠ PRESNE_HRANICE_CHYBI is true. "půlka března" is prose, not a date. The
- * season boundary decides the price — 15. 3. and 31. 3. are 4 000 Kč apart
+ * season boundary decides the price   15. 3. and 31. 3. are 4 000 Kč apart
  * for the same week. An exact boundary is launch-blocking: docs/01-content.md
  * §9 item 5. Until the client answers, the table shows the prose periods the
  * old site had, with a visible note that they are approximate.
@@ -24,12 +24,12 @@
  *
  * Section band: --kamen. KalendarSlot above it is --omitka.
  *
- * TODO(client) — docs/01-content.md §9 item 5: exact season boundaries.
+ * TODO(client)   docs/01-content.md §9 item 5: exact season boundaries.
  * "půlka března" and "půlka září" must become real dates. Once supplied,
  * SEZONY gains od/do month-day pairs and sezonaProDatum() can be added;
  * this component changes nothing.
  *
- * TODO(client) — docs/01-content.md §9 item 6: definition of "víkend".
+ * TODO(client)   docs/01-content.md §9 item 6: definition of "víkend".
  * How many nights, which days, bank holidays? The table caption notes it
  * as undefined until the answer arrives.
  */
@@ -37,7 +37,7 @@ import IconLucide from '../../IconLucide.astro';
 import { SEZONY, KAPACITA, formatKc, PRESNE_HRANICE_CHYBI } from '../../../data/cenik';
 
 /*
- * U+00A0 — hard space. Written as a constant so it cannot be mistaken for
+ * U+00A0   hard space. Written as a constant so it cannot be mistaken for
  * an ordinary space in review or in edits. docs/02-design-system.md §2.6:
  * required between a numeral and its unit and after single-letter prepositions.
  */
@@ -57,7 +57,7 @@ const NBSP = ' ';
       </p>
       <h2 id="cenik-nadpis">Ceník</h2>
       <p class="lead">
-        Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění —
+        Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění  
         chalupa je k dispozici jako celek.
       </p>
     </div>
@@ -73,9 +73,9 @@ const NBSP = ' ';
         <div class="hranice-pozn" role="note">
           <IconLucide name="info" size={16} class="hranice-ikona" />
           <p>
-            Přesné hranice sezón ještě čekají na potvrzení od klienta{NBSP}—
+            Přesné hranice sezón ještě čekají na potvrzení od klienta{NBSP} 
             zatím platí přibližné vymezení z původního ceníku.
-            {/* TODO(client) — docs/01-content.md §9 item 5 */}
+            {/* TODO(client)   docs/01-content.md §9 item 5 */}
           </p>
         </div>
       )}
@@ -91,7 +91,7 @@ const NBSP = ' ';
           <caption>
             Cena za celou chalupu
             {/*
-              "Víkend" is still undefined — docs/01-content.md §9 item 6.
+              "Víkend" is still undefined   docs/01-content.md §9 item 6.
               TODO(client): how many nights, Fri–Sun or Sat–Mon, bank holidays?
               The note below the table surfaces this. Caption keeps it short.
             */}
@@ -125,7 +125,7 @@ const NBSP = ' ';
 
       {/*
         The whole-weeks rule for Jan/Feb and Jul/Aug is already shown prominently
-        above by KalendarSlot — repeating it in full here would be redundant.
+        above by KalendarSlot   repeating it in full here would be redundant.
         The "Víkend" column itself implies the rule: if your month is one of the
         four, the weekend price simply does not apply.
       */}
@@ -148,7 +148,7 @@ const NBSP = ' ';
   }
 
   /*
-   * "2 až 15 osob · 3 ložnice" — styled as an eyebrow label in brass.
+   * "2 až 15 osob · 3 ložnice"   styled as an eyebrow label in brass.
    * --mosaz-tmava on --kamen = 5.06:1 ✓ (docs/02-design-system.md §1.1)
    */
   .kapacita {
@@ -179,7 +179,7 @@ const NBSP = ' ';
   }
 
   /*
-   * Horizontal scroll container. The page body never scrolls sideways — only
+   * Horizontal scroll container. The page body never scrolls sideways   only
    * this div does, and only when the table is too wide for the viewport.
    * Hard rule #13 in the build instructions.
    */
@@ -192,7 +192,7 @@ const NBSP = ' ';
      *
      * The table has three rows and four short cells per row. Left to fill the
      * full 1280px container it put `Zimní sezona` at one edge of the screen and
-     * `30 000 Kč` at the other, with roughly 900px of nothing between them — so
+     * `30 000 Kč` at the other, with roughly 900px of nothing between them   so
      * reading a row meant tracking a price back across half a metre of stone to
      * the season it belongs to. That is the failure mode a wide table with few
      * columns always has, and it is worse here because the whole point of
@@ -210,7 +210,7 @@ const NBSP = ' ';
   /* ---- Season-boundary note -------------------------------------------- */
 
   /*
-   * Visible when PRESNE_HRANICE_CHYBI is true. Not an error badge — it is an
+   * Visible when PRESNE_HRANICE_CHYBI is true. Not an error badge   it is an
    * honest statement of what the site does not yet know. Disappears the moment
    * the client supplies exact dates and the flag flips.
    */
@@ -277,7 +277,7 @@ const NBSP = ' ';
     font-weight: var(--font-weight-semibold);
     color: var(--color-kura);
     padding: 0.75rem 1rem;
-    /* Brass rule under the header row — the same device Ubytovani.astro uses. */
+    /* Brass rule under the header row   the same device Ubytovani.astro uses. */
     border-bottom: 2px solid var(--color-mosaz);
     white-space: nowrap;
   }
@@ -309,13 +309,13 @@ const NBSP = ' ';
     font-size: var(--text-body);
   }
 
-  /* Hairline border between rows — 1px is the only raw px permitted. */
+  /* Hairline border between rows   1px is the only raw px permitted. */
   tbody tr + tr th,
   tbody tr + tr td {
     border-top: 1px solid var(--color-kamen);
   }
 
-  /* Row hover — colour shift, nothing moves. */
+  /* Row hover   colour shift, nothing moves. */
   @media (hover: hover) {
     tbody tr {
       transition: background-color 150ms var(--ease-out);

@@ -1,9 +1,9 @@
----
+﻿---
 /**
  * Homepage.
  *
- * Structure, content and semantics pass. Decoration — the hand-drawn illustration
- * language, section reveals, the map line work as inline SVG — comes next.
+ * Structure, content and semantics pass. Decoration   the hand-drawn illustration
+ * language, section reveals, the map line work as inline SVG   comes next.
  *
  * Section order is docs/04-pages.md. Every section either moves the reader toward
  * the inquiry form with dates in hand, or answers the objection in the way of it.
@@ -28,12 +28,12 @@ import { HERO_PRELOAD_PROPS, HERO_SIZES } from '../data/hero';
 
 /*
  * Resolve the FIRST slide's transform here so <head> can preload precisely the
- * variant the hero will render. Identical props object, so identical output —
+ * variant the hero will render. Identical props object, so identical output  
  * Astro dedupes the transform and this costs nothing extra in the build.
  *
  * ⚠ Slide one only. The hero is a carousel now, and preloading the other four
  * would put four full-bleed photographs on the critical path in front of the LCP
- * — see the warning at the top of src/data/hero.ts.
+ *   see the warning at the top of src/data/hero.ts.
  */
 const hero = await getImage(HERO_PRELOAD_PROPS);
 ---

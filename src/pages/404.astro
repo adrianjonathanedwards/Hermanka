@@ -12,8 +12,8 @@
  *
  * One light page, the roof over the message, and the wood under it.
  *
- *   1. The roof from the logo — `RoofMark.astro`, the vector recreation, not the
- *      raster lockup — set wide, with the number and the copy tucked UNDER it.
+ *   1. The roof from the logo   `RoofMark.astro`, the vector recreation, not the
+ *      raster lockup   set wide, with the number and the copy tucked UNDER it.
  *      The number rises into the triangle of empty space beneath the apex, so the
  *      block reads as standing under a roof rather than beside a picture of one.
  *      That is also the logo's own construction: mark above, words under it.
@@ -21,7 +21,7 @@
  *      there is one continuous surface from the header to the trees.
  *   3. The FOOTER'S OWN treeline rises into the bottom of it, in `--les`, exactly
  *      as it does on every other page. Nothing was added to draw it. The section
- *      is sized so the wood is IN THE FIRST SCREEN with the message — see the
+ *      is sized so the wood is IN THE FIRST SCREEN with the message   see the
  *      `min-height` and the bottom padding, which are a pair.
  *
  * ⚠ TWO THINGS THAT WERE TRIED AND ARE NOT COMING BACK
@@ -32,12 +32,12 @@
  *     version.
  *   - The same treeline recoloured to `--kamen` and hung along the bottom of that
  *     panel, facing the footer's across a clearing. It reads as a bank of dark
- *     spikes hanging downward rather than as trees — the reason is written at the
+ *     spikes hanging downward rather than as trees   the reason is written at the
  *     top of Treeline.astro. It does not invert.
  *
  * ---------------------------------------------------------------------------
  * The two links are the two that answer the question the reader actually has.
- * The rest of the site — /chalupa, /terminy-a-ceny, /okoli, /galerie, /kontakt —
+ * The rest of the site   /ubytovani, /terminy-a-ceny, /okoli, /galerie, /kontakt  
  * is one scroll further down in the footer's Rozcestník, which is on this page
  * like every other, so repeating it here would be the same list twice. The phone
  * number is on it because a guest who cannot find a page can still ring.
@@ -59,7 +59,7 @@ const NBSP = ' ';
     <div class="wrap ztraceno-inner">
       {/*
         Decorative: the site name is already in the header, the title and the
-        footer. `width` here is only the SVG's intrinsic attribute — the CSS
+        footer. `width` here is only the SVG's intrinsic attribute   the CSS
         below overrides it, and the viewBox does the scaling.
       */}
       <RoofMark width={560} class="ztraceno-strecha" />
@@ -73,13 +73,13 @@ const NBSP = ' ';
       <h1 id="ztraceno-nadpis">Tudy cesta nevede</h1>
 
       <p class="ztraceno-lead">
-        Stránka, kterou hledáte, tady není{NBSP}— nejspíš se přestěhovala, nebo
+        Stránka, kterou hledáte, tady není{NBSP}  nejspíš se přestěhovala, nebo
         v{NBSP}odkazu chybí písmenko.
       </p>
 
       <div class="ztraceno-akce">
         <a href="/" class="btn btn-primary">Zpět na úvod</a>
-        {/* Absolute, and /kontakt rather than /#poptavka — the same target the
+        {/* Absolute, and /kontakt rather than /#poptavka   the same target the
             footer's CTA uses, for the reason written beside it there. */}
         <a href="/kontakt#poptavka" class="btn btn-secondary">Napsat nám</a>
       </div>
@@ -96,20 +96,20 @@ const NBSP = ' ';
 
   The footer's wood is sized for a page that has just scrolled through eleven
   sections: `--treeline-h` is up to 460px, and `main > *:last-child` in
-  global.css reserves 68% of that as clear ground above it. On a 404 — one short
-  block and then the footer — that reserved band is most of the screen, and the
+  global.css reserves 68% of that as clear ground above it. On a 404   one short
+  block and then the footer   that reserved band is most of the screen, and the
   message ends up stranded above a field of nothing.
 
   Both numbers come from the SAME variable, so overriding it here scales the wood
   and its clearance together and nothing else on the page has to know. `is:global`
   because a scoped style cannot reach `:root`, and page-level styles ship with
-  this page alone — verified: `dist/index.html` carries no trace of it.
+  this page alone   verified: `dist/index.html` carries no trace of it.
 
   Unlayered, so it beats global.css's own `:root` inside `@layer components`.
 
   ⚠ THERE IS A FLOOR ON IT, AND IT IS GEOMETRY, NOT TASTE.
 
-  The artwork is 1440 × 332 and it is drawn `xMidYMax slice` — scaled to COVER
+  The artwork is 1440 �  332 and it is drawn `xMidYMax slice`   scaled to COVER
   the box, cropping whatever does not fit. Which edge gets cropped depends
   entirely on the box's own ratio:
 
@@ -118,12 +118,12 @@ const NBSP = ' ';
 
   Cropping the sides is what the drawing is designed for: one stretch of wood
   looks like any other, and the page simply shows less of it. Cropping the top
-  takes the tips off the tallest trees and leaves them standing flat — and it
+  takes the tips off the tallest trees and leaves them standing flat   and it
   shows first at the LEFT AND RIGHT EDGES, because the saddle (forest.ts) is what
   puts the full-height trees there. A `clamp(150px, 14vw, 200px)` version of this
   line sat at 0.14 and was slicing 132px off the top at 1440.
 
-  `24vw` holds the ratio at 0.24 — just clear of the floor — at every width, which
+  `24vw` holds the ratio at 0.24   just clear of the floor   at every width, which
   is why it is a plain viewport unit and not a clamp. The 190px minimum only
   bites on a phone, where it makes the ratio LARGER, not smaller, so it is safe.
 
@@ -141,7 +141,7 @@ const NBSP = ' ';
 <style>
   /*
    * The section is sized so that the message AND the top of the wood are on the
-   * first screen together — that is the whole layout, and the two rules below
+   * first screen together   that is the whole layout, and the two rules below
    * are what buy it:
    *
    *   `min-height: 100svh` makes the section fill the viewport, and
@@ -155,25 +155,25 @@ const NBSP = ' ';
    * have somewhere to be. Cut it and the copy lands in the canopy.
    *
    * ⚠ EVERY SIZE BELOW IS PART OF A HEIGHT BUDGET. `min-height` only holds the
-   * floor — once the content plus these two paddings is taller than the viewport,
+   * floor   once the content plus these two paddings is taller than the viewport,
    * the section grows and the wood goes back below the fold, which is the one
    * thing this layout exists to prevent.
    *
-   * So the three big items — this padding, the mark and the number — are all
+   * So the three big items   this padding, the mark and the number   are all
    * sized in `svh` as well as in `rem`, and a short laptop window shrinks the lot
    * rather than pushing the trees off the bottom. A fixed 8rem/34rem/5.5rem
-   * version of this block put the whole wood below the fold at 1024 × 720.
+   * version of this block put the whole wood below the fold at 1024 �  720.
    * Measure at that size before enlarging any of them.
    *
    * `align-content: center` rather than `end`. Bottom-anchoring the block was
    * right while the wood was a 200px fringe; at its proper height there is no
    * longer enough screen for both, and anchoring to the bottom spent every spare
-   * pixel on the gap above the copy — 29px of air over the roof at 1280 × 800.
+   * pixel on the gap above the copy   29px of air over the roof at 1280 �  800.
    * Centred, the slack is split, and the roof keeps its air on every screen.
    *
    * ⚠ The bottom padding is measured against the wood, not picked. The ranks are
-   * generated with a saddle (forest.ts), so under the MIDDLE of the page — the
-   * only part the copy is ever over — the canopy reaches about 0.42 of the wood's
+   * generated with a saddle (forest.ts), so under the MIDDLE of the page   the
+   * only part the copy is ever over   the canopy reaches about 0.42 of the wood's
    * height; the tall edge trees stand well outside a 40rem measure. 0.5 clears
    * that with air to spare. Below about 0.45 the last line starts meeting
    * branches.
@@ -187,10 +187,10 @@ const NBSP = ' ';
      * a scaled value on purpose.
      *
      * At the wood's proper height there is no longer a screen tall enough for
-     * generous air AND the whole wood at 1280 × 800 — one of them has to give.
+     * generous air AND the whole wood at 1280 �  800   one of them has to give.
      * This gives the air and lets a short window scroll by 25–50px, so the
      * canopy is always in the first screen and the trunks may not be. The other
-     * way round — everything on screen, 22px over the roof — is what this
+     * way round   everything on screen, 22px over the roof   is what this
      * replaced.
      */
     padding-block: clamp(9rem, 14svh, 11rem) calc(var(--treeline-h) * 0.5 + 1.5rem);
@@ -212,11 +212,11 @@ const NBSP = ' ';
    * just an ornament sitting on top of a paragraph.
    *
    * `--les`, the same weight as the body type. Brass was tried and the mark
-   * turned into a badge — it is architecture here, not a decorative rule.
+   * turned into a badge   it is architecture here, not a decorative rule.
    */
   .ztraceno-strecha {
     display: block;
-    /* The third term is the height budget above — 40svh of WIDTH, which at this
+    /* The third term is the height budget above   40svh of WIDTH, which at this
        mark's 510:256 works out at about a fifth of the window's height. */
     width: min(22rem, 72%, 40svh);
     /*
@@ -226,7 +226,7 @@ const NBSP = ' ';
      * treated like an <img>: `auto` resolves to that height ATTRIBUTE, not to the
      * viewBox's ratio. So the box stayed 281px tall while CSS narrowed it, the
      * drawing letterboxed inside it under the default `xMidYMid meet`, and the
-     * mark sat in 136px of invisible padding — which is exactly the height budget
+     * mark sat in 136px of invisible padding   which is exactly the height budget
      * this layout is fighting for. The ratio is the viewBox's own.
      */
     aspect-ratio: 510 / 256;
@@ -238,7 +238,7 @@ const NBSP = ' ';
    * ⚠ The negative margin is the point of the whole block, not a nudge.
    *
    * The mark's two slopes leave a triangle of empty space under the apex, and
-   * the number is pulled up INTO it — the same tuck the logo itself does with
+   * the number is pulled up INTO it   the same tuck the logo itself does with
    * its wordmark. Take it out and the roof and the number are two separate
    * things stacked in a column.
    *

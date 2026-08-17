@@ -1,14 +1,14 @@
----
+﻿---
 /**
- * O nás — a centred column of type standing in a clearing.
+ * O nás   a centred column of type standing in a clearing.
  *
- * Copy is the paragraph from the current homepage, which is correct as written —
+ * Copy is the paragraph from the current homepage, which is correct as written  
  * KEEP, docs/01-content.md §4.2.
  *
  * WHAT WAS ON THE RIGHT, AND WHY NOTHING IS NOW
  * This was a split: text on the left, a panel on the right. The panel held a
  * photograph of the terrace, then a flat-vector drawing of the valley. Both had
- * the same problem — there was nothing for them to say. The paragraph already
+ * the same problem   there was nothing for them to say. The paragraph already
  * places the cottage, and every other section on this page carries a photograph
  * of its own subject, so a second picture of the same valley was filling a
  * rectangle rather than answering a question.
@@ -40,7 +40,7 @@ import Clearing from '../decor/Clearing.astro';
       k pronajmutí poskytuje ubytování pro 2 až 15 osob ve 3 ložnicích.
     </p>
     <p class="more">
-      <a href="/chalupa" class="link-more">
+      <a href="/ubytovani" class="link-more">
         <span>Více o nás</span>
       </a>
     </p>
@@ -49,7 +49,7 @@ import Clearing from '../decor/Clearing.astro';
 
 <style>
   .onas {
-    /* The measure, and the one number the stands are sized against — see the
+    /* The measure, and the one number the stands are sized against   see the
        gutter arithmetic further down. It is a variable because it is read in two
        places and two hand-typed 46rems would drift. */
     --measure: 46rem;
@@ -97,7 +97,7 @@ import Clearing from '../decor/Clearing.astro';
   /*
    * The stands.
    *
-   * ⚠ REMOVED BELOW 64rem, not shrunk — `display: none`, so nothing is painted
+   * ⚠ REMOVED BELOW 64rem, not shrunk   `display: none`, so nothing is painted
    * and nothing is downloaded twice. It is not that they would not fit: below
    * that width the measure fills the page, so there is no clearing left for them
    * to stand at the edge of and they would end up behind the type. A phone gets
@@ -123,7 +123,7 @@ import Clearing from '../decor/Clearing.astro';
        * `--stand-h`. Reserving the full height there left a field of empty stone
        * over their tips.
        *
-       * 1 is the stands' own aspect — roughly 477 × 470 and 414 × 430, the
+       * 1 is the stands' own aspect   roughly 477 �  470 and 414 �  430, the
        * viewBoxes Clearing.astro measures from the placed trees. It is an
        * estimate for WHITESPACE only; nothing is clipped if it drifts. `100vw`
        * rather than `100%` because a percentage in `min-height` resolves against
@@ -148,12 +148,12 @@ import Clearing from '../decor/Clearing.astro';
      *    and the trees are simply smaller. Neither case cuts anything.
      *
      * 2. The gutter is (page − measure) / 2. The extra 1.5rem is borrowed from
-     *    the measure's own 2rem of `.wrap` padding — no glyph is ever set there,
+     *    the measure's own 2rem of `.wrap` padding   no glyph is ever set there,
      *    so the outermost crown may lean into it, and the remaining 0.5rem is
      *    the gap that keeps it off the text.
      *
      * `max()` rather than a bare `calc()` on purpose: a negative `max-width` is
-     * an invalid declaration and would be DROPPED — i.e. the guard would vanish
+     * an invalid declaration and would be DROPPED   i.e. the guard would vanish
      * at exactly the width where it matters. Clamped at zero it fails closed.
      *
      * Vertical clearance is the section's own `min-height` above: stand + 11rem

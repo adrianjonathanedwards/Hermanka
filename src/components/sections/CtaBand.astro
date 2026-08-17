@@ -1,10 +1,10 @@
----
+﻿---
 /**
  * The cross-page closing CTA.
  *
  * The old site ended `/o-nas/` and `/tipy-na-vylety/` with
  * `Máte zájem o ubytování nebo informace?` over a button reading `KONTAKTUJE NÁS`
- * — error #4 in docs/01-content.md §1, a verb with a letter missing, shouted in
+ *   error #4 in docs/01-content.md §1, a verb with a letter missing, shouted in
  * capitals, pointing at a bare contact page. Fixed here, and pointed at the thing
  * the site exists to collect: an inquiry with dates on it (docs/04-pages.md).
  *
@@ -13,7 +13,7 @@
  * It is the last section on the pages that do not end with the form, which means
  * the footer's treeline rises out of it (`main > *:last-child` in global.css
  * reserves the room). That treeline is a `--les` silhouette. On a `--les` band it
- * is invisible — the drawing simply does not appear, and the page ends on a
+ * is invisible   the drawing simply does not appear, and the page ends on a
  * strip of dark nothing with a lot of padding under it. Stone or render white
  * only. The dark statement band already exists and is CenaBand.astro.
  *
@@ -24,7 +24,7 @@
 interface Props {
   /** The <h2>. */
   nadpis?: string;
-  /** One line under it. Optional — on a page that has already said enough. */
+  /** One line under it. Optional   on a page that has already said enough. */
   text?: string;
   /** Where the button goes. */
   href?: string;

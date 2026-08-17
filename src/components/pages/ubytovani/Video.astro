@@ -1,27 +1,30 @@
----
+﻿---
 /**
- * Video — section 7 on /chalupa (#video).
+ * Video   the last content section of /ubytovani (#video).
  *
  * YouTube ID: -U_w_kwtzjI (Chalupa Heřmanka).
  *
- * NO IFRAME — not on load, not on click.
+ * NO IFRAME   not on load, not on click.
  * Facade only: a poster image inside a link that opens YouTube in a new
  * window. Pattern from src/components/sections/GalerieTeaser.astro.
  *
  * Why no iframe: one embed is roughly 500 kB and several third-party origins,
  * which is five times the entire page budget (docs/03-tech.md §5). Opening
- * YouTube in a new window also gives the full player — captions, quality
- * selection, full screen, "add to watch later" — instead of a clipped widget.
+ * YouTube in a new window also gives the full player   captions, quality
+ * selection, full screen, "add to watch later"   instead of a clipped widget.
  *
- * ⚠ /video/ 301-redirects to /chalupa#video (public/_redirects). The anchor
+ * ⚠ /video/ 301-redirects to /ubytovani#video (public/_redirects). The anchor
  * #video therefore MUST exist and MUST sit on a stable element.
  *
- * Poster: the living room with the fireplace — the same image as in
- * GalerieTeaser.astro, because the video shows the cottage interior and this
- * room represents it best.
+ * Poster: the hot tub in the trees.
+ *
+ * ⚠ NOT the living room, which is the obvious choice and is already the
+ * photograph in the Ložnice split at the top of this page. The same picture
+ * twice on one page reads as a site that has run out of them   and it has only
+ * nine, so it must not look like it. This one appears nowhere else on /ubytovani.
  */
 import { Image } from 'astro:assets';
-import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
+import virivka from '@img/DSC_4684-scaled-1.jpg';
 import Icon from '../../Icon.astro';
 
 const VIDEO_ID = '-U_w_kwtzjI';
@@ -42,7 +45,7 @@ const VIDEO_ID = '-U_w_kwtzjI';
 
       {/*
         A link, not a button. href is the canonical YouTube URL.
-        `target="_blank"` together with `rel="noopener noreferrer"` — the
+        `target="_blank"` together with `rel="noopener noreferrer"`   the
         security standard for new windows. The accessible description combines
         the poster's alt text, the visible label, and the SR new-window warning.
       */}
@@ -55,8 +58,8 @@ const VIDEO_ID = '-U_w_kwtzjI';
         data-reveal-delay="80"
       >
         <Image
-          src={obyvak}
-          alt="Náhled videa o chalupě Heřmanka — obývák s krbem a jídelním stolem"
+          src={virivka}
+          alt="Náhled videa o chalupě Heřmanka   dřevěná vířivka na terase obklopená lesem"
           widths={[420, 640, 960, 1280]}
           sizes="(min-width: 64rem) 56vw, 100vw"
           width={1920}
@@ -194,7 +197,7 @@ const VIDEO_ID = '-U_w_kwtzjI';
    * still had to go, for the reason written at the top of src/components/Icon.astro
    * when the same thing was taken off the amenity glyphs: something moving on
    * its own, permanently, with nothing having asked it to, is a page decorating
-   * itself — and it is the clearest single sign that nobody chose any of it.
+   * itself   and it is the clearest single sign that nobody chose any of it.
    *
    * The play mark does not need to attract attention. It is a white ring with a
    * triangle in it, centred on a photograph, and every reader on earth knows

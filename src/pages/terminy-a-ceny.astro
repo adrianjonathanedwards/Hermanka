@@ -1,6 +1,6 @@
----
+﻿---
 /**
- * /terminy-a-ceny — calendar, price list, holiday blocks, fees, terms and
+ * /terminy-a-ceny   calendar, price list, holiday blocks, fees, terms and
  * the inquiry form.
  *
  * This is the most important page on the site (docs/04-pages.md). Calendar
@@ -8,12 +8,12 @@
  * move the reader to the form with dates and a number in hand.
  *
  * SECTION ORDER (docs/04-pages.md §/terminy-a-ceny):
- *   1. KalendarSlot   — booking rules + legend + "ask us today"
- *   2. Ceník          — one price table, seasons as rows
- *   3. Svátky         — Silvestr and Vánoce with self-expiring dates
- *   4. Poplatky       — fee schedule (electricity, water, sauna, deposit)
- *   5. Podmínky       — known terms as steps + missing terms as "ask us"
- *   6. Poptavka       — the inquiry form
+ *   1. KalendarSlot     booking rules + legend + "ask us today"
+ *   2. Ceník            one price table, seasons as rows
+ *   3. Svátky           Silvestr and Vánoce with self-expiring dates
+ *   4. Poplatky         fee schedule (electricity, water, sauna, deposit)
+ *   5. Podmínky         known terms as steps + missing terms as "ask us"
+ *   6. Poptavka         the inquiry form
  *
  * BAND ALTERNATION (from KalendarSlot's --omitka):
  *   KalendarSlot  --omitka   (the component sets this)
@@ -27,23 +27,23 @@
  * (Podmínky) is already stone. docs/02-design-system.md §3 forbids identical
  * adjacent bands, and Poptavka.astro documents this exact case.
  *
- * PAGE HERO PRELOAD — follows the pattern in docs/01-content.md and the
+ * PAGE HERO PRELOAD   follows the pattern in docs/01-content.md and the
  * PageHero component header exactly. src and srcset from getImage() feed
  * BaseLayout.heroPreload so the browser can start the image download from
  * the <head> without waiting for the component to render.
  *
  * NO CLIENT JAVASCRIPT anywhere in this file or its components.
  *
- * TODO(feed) — docs/01-content.md §9 item 15 (LAUNCH-BLOCKING): the iCal
- * feed is unresolved. KalendarSlot is already wired for the grid — it ships
+ * TODO(feed)   docs/01-content.md §9 item 15 (LAUNCH-BLOCKING): the iCal
+ * feed is unresolved. KalendarSlot is already wired for the grid   it ships
  * the real parts (booking rules, legend, CTA) and defers the grid to a
  * .kalendar-plocha region that will receive the calendar when the feed
  * arrives. Nothing on this page has to change when it does.
  *
- * TODO(feed) — docs/04-pages.md: dates prefilled in the form from the
+ * TODO(feed)   docs/04-pages.md: dates prefilled in the form from the
  * calendar selection. That interaction depends on the feed. When the feed
  * and the calendar grid land, wire the Poptavka form's date field from the
- * selection — no structural change to this file required.
+ * selection   no structural change to this file required.
  */
 import { getImage } from 'astro:assets';
 
@@ -76,7 +76,7 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
 >
 
   {/*
-    PageHero — the page's one <h1>. LCP element. No entrance animation on
+    PageHero   the page's one <h1>. LCP element. No entrance animation on
     the photograph; only the text copy fades in (docs/02-design-system.md §5.3).
   */}
   <PageHero
@@ -85,7 +85,7 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   />
 
   {/*
-    1. KalendarSlot — first, above the fold.
+    1. KalendarSlot   first, above the fold.
     The component ships what is real now: the two booking rules and the four
     legend states. The calendar grid is deferred until the iCal feed is
     resolved (docs/01-content.md §9 item 15). The component's own header
@@ -95,21 +95,21 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <KalendarSlot id="kalendar" />
 
   {/*
-    2. Ceník — one table, seasons as rows, week and weekend as columns.
+    2. Ceník   one table, seasons as rows, week and weekend as columns.
     Not six cards. Section band: --kamen.
   */}
   <Cenik />
 
   {/*
-    3. Svátky — Silvestr and Vánoce.
+    3. Svátky   Silvestr and Vánoce.
     Both have null dates at launch (launch-blocking §9 items 3 and 4).
-    jeAktualni() renders the "termín upřesníme" path — never a stale year.
+    jeAktualni() renders the "termín upřesníme" path   never a stale year.
     Section band: --les.
   */}
   <Svatky />
 
   {/*
-    4. Poplatky — what is added to the rate.
+    4. Poplatky   what is added to the rate.
     Two entries are marked nepotvrzeno: true (electricity and municipal fee);
     they render with an "orientačně" badge (§9 item 7).
     Section band: --omitka.
@@ -118,22 +118,22 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
 
   {/*
     RoofDivider separates the fee table from the terms. One use here, at the
-    transition between pricing information and payment process — the natural
+    transition between pricing information and payment process   the natural
     break in the reader's decision flow. docs/04-pages.md says once or twice
     at most; homepage uses it twice.
   */}
   <RoofDivider />
 
   {/*
-    5. Podmínky — known terms as steps, missing terms as "ask us".
-    CHYBEJICI_PODMINKY is never dropped — it is the honest answer to "what
+    5. Podmínky   known terms as steps, missing terms as "ask us".
+    CHYBEJICI_PODMINKY is never dropped   it is the honest answer to "what
     does this site not yet tell you?" and bed linen is the single most-asked
     question for a Czech chalupa let. Section band: --kamen.
   */}
   <Podminky />
 
   {/*
-    6. Poptavka — the inquiry form.
+    6. Poptavka   the inquiry form.
     band="omitka" because Podmínky above is --kamen (stone). The last section
     must be on a light band ✓. The lead references the price list the reader
     has just read.
@@ -146,7 +146,7 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <Poptavka
     band="omitka"
     nadpis="Napište si o termín"
-    lead="Přečetli jste ceny a podmínky — teď nám napište termín a kolik vás bude. Ozveme se s potvrzením dostupnosti co nejdříve."
+    lead="Přečetli jste ceny a podmínky   teď nám napište termín a kolik vás bude. Ozveme se s potvrzením dostupnosti co nejdříve."
     id="poptavka"
   />
 

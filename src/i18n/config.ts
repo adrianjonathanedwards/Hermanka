@@ -1,5 +1,5 @@
-/**
- * Locale configuration. Mirrors the `i18n` block in astro.config.mjs — if you
+﻿/**
+ * Locale configuration. Mirrors the `i18n` block in astro.config.mjs   if you
  * change one, change the other.
  *
  * Czech is the default and is unprefixed: cs lives at `/`, de will live at `/de/`.
@@ -17,7 +17,7 @@ export type Locale = (typeof LOCALES)[number];
  *
  * `de` is configured but NOT live: German copy does not exist yet
  * (docs/01-content.md §10). Add it here on the day the translations land, and not
- * before — an hreflang pointing at a Czech page claiming to be German is worse
+ * before   an hreflang pointing at a Czech page claiming to be German is worse
  * than no hreflang at all.
  */
 export const LIVE_LOCALES: readonly Locale[] = ['cs'];

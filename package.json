@@ -2,7 +2,7 @@
   "name": "hermanka",
   "version": "0.1.0",
   "private": true,
-  "description": "chalupahermanka.cz — holiday cottage site. Astro, static, Cloudflare Pages.",
+  "description": "chalupahermanka.cz   holiday cottage site. Astro, static, Cloudflare Pages.",
   "type": "module",
   "engines": {
     "node": ">=20.3.0"

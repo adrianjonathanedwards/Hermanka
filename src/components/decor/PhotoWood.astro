@@ -1,10 +1,10 @@
----
+﻿---
 /**
  * A stand of spruce standing in front of a photograph.
  *
  * The job is the oldest device in landscape drawing: put trees across the near
  * edge of the frame and the viewer is standing *in* the wood looking out, rather
- * than looking at a picture. On the Dolní Morava band that is the point — the
+ * than looking at a picture. On the Dolní Morava band that is the point   the
  * resort is somewhere you look across at from the wood the cottage sits in, and
  * that relationship is what "12 minutes away" is actually about.
  *
@@ -12,7 +12,7 @@
  * WHY THIS AND NOT A BOUGH ACROSS THE CORNER
  * The first attempt was a branch reaching in from each corner, generated stem
  * and needles. Two versions of it failed the same way: drawn as strokes it was a
- * fishbone — the exact failure §4 rule 2 names — and drawn as a filled outline
+ * fishbone   the exact failure §4 rule 2 names   and drawn as a filled outline
  * it was a saw blade. A spruce bough is a hard thing to generate and an easy
  * thing to get wrong, and the site already owns a drawing of spruce that works.
  *
@@ -20,7 +20,7 @@
  * two ranks. The only new idea is the ENVELOPE: `saddle` gives full-height trees
  * at both edges dropping to a low band across the middle, which was written for
  * the footer wood so the inquiry form could sit in clear air. Here it does the
- * same job for the pistes — the subject of the photograph stays in the open,
+ * same job for the pistes   the subject of the photograph stays in the open,
  * and the trees close in at the sides where nothing is happening.
  * ---------------------------------------------------------------------------
  *
@@ -45,7 +45,7 @@ const { class: className, ...rest } = Astro.props;
 
 /*
  * Six crowns, tip at y=-112 and closed on the ground line at y=0. CROWN ONLY,
- * no trunk — see Treeline.astro for why: a wood seen from outside is a mass of
+ * no trunk   see Treeline.astro for why: a wood seen from outside is a mass of
  * foliage, and the gap a trunk implies is what makes a rank read as a row of
  * separate ornaments. Drawn to §4: a narrow spike leader over three to five
  * boldly notched tiers, every flank different from its opposite.
@@ -64,11 +64,11 @@ const SPRUCES = [
  *
  * `preserveAspectRatio` is `slice`, so the SVG scales to COVER its box and crops
  * whichever axis is proportionally longer. A wide viewBox in a nearly-square
- * panel gets cropped hard at the sides — and the sides are exactly where the
+ * panel gets cropped hard at the sides   and the sides are exactly where the
  * saddle puts the full-height trees, so the composition this component exists
  * for was being thrown away and only the low middle survived.
  *
- * 900 × 700 is 1.29:1, against roughly 1.23:1 for the panel on a laptop and
+ * 900 �  700 is 1.29:1, against roughly 1.23:1 for the panel on a laptop and
  * 1.11:1 on a phone. Both crop by under 5 % a side, so the edge stand is kept.
  */
 const W = 900;
@@ -77,13 +77,13 @@ const BASE_Y = 692;
 
 /*
  * Two ranks, back to front. Scales are chosen so the edge trees stand about two
- * thirds of the frame — tall enough to be trees you are standing among, short
+ * thirds of the frame   tall enough to be trees you are standing among, short
  * enough that the ridge and the Sky Walk at the top of the photograph are still
  * in open sky.
  *
  * `saddle` is the whole composition. 0.17 means the middle of the rank drops to
  * 17 % of full height: a low band of wood along the bottom edge, with the stand
- * closing in at both sides. Scales never go below 0.45 of the drawn size — under
+ * closing in at both sides. Scales never go below 0.45 of the drawn size   under
  * that the notches close up and the crown reverts to the plain triangle the
  * shape exists to avoid.
  */
@@ -111,7 +111,7 @@ const PLANTED = RANKS.map((r) => ({
   `slice`, never `none`: a non-uniform fit would squash the crowns and the
   notches would stop reading as notches. Bottom-aligned, so however the panel is
   proportioned the trees always stand on its lower edge and the crop happens at
-  the sides — where one stretch of wood looks like any other.
+  the sides   where one stretch of wood looks like any other.
 */}
 <svg
   class={className}

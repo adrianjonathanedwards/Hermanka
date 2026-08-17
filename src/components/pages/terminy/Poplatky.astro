@@ -1,9 +1,9 @@
----
+﻿---
 /**
- * Co se připočítává — fee schedule.
+ * Co se připočítává   fee schedule.
  *
  * docs/01-content.md §6.4 (REWRITE): the old site buried all of this in a
- * 120-word run of prose — the guest found out about the electricity meter after
+ * 120-word run of prose   the guest found out about the electricity meter after
  * they had already decided. A table of line items makes each charge visible and
  * comparable at a glance.
  *
@@ -11,7 +11,7 @@
  * Nothing about money is typed into this file (docs/01-content.md §2).
  *
  * ⚠ Two entries carry `nepotvrzeno: true`. They must be shown as approximate
- * rather than as confirmed prices — a guest who bases a budget on an unconfirmed
+ * rather than as confirmed prices   a guest who bases a budget on an unconfirmed
  * rate and finds a different one on arrival loses trust in everything on the page.
  * The unconfirmed badge and the TODO comments below track exactly which items
  * are waiting on the client.
@@ -22,8 +22,8 @@
  *
  * Section band: --omitka. Previous section (Svátky) is --les.
  *
- * TODO(client) — docs/01-content.md §9 item 7:
- *   · Electricity rate ("7 Kč/kWh" is from 2019 — the old site says
+ * TODO(client)   docs/01-content.md §9 item 7:
+ *   · Electricity rate ("7 Kč/kWh" is from 2019   the old site says
  *     "momentálně", which is not a price).
  *   · Municipal recreation fee (4 Kč/os/noc is low for 2026; must be confirmed
  *     with the obec).
@@ -35,7 +35,7 @@ import { POPLATKY } from '../../../data/cenik';
 /*
  * No `const NBSP` here, deliberately. Every string this section renders comes
  * out of POPLATKY in src/data/cenik.ts, and that module already binds its own
- * hard spaces — `7 Kč/kWh`, `2 000 Kč`. There is no free-typed numeral on this
+ * hard spaces   `7 Kč/kWh`, `2 000 Kč`. There is no free-typed numeral on this
  * page for one to go in, and an unused constant is an invitation to start
  * typing prices into the markup, which is the one thing this page must not do.
  */
@@ -67,7 +67,7 @@ import { POPLATKY } from '../../../data/cenik';
               /*
                * Unconfirmed rate. Shown as "orientačně" (approx.) rather than
                * silently presented as a confirmed price. See the TODO(client) in
-               * the file header — both items must be confirmed before launch.
+               * the file header   both items must be confirmed before launch.
                *
                * docs/01-content.md §6.4: `momentálně 7 Kč/kWh` is "not a price".
                * That is the reason this badge exists. A guest who gets a surprise
@@ -87,11 +87,14 @@ import { POPLATKY } from '../../../data/cenik';
     </ul>
 
     {/*
-      The sauna and hot tub charge is listed above in POPLATKY. Surfacing it
-      again here would be redundant — but docs/01-content.md §4.7 requires that
-      the charge also appears on the /chalupa wellness section, next to the
-      description of the sauna itself. This page covers the fee; the other page
-      covers the context. That is the two-page agent's responsibility.
+      The sauna and hot tub charge is listed above in POPLATKY, and this is the
+      page that owns it: every figure about money is printed on /terminy-a-ceny
+      and nowhere else, so there is one place to change a price.
+
+      docs/01-content.md §4.7 also wants the charge visible beside the
+      description of the sauna itself, which is the homepage's Wellness section.
+      That is a cross-reference to add there, not a second copy of the number to
+      keep in sync here.
     */}
 
   </div>
@@ -149,7 +152,7 @@ import { POPLATKY } from '../../../data/cenik';
 
   /*
    * Uses the global .card class: --omitka background, hairline border, stays
-   * still on hover (no lift, no glow — the card vocabulary here is a printed
+   * still on hover (no lift, no glow   the card vocabulary here is a printed
    * invoice, not a landing-page tile).
    */
   .poplatek {
@@ -171,7 +174,7 @@ import { POPLATKY } from '../../../data/cenik';
   }
 
   /*
-   * Fee labels — UI labels, not display headings.
+   * Fee labels   UI labels, not display headings.
    * docs/02-design-system.md §2.6: Fraunces "never for UI labels, never below
    * 20 px". Same reasoning as Ubytovani's tbody th using --font-body.
    */
@@ -210,12 +213,12 @@ import { POPLATKY } from '../../../data/cenik';
   /* ---- Unconfirmed badge ----------------------------------------------- */
 
   /*
-   * "orientačně" — approx. Distinguishes an unconfirmed figure from a confirmed
+   * "orientačně"   approx. Distinguishes an unconfirmed figure from a confirmed
    * price. Two items carry this at launch: electricity rate and the municipal
    * recreation fee. Both must be confirmed with the client before the site goes
    * live (docs/01-content.md §9 item 7).
    *
-   * Styled as a quiet label rather than a warning — the information is still
+   * Styled as a quiet label rather than a warning   the information is still
    * useful to the guest; it is just approximate, not wrong.
    */
   .badge-nepotvrzeno {

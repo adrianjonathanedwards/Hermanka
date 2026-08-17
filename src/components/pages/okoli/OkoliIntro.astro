@@ -1,65 +1,131 @@
----
+﻿---
 /**
- * Intro — Dolní Morava, Stezka v oblacích, Sky Bridge 721.
+ * Intro   Dolní Morava, Stezka v oblacích, Sky Bridge 721.
  *
- * Rewrites docs/01-content.md §4.8 and §7.1:
+ * ---------------------------------------------------------------------------
+ * WHY THIS IS NOT A `.split` ANY MORE
  *
- *   - Error #9: `bobový dráha` → `bobová dráha`.
- *   - Standardises `Sky Bridge 721` — the attraction's real name. The old site
- *     spelled it three different ways across three pages (`Sky bridge`, `SkyBridge`,
- *     `Sky Bridge 721`). One spelling, here.
- *   - `Červená Voda` — both words capitalised, it is a place name (§7.1).
- *   - The §4.8 original was a subordinate clause with no main verb ("Ať už je ve
- *     vašem hledáčku… nebo se jen tak chcete potulovat…"); rewritten into three
- *     complete sentences — same facts, correct Czech.
+ * It was: photograph in the right half, copy in the left, the primitive every
+ * other section on the site is built from. On `/okoli` that is the wrong shape
+ * for two reasons.
+ *
+ * The first is repetition. This page is the one that has to hold somebody's
+ * attention through five sections of lists, and it opened on the same split the
+ * homepage opens on, with the SAME PHOTOGRAPH   dolnimorava.webp is the only
+ * landscape in the asset set and DolniMorava.astro already uses it. Two splits
+ * of one picture is not an opener, it is a page repeating itself.
+ *
+ * The second is the drift. `[data-drift]` existed in exactly one place on this
+ * site (DolniMorava.astro) and moved exactly one photograph inside one half of
+ * one split, where there is nothing beside it standing still to measure it
+ * against. An effect with nothing to compare itself to is not depth; it is a
+ * picture that will not sit down.
+ *
+ * ---- SO: A STAGE WITH THREE LAYERS IN IT ----
+ * Back to front, each moving at its own rate, which is the only thing that makes
+ * a parallax read as one:
+ *
+ *   1. THE PHOTOGRAPH   `--drift-shift: 6%`, downward. Oversized 1.18 so it has
+ *      somewhere to go, and clipped by `.intro` rather than by `.photo-frame`,
+ *      which only clips under `@media (hover: hover)` and would let the picture
+ *      slide out across the section boundary on a phone.
+ *
+ *   2. THE WOOD   Treeline.astro, the footer's own drawing, laid along the
+ *      bottom edge at `--drift-shift: 2.4%`. It travels a bit over a third as
+ *      far as the photograph, so the trees separate from the mountain behind
+ *      them as the section crosses the viewport. This is the layer that does the
+ *      work: two layers is a moving picture, three is a place with depth in it.
+ *      It is also honest about the geography   the resort is something seen from
+ *      inside the wood the cottage stands in.
+ *
+ *   3. THE COPY PANEL   `--drift-shift: -1.6%`, and note the MINUS. It rises
+ *      while the other two fall, which is what puts the reader's eye in front of
+ *      the scene rather than on it, and it is the reason this section counts as
+ *      "content in the parallax" rather than "a photograph that moves".
+ *      `--drift-scale` stays at its default 1: a scaled text layer is a blurred
+ *      text layer.
+ *
+ * All three stop dead under `prefers-reduced-motion` and all three are simply
+ * still where `animation-timeline: view()` does not exist   the primitive in
+ * global.css carries that contract, and the section is composed so that a
+ * completely static render is a perfectly good static render.
+ *
+ * ⚠ THE PANEL IS OPAQUE --omitka, NOT TYPE ON A SCRIM.
+ * PageHero directly above this sets --omitka type straight onto a darkened
+ * photograph. Doing the same thing here would make the page open on two
+ * scrimmed photo bands in a row, and it would put four paragraphs and a pair of
+ * figures over a picture whose luminance runs from black spruce to lit snow in
+ * the space of 200 px. An opaque panel means the copy keeps the page's ordinary
+ * contrast pairings (--les on --omitka, 15.45:1) and the photograph keeps its
+ * highlights.
+ *
+ * CONTENT is unchanged from the version this replaces   docs/01-content.md §4.8
+ * and §7.1: `bobová dráha` not `bobový` (error #9), one spelling of
+ * `Sky Bridge 721`, `Červená Voda` capitalised as the place name it is, and the
+ * §4.8 original's verb-less subordinate clause rewritten into whole sentences.
  *
  * We do NOT name the Sněžník summit trail distance here. The old copy says 14 km,
  * the regional map says 17 km, the data holds null (docs/01-content.md §9 item 18).
  * Naming either next to a map that contradicts it is worse than naming neither.
  *
- * IMAGE: img/dolnimorava.webp. Same photograph as the homepage DolniMorava section —
- * the two pages serve different purposes: the homepage teases, this page expands.
- * No second photograph of Dolní Morava exists in the asset set.
- *
- * Band: --omitka. First content section after the dark page hero.
+ * Band: the section ground is --les, seen only at the extremes of the drift and
+ * behind the wood. The panel is --omitka. The map section below is --kamen.
  */
 import { Image } from 'astro:assets';
 import sjezdovky from '@img/dolnimorava.webp';
+import EdgePines from '../../decor/EdgePines.astro';
 
-/* U+00A0 — non-breaking space. Binds numerals to their units and single-letter
+/* U+00A0   non-breaking space. Binds numerals to their units and single-letter
    prepositions to the word that follows (docs/02-design-system.md §2.6). */
 const NBSP = ' ';
 ---
 
-<section class="intro split split--media-right" aria-labelledby="intro-nadpis">
-  <div class="intro-media split-media photo-frame" data-reveal>
+<section class="intro" aria-labelledby="intro-nadpis">
+  <div class="intro-scena" aria-hidden="true">
     <Image
       src={sjezdovky}
-      alt="Letecký pohled na zasněžený areál Dolní Morava se sjezdovkami, lanovkou a Stezkou v oblacích nad korunami stromů"
-      widths={[560, 900, 1200]}
-      sizes="(min-width: 64rem) 50vw, 100vw"
+      alt=""
+      widths={[560, 900, 1200, 1600]}
+      sizes="100vw"
       width={950}
       height={789}
       format="webp"
       quality={64}
       loading="lazy"
-      class="intro-img"
+      class="intro-foto"
+      data-drift
+      style="--drift-scale: 1.18; --drift-shift: 6%"
     />
+
+    {/*
+      The photograph is decorative here   `alt=""` above   because the copy panel
+      in front of it names the resort, the pistes, the walkway and the bridge in
+      full. A screen reader that has just been read four sentences about Dolní
+      Morava does not need "letecký pohled na zasněžený areál Dolní Morava"
+      immediately afterwards. The same photograph carries its full alt on the
+      homepage, where nothing else describes it.
+    */}
+
+    <div class="intro-scrim"></div>
+
+    <div class="intro-les" data-drift style="--drift-shift: 4%">
+      <EdgePines class="intro-les-svg" />
+    </div>
   </div>
 
-  <div class="split-body intro-body">
-    <div data-reveal>
+  <div class="wrap intro-wrap">
+    <div class="intro-panel" data-drift style="--drift-shift: -1.6%" data-reveal>
       <h2 id="intro-nadpis">
         Dolní Morava, Stezka{NBSP}v oblacích, Sky Bridge{NBSP}721
       </h2>
       <p class="intro-lead">
-        Hlavní turistická atrakce v okolí je ski areál Dolní Morava — vzdušnou čarou
+        Hlavní turistická atrakce v okolí je ski areál Dolní Morava   vzdušnou čarou
         asi 3{NBSP}km, autem 12{NBSP}minut.
       </p>
       <p>
         Resort nabízí více než deset kilometrů sjezdovek s umělým zasněžováním,
         v zimě pro lyžování a snowboarding, v létě na sjezdy kol. Nad hřebenem stojí
-        Stezka v oblacích a od ní vede visutý most Sky Bridge{NBSP}721 — nejdelší visutý
+        Stezka v oblacích a od ní vede visutý most Sky Bridge{NBSP}721   nejdelší visutý
         most pro pěší na světě.
       </p>
       <p>
@@ -67,49 +133,195 @@ const NBSP = ' ';
         park, Lesní zážitkový park a Pískový svět. V okolí jsou i sjezdovky v Červené
         Vodě a Čenkovicích a turistické stezky, které se dají chytit přímo u chalupy.
       </p>
+
+      {/*
+        Decorative: both figures are in the sentences above and in the trip index
+        further down the page. Set as a pair of numbers under one rule, the way a
+        printed guide sets a fact box   the same shape DolniMorava.astro uses, and
+        deliberately the same, because it is the site's way of setting two figures.
+      */}
+      <dl class="intro-fakta" aria-hidden="true">
+        <div>
+          <dt>12{NBSP}min</dt>
+          <dd>autem z chalupy</dd>
+        </div>
+        <div>
+          <dt>10{NBSP}km</dt>
+          <dd>sjezdovek</dd>
+        </div>
+      </dl>
     </div>
   </div>
 </section>
 
 <style>
+  /*
+   * The clip is unconditional and load-bearing: every layer inside the stage is
+   * oversized or moving, and `.photo-frame` only clips inside
+   * `@media (hover: hover)`, which on a phone would let the photograph slide out
+   * across the section boundary.
+   *
+   * ⚠ `clip`, NEVER `hidden`. `overflow: hidden` creates a scroll container, and
+   * `view()` resolves against the nearest ancestor scroll container   so all
+   * three layers below would take their timeline from THIS box, which never
+   * scrolls, and would sit frozen at 0.500 progress: correctly framed, correctly
+   * scaled, and completely static. That is not a hypothetical; it is what the
+   * homepage's Dolní Morava section did from the day it was written until this
+   * primitive was extracted. The full write-up is over `[data-drift]` in
+   * global.css.
+   */
   .intro {
-    background-color: var(--color-omitka);
+    position: relative;
+    overflow: clip;
+    background-color: var(--color-les);
+    isolation: isolate;
   }
 
-  /*
-   * The media cell needs overflow: hidden so the photo-frame hover-zoom is
-   * clipped. On mobile it forms a tall letterbox; from 64rem it takes the full
-   * grid-row height beside the text panel.
+  /* ---- The stage --------------------------------------------------------
+   *
+   * On a phone it is an in-flow letterbox with the panel pulled up over its
+   * bottom edge; from 64rem it goes out of flow and fills the whole section, so
+   * the photograph runs the full width of the page behind a panel that occupies
+   * a little under half of it. Two arrangements, one DOM.
    */
-  .intro-media {
-    overflow: hidden;
-    min-height: 18rem;
-    background-color: var(--color-les);
+  .intro-scena {
+    position: relative;
+    height: 17rem;
+    z-index: 0;
   }
 
   @media (width >= 64rem) {
-    .intro-media {
-      min-height: 28rem;
-      /*
-       * Override `.split`'s `align-items: center` for the media cell alone.
-       * Without this the photograph column is only as tall as the text column
-       * sets it — `align-self: stretch` fills the whole row instead.
-       */
-      align-self: stretch;
+    .intro-scena {
+      position: absolute;
+      inset: 0;
+      height: auto;
     }
   }
 
   /*
-   * Out of flow so it fills the container regardless of what height the grid
-   * gives the cell. `.split-media img` in global.css sets width/height/object-fit
-   * but does not position — add that here.
+   * Out of flow so it covers whatever height the stage turns out to be  
+   * `height: 100%` on an in-flow image resolves against a parent with no
+   * definite height and falls back to the intrinsic ratio.
    */
-  .intro-img {
+  .intro-foto {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 42%;
+  }
+
+  /*
+   * A light --les wash, not a scrim in the PageHero sense   no text sits on the
+   * photograph here. It is there to stop a bright snowfield from out-shouting an
+   * --omitka panel laid on top of it, and to give the --les treeline something
+   * fractionally darker than lit snow to be a silhouette against.
+   */
+  .intro-scrim {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+      to bottom,
+      rgb(22 36 28 / 0.28) 0%,
+      rgb(22 36 28 / 0.12) 45%,
+      rgb(22 36 28 / 0.45) 100%
+    );
+  }
+
+  /* ---- The wood ---------------------------------------------------------
+   *
+   * EdgePines.astro   the same pair of spruce DolniMorava.astro stands at the
+   * left of its photograph, here MIRRORED to the right-hand edge.
+   *
+   * ⚠ NOT Treeline.astro, and the reason is geometry rather than taste. That
+   * drawing is 1440 �  332 set `xMidYMax slice`, so it crops the SIDES only while
+   * its box stays at or above height/width = 0.2306   below that the crop moves
+   * to the TOP and shears the tips off the tallest trees, which stand at the left
+   * and right edges and therefore make it read as "the sides are cut off". A band
+   * of wood at a believable middle distance behind this panel wants to be about
+   * 200 px tall on a laptop, and 200/1440 is 0.14. There is no `--treeline-h`
+   * that is both short enough for this stage and legal for that drawing.
+   * EdgePines is `xMinYMax meet`, scales down to whatever box it is given and is
+   * never clipped, so it takes a height in per cent without any of that.
+   *
+   * The mirror is on the SVG and the drift is on the wrapper. They must not swap
+   * places or share an element: both are `transform`, and the second one to be
+   * declared would simply replace the first.
+   *
+   * `bottom` is negative by more than the drift's travel, so across the whole
+   * range the feet stay below the section's lower edge. Let them rise above it
+   * and the trees are standing on a line of photograph with nothing under them.
+   */
+  .intro-les {
+    position: absolute;
+    right: 0;
+    bottom: -5%;
+    height: 62%;
+  }
+
+  .intro-les-svg {
+    height: 100%;
+    width: auto;
+    /* Mirrored: EdgePines is drawn with its cut flank on the LEFT, and this copy
+       is flush with the right-hand edge of the frame. */
+    transform: scaleX(-1);
+  }
+
+  @media (width < 64rem) {
+    .intro-les {
+      /* A wide letterbox rather than a tall stage: at 62% the pair comes out
+         small enough to read as an ornament parked in a corner. */
+      height: 74%;
+    }
+  }
+
+  /* ---- The copy panel ---------------------------------------------------- */
+
+  .intro-wrap {
+    position: relative;
+    z-index: 1;
+    /* Pulls the panel up over the bottom of the letterbox on a phone. */
+    margin-top: -3.5rem;
+    padding-bottom: 3.5rem;
+  }
+
+  @media (width >= 64rem) {
+    .intro-wrap {
+      display: flex;
+      align-items: center;
+      min-height: 44rem;
+      margin-top: 0;
+      padding-block: 6rem;
+    }
+  }
+
+  .intro-panel {
+    /* Opaque, so the copy keeps --les on --omitka at 15.45:1 whatever the
+       photograph is doing underneath it. */
+    background-color: var(--color-omitka);
+    /* Square corners. A photograph in a magazine has square corners and so does
+       the panel laid on it   docs/02-design-system.md §6. */
+    border-top: 3px solid var(--color-mosaz);
+    box-shadow: var(--shadow-float);
+    padding: 2rem 1.5rem 2.25rem;
+  }
+
+  @media (width >= 48rem) {
+    .intro-panel {
+      padding: 2.75rem 2.5rem 3rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .intro-panel {
+      /*
+       * A little under half the 1280 container, left of centre with the right
+       * side open   §3, and here the open side is the mountain.
+       */
+      max-width: 38rem;
+      padding: 3rem 3rem 3.25rem;
+    }
   }
 
   h2 {
@@ -127,6 +339,37 @@ const NBSP = ' ';
   p {
     margin-top: 1.25rem;
     /* --kura on --omitka = 11.92:1 */
+    color: var(--color-kura);
+  }
+
+  /* ---- The two figures --------------------------------------------------
+   * One hairline over both, the pair on a two-column grid so each caption sits
+   * under its own figure. The rule is the only chrome   no fill, no border box,
+   * nothing that turns two numbers into two badges.
+   */
+  .intro-fakta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    max-width: 22rem;
+    margin: 2rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgb(140 99 24 / 0.35);
+  }
+
+  .intro-fakta dt {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-title-s);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .intro-fakta dd {
+    margin: 0.3rem 0 0;
+    font-size: var(--text-caption);
+    line-height: 1.4;
     color: var(--color-kura);
   }
 </style>

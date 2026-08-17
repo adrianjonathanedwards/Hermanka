@@ -1,0 +1,259 @@
+﻿---
+/**
+ * Chamomile sprig   `heřmánek`. The plant the cottage is named after.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ WHY THIS IS DRAWN AND NOT TAKEN FROM AN ICON SET.
+ *
+ * The obvious way to get a flower onto a page is to pull one from Lucide, Noun
+ * Project or any of a hundred free SVG packs. docs/02-design-system.md §4 rules
+ * that out twice over, and the reasons are not fussiness:
+ *
+ *   - Rule 2: a stock flower is drawn from primitives   a perfect circle with
+ *     twelve identical petals on a 30° rota. Set next to the 2019 owl-and-spruce
+ *     mark, whose lines visibly wobble, it reads as a second brand on the same
+ *     page. "The mismatch is more visible than the illustration itself."
+ *   - Rule 4: "Nothing that is not from this place. No generic leaves, no pine
+ *     cones borrowed from a stock set, no seasonal flourishes."
+ *
+ * Heřmánek passes rule 4 on the strongest possible grounds: `Heřmanka` is the
+ * name over the door. It is the one plant this site can draw that is not just
+ * local flora but the property's own namesake. Bilberry (BoruvkaSprig.astro)
+ * is the other, and the two are a pair.
+ *
+ * ---------------------------------------------------------------------------
+ * HOW THE IRREGULARITY IS PRODUCED
+ *
+ * Not by hand-typing twenty-two petal coordinates   a human typing numbers
+ * produces a rhythm, which is the failure forest.ts documents at length for the
+ * treeline. The petals and the leaf barbs are generated from the SAME seeded
+ * mulberry32 generator the wood uses (`makeRng`), jittered on angle, length,
+ * width and reach.
+ *
+ * ⚠ SEEDED, never `Math.random()`. This runs at BUILD time. An unseeded roll
+ * would redraw the flower on every build: the HTML would change on every deploy,
+ * every cache would miss, and no diff would be reviewable. Same seed, same
+ * flower. To redraw one deliberately, change its seed and look at the result.
+ *
+ * Unfilled, line only, as rule 3 requires   `fill="none"` and `currentColor` on
+ * the stroke, so the caller decides whether this is a white line over a
+ * photograph or a brass line in a divider. It is never given a fill.
+ *
+ * Decorative: `aria-hidden`, and `pointer-events: none` comes from the global
+ * `svg[aria-hidden='true']` rule.
+ */
+import { makeRng } from './forest';
+
+interface Props {
+  class?: string;
+}
+
+/*
+ * ⚠ `...rest` IS LOAD-BEARING. Without it every scoped style a caller writes
+ * against this component is silently dead.
+ *
+ * Astro passes the PARENT's `data-astro-cid-…` down as a prop and expects the
+ * child to put it on its root element. A scoped rule like
+ * `.vytapeni-rostlina { … }` compiles to `.vytapeni-rostlina[data-astro-cid-x]`,
+ * so without the attribute on this <svg> the selector matches nothing at all  
+ * and nothing *errors*: the mark simply renders at its fallback size, at full
+ * opacity, in its static position. Which is exactly what happened the first
+ * time this was placed on the Vytápění band.
+ *
+ * Icon.astro and IconLucide.astro both carry the same spread for the same
+ * reason. `class:list` alone is not enough; the class arrives, the cid does not.
+ */
+const { class: className, ...rest } = Astro.props;
+
+/** One ray floret. Ellipses rather than paths   a chamomile ligule is a blunt
+ *  strap, and at 40px a path with four control points is indistinguishable from
+ *  an ellipse while being four times the bytes. */
+interface Petal {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  a: number;
+}
+
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+/**
+ * A flower head. `n` petals around a disc of radius `discR`.
+ *
+ * Every petal gets four independent jitters. Angular jitter is capped at 28% of
+ * the nominal step: past about a third the petals start visibly colliding and
+ * the head reads as damaged rather than as drawn.
+ */
+function kvet(cx: number, cy: number, discR: number, n: number, len: number, seed: number): Petal[] {
+  const rnd = makeRng(seed);
+  const krok = 360 / n;
+  const petals: Petal[] = [];
+
+  for (let i = 0; i < n; i++) {
+    const uhel = i * krok + (rnd() * 2 - 1) * krok * 0.28;
+    const delka = len * (0.8 + rnd() * 0.4);
+    /*
+     * ⚠ Narrow. A chamomile ray floret is a strap roughly four times longer
+     * than it is wide; the first pass used 0.19–0.27 of the length, which put
+     * the petals at about 2.2:1 and made the head read as a generic daisy from
+     * an icon set. §4 rule 4 asks for this plant, not a flower shape. At
+     * 0.11–0.16 the ratio lands near 3.5:1 and it reads as heřmánek.
+     */
+    const sirka = len * (0.11 + rnd() * 0.05);
+    /* How far the petal's own centre sits from the disc. The +jitter is what
+       stops the inner ends landing on one perfect circle. */
+    const dosah = discR + delka * 0.52 + rnd() * 0.6;
+    const rad = (uhel * Math.PI) / 180;
+
+    petals.push({
+      cx: r2(cx + Math.cos(rad) * dosah),
+      cy: r2(cy + Math.sin(rad) * dosah),
+      rx: r2(delka * 0.52),
+      ry: r2(sirka),
+      a: r2(uhel),
+    });
+  }
+
+  return petals;
+}
+
+/**
+ * A bipinnate leaf   chamomile foliage is thread-fine and feathery, which is
+ * most of what distinguishes it from a daisy at a glance.
+ *
+ * A midrib with paired barbs raked back toward the base. Barbs shorten toward
+ * the tip, and each side is jittered independently so the pairs never mirror.
+ */
+function perist(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  n: number,
+  len: number,
+  seed: number,
+): string[] {
+  const rnd = makeRng(seed);
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const L = Math.hypot(dx, dy);
+  const ux = dx / L;
+  const uy = dy / L;
+  /* Unit normal to the midrib   the direction a barb leaves it. */
+  const nx = -uy;
+  const ny = ux;
+
+  const barbs: string[] = [];
+
+  for (let i = 1; i <= n; i++) {
+    const t = i / (n + 1);
+    const px = x1 + dx * t;
+    const py = y1 + dy * t;
+
+    for (const strana of [1, -1]) {
+      const d = len * (1 - t * 0.5) * (0.7 + rnd() * 0.6);
+      /* The `- ux * d * 0.4` is the rake: barbs lean back toward the base, as
+         they do on the plant. Straight-out barbs read as a fish bone. */
+      const bx = px + nx * d * strana - ux * d * 0.4;
+      const by = py + ny * d * strana - uy * d * 0.4;
+      barbs.push(`M${r2(px)} ${r2(py)} L${r2(bx)} ${r2(by)}`);
+    }
+  }
+
+  return barbs;
+}
+
+/* Two heads and a bud. Sizes and petal counts differ; a matched pair would read
+   as a stamp used twice. */
+const hlavaVelka = kvet(26.2, 14.5, 3, 12, 6.2, 20260816);
+const hlavaMala = kvet(10.8, 25.5, 2.3, 10, 4.8, 71423);
+
+const listA = perist(24.2, 47, 34, 42.2, 5, 2.6, 5150);
+const listB = perist(23, 39, 13.4, 35.4, 5, 2.4, 9812);
+const listC = perist(24.8, 28.4, 32.6, 26, 4, 1.9, 3377);
+---
+
+<svg
+  class:list={['hermanek', className]}
+  {...rest}
+  viewBox="1 3 38 56"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.3"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {/*
+    Main stem. Three shallow reversals   a chamomile stem is wiry and never
+    runs straight, and the reversals are what carry the hand.
+  */}
+  <path d="M24 57.5 C22.6 48 25.4 40 23.8 32 C22.6 25 24.6 19.5 26 17.2" />
+
+  {/* Side branch to the smaller head. Leaves the stem low and sweeps out. */}
+  <path d="M23.6 33.6 C19.8 31.6 15.6 30 12.6 27.4" />
+
+  {/* An unopened bud on a short stalk   asymmetry, and true to the plant. */}
+  <path d="M24.7 23.4 C27.4 22.4 29.6 21.4 31.4 19.8" />
+  <ellipse cx="32.6" cy="18.6" rx="2" ry="1.6" transform="rotate(-28 32.6 18.6)" />
+
+  {/* Foliage. Midribs first, then the barbs generated above. */}
+  <path d="M24.2 47 C27.8 45.6 31.2 44 34 42.2" />
+  {listA.map((d) => <path d={d} />)}
+
+  <path d="M23 39 C19.6 37.6 16.4 36.4 13.4 35.4" />
+  {listB.map((d) => <path d={d} />)}
+
+  <path d="M24.8 28.4 C27.4 27.7 30.2 26.9 32.6 26" />
+  {listC.map((d) => <path d={d} />)}
+
+  {/*
+    The heads. Petals are drawn BEFORE the disc so the disc's outline sits on
+    top and reads as in front of them, which is how the flower is built.
+  */}
+  {
+    hlavaVelka.map((p) => (
+      <ellipse cx={p.cx} cy={p.cy} rx={p.rx} ry={p.ry} transform={`rotate(${p.a} ${p.cx} ${p.cy})`} />
+    ))
+  }
+  <circle cx="26.2" cy="14.5" r="3" />
+  {/* Two short arcs inside the disc. Chamomile's centre is domed, not flat, and
+      this is the least amount of line that says so. */}
+  <path d="M24 13.4 C24.9 12.5 26.3 12.2 27.4 12.7" />
+  <path d="M24.4 15.8 C25.5 15 26.9 14.9 28 15.4" />
+
+  {
+    hlavaMala.map((p) => (
+      <ellipse cx={p.cx} cy={p.cy} rx={p.rx} ry={p.ry} transform={`rotate(${p.a} ${p.cx} ${p.cy})`} />
+    ))
+  }
+  <circle cx="10.8" cy="25.5" r="2.3" />
+  <path d="M9.2 24.8 C10 24.1 11.2 24 12.1 24.4" />
+</svg>
+
+<style>
+  .hermanek {
+    display: block;
+    flex: none;
+    /* Sized by the caller; this is the fallback. */
+    width: 2.25rem;
+    height: auto;
+  }
+
+  /*
+   * ⚠ On the CHILDREN, not just the root.
+   *
+   * BoruvkaSprig.astro sets `vector-effect` as an attribute on its <svg>, and
+   * that is not actually enough: the property does not inherit, so on a strict
+   * reading only the root element gets it and the stroke on every path inside
+   * still scales with the box. This mark is set at three very different sizes
+   * on this site   22px in a divider and ~200px on the Vytápění band   so a
+   * scaling stroke would be plainly visible as a hairline at one end and a
+   * marker pen at the other. Declaring it in CSS against `*` is the fix.
+   */
+  .hermanek :global(*) {
+    vector-effect: non-scaling-stroke;
+  }
+</style>

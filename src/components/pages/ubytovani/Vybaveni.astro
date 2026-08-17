@@ -1,0 +1,262 @@
+﻿---
+/**
+ * `Vybavení chalupy` + `Přehled vybavení`   the second section of /ubytovani.
+ *
+ * COPY IS THE OLD SITE'S, VERBATIM: three paragraphs of prose, then the five
+ * lists. Nothing is reworded and nothing is dropped. See the header of
+ * src/data/vybaveni.ts for the one entry that carries a caveat and why.
+ *
+ * DESIGN: the split again, mirrored   media-LEFT this time, because the section
+ * above is media-right and alternating sides down the page is the rule
+ * (docs/02-design-system.md §3). The photograph is the covered terrace with its
+ * outdoor fireplace, which is what the third paragraph is about.
+ *
+ * ---------------------------------------------------------------------------
+ * THE OVERVIEW WAS FIVE COLUMNS OF PLAIN TEXT AND IT STILL IS.
+ *
+ * On the old page these were five headed lists floated three-across, with a
+ * hanging en dash before each entry and nothing else   no rule, no ground, no
+ * mark. It was hard to scan, but it was hard to scan because it was UNDESIGNED,
+ * not because it was five lists. So this keeps the five lists, in the old order,
+ * with the old words, and does the typographic work instead: a group icon, a
+ * tick, a card ground, and columns that actually align.
+ *
+ * It is deliberately NOT re-sorted, NOT merged into three groups, and NOT
+ * trimmed of the entries that are about the surroundings rather than the
+ * cottage. Those would all be content decisions and this pass does not make
+ * content decisions.
+ */
+import { Image } from 'astro:assets';
+import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+import IconLucide from '../../IconLucide.astro';
+import SprigDivider from '../../decor/SprigDivider.astro';
+import { VYBAVENI } from '../../../data/vybaveni';
+---
+
+<section id="vybaveni" class="vybaveni" aria-labelledby="vybaveni-nadpis">
+  <div class="split split--media-left">
+    <div class="split-media">
+      {/*
+        ⚠ This file is only 1000 �  667. It must never be asked for a variant
+        wider than 1000   Astro will not upscale, and a soft photograph is worse
+        than a small one. Half of a 1280 container is 640, so the split is
+        exactly where this image still holds up. docs/01-content.md §10 lists a
+        replacement shot as the most valuable photograph the site could be given.
+      */}
+      <Image
+        src={terasa}
+        alt="Krytá terasa chalupy Heřmanka s venkovním zděným krbem, dřevěným stolem a proutěnými křesly, v pozadí les"
+        widths={[500, 750, 1000]}
+        sizes="(min-width: 64rem) 50vw, 100vw"
+        width={1000}
+        height={667}
+        format="webp"
+        quality={68}
+        loading="lazy"
+      />
+    </div>
+
+    <div class="split-body">
+      <div data-reveal="up">
+        <h2 id="vybaveni-nadpis">Vybavení chalupy</h2>
+        <p>
+          Obývací pokoj je vybaven krbem, stolem, koženou sedačkou a&nbsp;velkou
+          plochou TV s&nbsp;více než 100&nbsp;kanály. Kuchyně je plně vybavena
+          a&nbsp;to: troubou, varnou deskou, lednicí, kávovarem, rychlovarnou
+          konvicí, myčkou na nádobí a&nbsp;mikrovlnnou troubou (příbory
+          a&nbsp;talíře, sklenice jsou samozřejmostí). V&nbsp;objektu je
+          k&nbsp;dispozici i&nbsp;pračka a&nbsp;sušička.
+        </p>
+        <p>
+          Ložnice jsou vybaveny postelemi s&nbsp;pohodlnými novými matracemi
+          a&nbsp;skříněmi.
+        </p>
+        <p>
+          Terasa (spodní) disponuje venkovním krbem a&nbsp;posezením. Horní terasa
+          disponuje posezením.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap prehled">
+    {/* Chamomile here, bilberry in the section above   see the note there. */}
+    <SprigDivider rostlina="hermanek" class="prehled-divider" />
+
+    <h3 id="prehled-nadpis" data-reveal="up">Přehled vybavení</h3>
+
+    <div class="prehled-grid" data-reveal="up" data-reveal-delay="80">
+      {
+        VYBAVENI.map((skupina) => (
+          <section class="skupina" aria-labelledby={`skupina-${skupina.klic}`}>
+            <h4 id={`skupina-${skupina.klic}`} class="skupina-nadpis">
+              <IconLucide name={skupina.icon} size={20} class="skupina-ikona" />
+              <span>{skupina.nazev}</span>
+            </h4>
+
+            <ul role="list">
+              {
+                skupina.polozky.map((p) => (
+                  <li>
+                    <IconLucide
+                      name={p.overit ? 'circle-alert' : 'circle-check'}
+                      size={16}
+                      class:list={['polozka-ikona', p.overit && 'polozka-ikona--overit']}
+                    />
+                    <span>
+                      {p.nazev}
+                      {/*
+                        The caveat is rendered INSIDE the item, never as a
+                        footnote and never suppressed. An entry that needs one
+                        must not be able to appear as a plain tick   see the
+                        argument in src/data/vybaveni.ts.
+                      */}
+                      {p.overit && <span class="polozka-overit">{p.overit}</span>}
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .vybaveni {
+    background-color: var(--color-kamen);
+  }
+
+  h2 {
+    /* --mosaz-tmava on --kamen = 5.06:1. Plain --mosaz would be 4.30:1   the
+       failure §1.2 warns about, and this is a stone band. */
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* `p` has no margin in global.css by design   see the note in Loznice.astro. */
+  .split-body p {
+    margin-top: 1.25rem;
+  }
+
+  /* ---- Přehled vybavení ------------------------------------------------ */
+
+  /* Top padding clears the photograph's bottom edge   see Loznice.astro. */
+  .prehled {
+    padding-block: 3rem 4rem;
+  }
+
+  @media (width >= 48rem) {
+    .prehled {
+      padding-block: 4.5rem 6rem;
+    }
+  }
+
+  .prehled-divider {
+    margin-bottom: 2.5rem;
+  }
+
+  h3 {
+    font-size: var(--text-title-m);
+    color: var(--color-les);
+  }
+
+  /*
+   * ⚠ TWO COLUMNS, NOT THREE, AND THE REASON IS ARITHMETIC.
+   *
+   * The five groups are wildly uneven   5, 13, 5, 5, 8 entries. A column flow
+   * balances by height while `break-inside: avoid` keeps each group whole, so
+   * the count per column is what decides whether it looks deliberate.
+   *
+   *   two columns:   5 + 13 = 18  |  5 + 5 + 8 = 18   ← level
+   *   three columns: 5 | 13 + 5 | 5 + 8               ← a short first column
+   *                                                     with a hole under it
+   *
+   * Three columns was tried and is what the screenshot showed: `Obecně` alone
+   * at the top left with half a column of nothing beneath it. Two columns also
+   * gives each card enough width that a two-word entry does not wrap.
+   *
+   * The fix is NOT to reorder the groups so they pack better. Their order is
+   * the old site's and this pass does not reorder content.
+   */
+  .prehled-grid {
+    margin-top: 1.5rem;
+    /* The measure still matters: a 1280-wide two-column list of two-word
+       entries is mostly whitespace with a tick at each end. */
+    max-width: 62rem;
+    columns: 1;
+    column-gap: 2rem;
+  }
+
+  @media (width >= 48rem) {
+    .prehled-grid {
+      columns: 2;
+      column-gap: 2.5rem;
+    }
+  }
+
+  .skupina {
+    break-inside: avoid;
+    margin-bottom: 2rem;
+    padding: 1.25rem 1.25rem 1.25rem;
+    background-color: var(--color-omitka);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgb(62 50 38 / 0.1);
+  }
+
+  .skupina-nadpis {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    /* Public Sans, not Fraunces: this is a UI label at 16px and the display
+       face is never used below 20px (docs/02-design-system.md §2.6). */
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-les);
+  }
+
+  .skupina-ikona {
+    flex: none;
+    /* An icon is a fill, so plain brass is correct here. */
+    color: var(--color-mosaz);
+  }
+
+  .skupina ul {
+    margin: 0.875rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .skupina li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: var(--color-kura);
+  }
+
+  .skupina li + li {
+    margin-top: 0.45rem;
+  }
+
+  .polozka-ikona {
+    flex: none;
+    margin-top: 0.2rem;
+    color: var(--color-mosaz);
+    opacity: 0.75;
+  }
+
+  /* The one entry with a caveat is marked differently, not just worded so. */
+  .polozka-ikona--overit {
+    color: var(--color-mosaz-tmava);
+    opacity: 1;
+  }
+
+  .polozka-overit {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+  }
+</style>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * The character set every self-hosted face on this site is subset to.
  *
  * Read docs/02-design-system.md §2.2 before changing anything here. The short
@@ -11,7 +11,7 @@
 /** Contiguous ranges, inclusive. */
 const RANGES = [
   [0x0020, 0x007e], // basic Latin
-  [0x00a0, 0x00a0], // no-break space — required, Czech binds v/k/s/z/a/i/o + numerals
+  [0x00a0, 0x00a0], // no-break space   required, Czech binds v/k/s/z/a/i/o + numerals
   [0x00ad, 0x00ad], // soft hyphen
 ];
 
@@ -21,8 +21,8 @@ const GROUPS = {
   czechUpper: 'ÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ',
   german: 'äöüßÄÖÜ', //          for the planned /de/ locale
   polish: 'ężźłńśćŁ', //         one word: Międzygórze, on the regional map
-  punctuation: '–—‘’‚“„…•§', //  Czech quotes are „low“ high; § for the terms page
-  symbols: '©°×€', //            Kč needs nothing special — it is K + č
+  punctuation: '– ‘’‚“„…•§', //  Czech quotes are „low“ high; § for the terms page
+  symbols: '©°� €', //            Kč needs nothing special   it is K + č
 };
 
 /** The 30 Czech accented characters. Used by the coverage verifier. */

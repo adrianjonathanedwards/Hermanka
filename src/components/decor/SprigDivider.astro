@@ -1,0 +1,90 @@
+﻿---
+/**
+ * Section divider   a thin `--mosaz` rule interrupted at its centre by a plant
+ * sprig, sitting on the line as if it were growing out of it.
+ *
+ * The sibling of RoofDivider.astro, and built the same way. That one carries the
+ * client's roof mark and is used to separate whole sections; this one carries a
+ * plant and is for the smaller break INSIDE a section   between the prose half
+ * of a split and the list that follows it, where a full roof would be too loud
+ * and a plain rule would be nothing at all.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ BRASS, NOT WHITE, AND THAT IS THE WHOLE REASON THIS COMPONENT EXISTS.
+ *
+ * docs/02-design-system.md §4 rule 5 forbids white line work on `--omitka` and
+ * `--kamen`: it is invisible on a near-white ground, and the way that gets
+ * "fixed" is by someone colouring it in, which breaks rule 3. Both places this
+ * divider is used are light bands.
+ *
+ * §4 records the sanctioned exception in as many words   "Brass line on a light
+ * ground, for the section dividers… the sprig takes `--mosaz`, the colour of the
+ * rule it interrupts, and the three marks read as one ornament." This is exactly
+ * that case, so the sprig inherits `--mosaz` from `.divider` via `currentColor`.
+ *
+ * `--mosaz` as a LINE is legitimate here: §1.2's ban is on brass as *text*.
+ * Rules and ornament are non-text and need 3:1 under WCAG 1.4.11, which brass
+ * clears on both light grounds (4.30:1 on stone, 5.14:1 on render white).
+ */
+import BoruvkaSprig from './BoruvkaSprig.astro';
+import HermanekSprig from './HermanekSprig.astro';
+
+interface Props {
+  /** Which plant. Both are from this valley; see each component's header. */
+  rostlina?: 'hermanek' | 'boruvka';
+  /** Extra class for spacing control at the call site. */
+  class?: string;
+}
+
+const { rostlina = 'hermanek', class: className } = Astro.props;
+---
+
+<div class:list={['divider', className]} aria-hidden="true">
+  <span class="rule"></span>
+  {
+    rostlina === 'hermanek' ? (
+      <HermanekSprig class="divider-sprig" />
+    ) : (
+      <BoruvkaSprig class="divider-sprig" />
+    )
+  }
+  <span class="rule"></span>
+</div>
+
+<style>
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    /* The sprig inherits this through currentColor   see the header. */
+    color: var(--color-mosaz);
+  }
+
+  .rule {
+    flex: 1 1 0;
+    height: 1px;
+    background-color: var(--color-mosaz);
+    /*
+     * The rule fades toward the page rather than stopping dead at the container
+     * edge. A hard-ended hairline reads as a table border; this reads as a mark.
+     */
+    opacity: 0.45;
+  }
+
+  /*
+   * ⚠ 44px IS A FLOOR, NOT A PREFERENCE. Measured, not guessed.
+   *
+   * Rendered against a ramp at 24 / 34 / 44 / 60 / 90. The chamomile closes into
+   * a blob at 24 and 34: the stroke is `non-scaling-stroke`, so it stays 1.3
+   * CSS px at every size, and below about 44px the twelve ligules and the disc
+   * outline are drawing more line than there is room for. At 44 the petals
+   * separate and it reads as a flower; by 60 it is comfortable.
+   *
+   * The first pass set this to 34px on the strength of a guess written into a
+   * comment as though it had been checked. It had not been. If this size is
+   * changed, render the ramp again   do not reason about it.
+   */
+  .divider-sprig {
+    width: 2.75rem;
+  }
+</style>

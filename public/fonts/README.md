@@ -1,11 +1,11 @@
-# public/fonts
+﻿# public/fonts
 
 Two files, both generated. **Do not edit them, do not download replacements by
 hand, and do not add a third face.**
 
 ```
-fraunces-var.woff2      22.5 kB   display — Fraunces, wght 400–600 axis
-public-sans-var.woff2   18.2 kB   body    — Public Sans, wght 400–600 axis
+fraunces-var.woff2      22.5 kB   display   Fraunces, wght 400–600 axis
+public-sans-var.woff2   18.2 kB   body      Public Sans, wght 400–600 axis
 ```
 
 Both are committed, so a normal `npm run build` and a Cloudflare Pages deploy need
@@ -39,7 +39,7 @@ both as one unified range. Full reasoning in
 
 **Variable beats static here.** Two static instances per family would be 25.9 kB
 (Fraunces) and 22.0 kB (Public Sans) against 22.5 kB and 18.2 kB for one variable
-file each — smaller *and* two fewer requests, while keeping the whole 400–600 range.
+file each   smaller *and* two fewer requests, while keeping the whole 400–600 range.
 
 **Axes are pinned.** Fraunces ships with four axes; `opsz` is pinned to 144, and
 `SOFT` and `WONK` to 0. The wonky forms are not the brand, and shipping unused axes
@@ -49,5 +49,5 @@ costs bytes.
 
 Both faces are SIL Open Font License 1.1. Fraunces © Undercase Type; Public Sans is
 a US Government / USWDS work. The OFL requires the licence to travel with the font,
-including with subsets — keep [`OFL.txt`](OFL.txt) here and do not rename the
+including with subsets   keep [`OFL.txt`](OFL.txt) here and do not rename the
 families.

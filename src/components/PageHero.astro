@@ -1,10 +1,10 @@
----
+﻿---
 /**
- * Subpage header — the band every page except `/` opens with.
+ * Subpage header   the band every page except `/` opens with.
  *
  * The old site put a fixed 300px photograph strip behind a centred serif title on
  * `/o-nas/`, `/ubytovani/`, `/volne-terminy-a-ceny/`, `/tipy-na-vylety/` and
- * `/kontakt/` — the same crop of the same exterior five times. The photograph is
+ * `/kontakt/`   the same crop of the same exterior five times. The photograph is
  * kept, because a page about a cottage should open on the cottage; the centring
  * is not. docs/02-design-system.md §3 sets this site left of centre with the
  * right third open, and the two sanctioned exceptions (the O nás clearing and the
@@ -16,11 +16,11 @@
  * The image props live in `src/data/pageHero.ts` and are spread into BOTH the
  * <Image> below and the `getImage()` call each page makes to feed
  * `heroPreload` on BaseLayout. They must describe exactly the same transform or
- * the browser preloads one file and renders another — the hero downloaded twice,
+ * the browser preloads one file and renders another   the hero downloaded twice,
  * which is the worst possible outcome for the one image being made fast. Never
  * retype them; import them.
  *
- * A page may pass its own photograph. `alt` then becomes required in practice —
+ * A page may pass its own photograph. `alt` then becomes required in practice  
  * the default alt describes the default exterior and nothing else.
  *
  * NO ENTRANCE ANIMATION on the photograph (docs/02-design-system.md §5.3). The
@@ -82,7 +82,7 @@ const {
     align-content: end;
     /*
      * Deliberately not a full viewport. This band is a title with a photograph
-     * behind it, not a hero — the page's actual first section has to be visible
+     * behind it, not a hero   the page's actual first section has to be visible
      * under it on a laptop, or every subpage opens on a picture the reader has
      * already seen on the homepage.
      */
@@ -143,7 +143,7 @@ const {
   }
 
   /*
-   * Plain keyframes on the copy alone. The photograph never moves — it is the
+   * Plain keyframes on the copy alone. The photograph never moves   it is the
    * LCP element and animating it delays the one thing the guest came for.
    */
   @media (prefers-reduced-motion: no-preference) {

@@ -1,10 +1,10 @@
----
+﻿---
 /**
  * The roof from the Chalupa Heřmanka logo, recreated as vector paths.
  *
  * Traced from `img/logo3-inv.png` by reading the alpha mask row by row and
  * measuring the corners, then verified by overlaying the result on the original
- * at full size — the outlines sit on the raster to within a pixel.
+ * at full size   the outlines sit on the raster to within a pixel.
  *
  * Three shapes, and each one matters:
  *   1. the left slope, running from a mitred point top-right down to bottom-left
@@ -12,7 +12,7 @@
  *   3. the chimney, a stub whose bottom-right is cut at the roof's own pitch
  *
  * The two slopes deliberately do NOT meet. The left one overshoots past where the
- * right one starts, leaving a gap at the apex — that offset is the whole character
+ * right one starts, leaving a gap at the apex   that offset is the whole character
  * of the mark and the thing that makes it read as drawn rather than generated. Do
  * not "fix" it into a symmetrical gable.
  *
@@ -20,14 +20,14 @@
  * --omitka on the dark header, --mosaz in a section divider, and so on.
  *
  * Used today by the section dividers and the favicon. Built as a standalone
- * component because it is the one piece of the brand that scales to anything —
+ * component because it is the one piece of the brand that scales to anything  
  * expect it on cards, empty states and the /de/ locale badge later.
  */
 
 interface Props {
   /** Rendered width in px. Height follows the 510:256 aspect. */
   width?: number;
-  /** Drop the chimney — at very small sizes it closes up into a blob. */
+  /** Drop the chimney   at very small sizes it closes up into a blob. */
   chimney?: boolean;
   class?: string;
   /**
@@ -38,12 +38,12 @@ interface Props {
 }
 
 /*
- * ⚠ `rest` is not optional decoration — see the same note in Icon.astro.
+ * ⚠ `rest` is not optional decoration   see the same note in Icon.astro.
  *
  * Astro hands a child component the parent's `data-astro-cid-…` as a prop and
  * expects to find it on the child's root element. Without this spread it never
- * lands, and a scoped rule in the calling component — `.ztraceno-strecha { … }`
- * on the 404, say — matches nothing at all and fails silently. That cost an hour
+ * lands, and a scoped rule in the calling component   `.ztraceno-strecha { … }`
+ * on the 404, say   matches nothing at all and fails silently. That cost an hour
  * once already: the mark rendered at its attribute size and every CSS rule aimed
  * at it was simply ignored.
  */
@@ -65,10 +65,10 @@ const height = Math.round(width * ASPECT);
   aria-label={title}
   focusable="false"
 >
-  {/* Left slope — mitred to a point at the top, overshooting the apex. */}
+  {/* Left slope   mitred to a point at the top, overshooting the apex. */}
   <path d="M254 0 L284 26 L27 254 L0 225 Z" />
-  {/* Right slope — starts lower and further right; the gap is intentional. */}
+  {/* Right slope   starts lower and further right; the gap is intentional. */}
   <path d="M310 48 L283 77 L483 254 L509 225 Z" />
-  {/* Chimney — bottom-right cut at the roof pitch. */}
+  {/* Chimney   bottom-right cut at the roof pitch. */}
   {chimney && <path d="M75 21 L140 21 L139 61 L75 117 Z" />}
 </svg>

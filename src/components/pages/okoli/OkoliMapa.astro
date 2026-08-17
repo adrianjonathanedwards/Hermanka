@@ -1,89 +1,133 @@
----
+﻿---
 /**
- * Regional map — the illustrated aerial photograph.
+ * Regional map   the illustrated aerial photograph, full bleed.
  *
  * STATUS: raster-only, labels baked into pixels.
  *
- * docs/02-design-system.md §4 and docs/01-content.md §7.4 both call for this to
- * be rebuilt as photograph + inline SVG <text> so the labels become real,
- * searchable and screen-readable. That rebuild requires a clean aerial with no
- * baked type — see TODO(client) below. Until that plate arrives, the raster is
- * used as-is with a thorough Czech `alt` naming every place the map shows.
+ * ---------------------------------------------------------------------------
+ * WHY IT IS FULL BLEED NOW
+ *
+ * It was a 2fr column beside a 1fr text column inside the 1280 container: at
+ * 1440 that put a drawing whose labels are baked in at a native 1280 px on
+ * screen at roughly 760. `Králický Sněžník 1423 m n. m.` came out around 9 px
+ * tall, so the section was a picture OF a map rather than a map, and the reader
+ * got the same information from it at 1440 as they did at 390   which is none.
+ *
+ * docs/02-design-system.md §3 already licenses this: "photography escapes the
+ * container; text never does". So the heading and lead keep their measure inside
+ * `.wrap` and the plate runs edge to edge under them, at up to 90rem   near
+ * enough the drawing's own 1280 that it is never upscaled by more than an eighth
+ * and every label is legible without leaning in.
+ *
+ * The section is also flatter for it, deliberately. What comes before it is the
+ * three-layer parallax stage and what comes after is a dense catalogue; this one
+ * is meant to be a single wide plate and a caption, the quiet beat between them.
+ * Do not put a second column back beside it.
+ * ---------------------------------------------------------------------------
  *
  * ⚠ DISTANCE CONFLICTS IN THIS IMAGE
  * The raster shows two distances that contradict the verified table in DOSTUPNOST:
  *
  *   - Králíky: map shows 7 km, distance table has 3 km (and that table is the
- *     internally consistent source — docs/01-content.md §5.2 header note).
+ *     internally consistent source   docs/01-content.md §5.2 header note).
  *   - Králický Sněžník trail: map shows 17 km / 4 h 15 min, the old
  *     /tipy-na-vylety/ copy said 14 km, the data keeps null pending client
  *     confirmation (docs/01-content.md §9 item 18).
  *
  * The alt text below names the places without repeating the contradicted figures.
- * Do NOT add chips or labels next to this image that name either distance — it
- * would put a different number alongside the one baked into the pixels.
+ * Do NOT add chips or labels next to this image that name either distance   it
+ * would put a different number alongside the one baked into the pixels. Making
+ * the plate bigger makes this MORE important, not less: at 1440 the `7 km / 9 min`
+ * beside Králíky is now perfectly readable.
  *
- * TODO(client) — §9 item 18: confirm the Sněžník trail distance (14 km or 17 km)
+ * TODO(client)   §9 item 18: confirm the Sněžník trail distance (14 km or 17 km)
  *   so the entry in VYLETY can be given a vzdalenost instead of null.
- * TODO(client) — §7.4 / §4: supply a clean aerial photograph with no labels
- *   baked in, so the map can be rebuilt as photograph + inline SVG <text>.
+ * TODO(client)   §7.4 / §4: supply a clean aerial photograph with no labels
+ *   baked in, so the map can be rebuilt as photograph + inline SVG <text>. That
+ *   is still the real fix   full bleed buys legibility, not searchable text.
  *
- * Band: --kamen. Follows the --omitka intro section.
+ * Band: --kamen. Follows the photographic opener and precedes --omitka.
  */
 import { Image } from 'astro:assets';
 import mapa from '@img/situace1-1.webp';
+
+/* U+00A0   non-breaking space. */
+const NBSP = ' ';
 ---
 
-<section class="mapa section" aria-labelledby="mapa-nadpis">
-  <div class="wrap">
-    <div class="mapa-grid">
-      <header class="mapa-header" data-reveal>
-        <h2 id="mapa-nadpis">Poloha chalupy a okolí</h2>
-        <p class="mapa-lead">
-          Mapa ukazuje dosažitelné cíle od chalupy. Turistické stezky se dají chytit
-          přímo u dveří — jedna vede až na vrchol Králického Sněžníku.
-        </p>
-      </header>
-
-      <figure class="mapa-figure" data-reveal>
-        <div class="media-frame photo-frame">
-          <Image
-            src={mapa}
-            alt="Ilustrovaný letecký snímek okolí chalupy Heřmanka v Heřmanicích u Králík s vyznačenými destinacemi: Polsko a Międzygórze na severu se sjezdovkami 30–60 minut, hora Klepáč 1145 m n. m. jako rozvodí do trojice evropských moří, Králický Sněžník 1423 m n. m. nejvyšší hora Čech s pramenem řeky Moravy, lyžařské středisko Dolní Morava se Stezkou v oblacích a Sky Bridge 721, barokní klášter Hedeč mariánské poutní místo a město Králíky"
-            widths={[640, 960, 1280]}
-            sizes="(min-width: 64rem) 60vw, 100vw"
-            width={1280}
-            height={958}
-            format="webp"
-            quality={68}
-            loading="lazy"
-          />
-        </div>
-        {/*
-          No figcaption. The heading and lead above name the map; the <img> alt
-          names the places to a screen reader. A caption beneath would be the
-          third statement of the same thing.
-        */}
-      </figure>
-    </div>
+<section class="mapa" aria-labelledby="mapa-nadpis">
+  <div class="wrap mapa-header" data-reveal>
+    <h2 id="mapa-nadpis">Poloha chalupy a okolí</h2>
+    <p class="mapa-lead">
+      Mapa ukazuje dosažitelné cíle od chalupy. Turistické stezky se dají chytit
+      přímo u dveří{NBSP}  jedna vede až na vrchol Králického Sněžníku.
+    </p>
   </div>
+
+  <figure class="mapa-figure" data-reveal>
+    {/*
+      ---- WHY THE PLATE STILL PANS ON A PHONE ----
+      Full bleed fixes the laptop and does nothing for a 390 px viewport, where
+      even edge to edge is under a third of the drawing's native width. Below
+      48rem the figure is a horizontal scroller and the plate holds a 40rem
+      minimum, so the reader pans it at a size the baked-in type can be read at.
+      From 48rem up the container is wider than that minimum, `overflow-x: auto`
+      never has anything to scroll, and this is an ordinary block.
+
+      `tabindex="0"` is REQUIRED, not decoration: a scrollable region that cannot
+      be focused cannot be scrolled from a keyboard, which is WCAG 2.1.1.
+      `role="group"` plus the label is what stops a screen reader announcing it
+      as an unnamed scroll region.
+    */}
+    <div
+      class="mapa-pan"
+      tabindex="0"
+      role="group"
+      aria-label="Ilustrovaná mapa okolí   na malé obrazovce ji lze posouvat do stran"
+    >
+      <div class="mapa-plate">
+        <Image
+          src={mapa}
+          alt="Ilustrovaný letecký snímek okolí chalupy Heřmanka v Heřmanicích u Králík s vyznačenými destinacemi: Polsko a Międzygórze na severu se sjezdovkami 30–60 minut, hora Klepáč 1145 m n. m. jako rozvodí do trojice evropských moří, Králický Sněžník 1423 m n. m. nejvyšší hora Čech s pramenem řeky Moravy, lyžařské středisko Dolní Morava se Stezkou v oblacích a Sky Bridge 721, barokní klášter Hedeč mariánské poutní místo a město Králíky"
+          widths={[640, 960, 1280]}
+          sizes="(min-width: 64rem) 1280px, (min-width: 48rem) 100vw, 40rem"
+          width={1280}
+          height={958}
+          format="webp"
+          quality={72}
+          loading="lazy"
+        />
+      </div>
+    </div>
+
+    {/*
+      The one caption this figure gets, and it is an instruction rather than a
+      description   the heading and lead above already say what the map is and
+      the <img> alt says it to a screen reader. `aria-hidden` because the panning
+      affordance is already in the region's own label, and it is hidden outright
+      from 48rem where there is nothing to pan.
+    */}
+    <figcaption class="mapa-hint" aria-hidden="true">Mapu posuňte prstem do stran.</figcaption>
+  </figure>
 </section>
 
 <style>
   .mapa {
     background-color: var(--color-kamen);
+    /* Not `.section`: the plate needs less air under it than over it, or the
+       band reads as a picture floating in a wide grey field. */
+    padding-block: 4rem 3rem;
   }
 
-  .mapa-grid {
-    display: grid;
-    gap: 2rem;
+  @media (width >= 48rem) {
+    .mapa {
+      padding-block: 6rem 4rem;
+    }
   }
 
   @media (width >= 64rem) {
-    .mapa-grid {
-      grid-template-columns: 1fr 2fr;
-      gap: 3rem;
-      align-items: start;
+    .mapa {
+      padding-block: 8rem 5rem;
     }
   }
 
@@ -92,29 +136,105 @@ import mapa from '@img/situace1-1.webp';
     color: var(--color-mosaz-tmava);
   }
 
+  /*
+   * ⚠ NO `max-width` ON `.mapa-header`. It carries the `.wrap` class, and `.wrap`
+   * is `max-width: 80rem; margin-inline: auto`   so narrowing it here narrows the
+   * CONTAINER, and the auto margins then centre the heading and lead in the
+   * middle of the page. This section shipped like that for one build. The measure
+   * belongs on the children, where it constrains the type without touching the
+   * container that positions it. §3 puts this site left of centre with the right
+   * third open; the plate below is the only thing here that goes full width.
+   */
+  .mapa-header h2 {
+    max-width: 22ch;
+  }
+
   .mapa-lead {
-    margin-top: 1.25rem;
+    margin-top: 1rem;
     font-size: var(--text-lead);
-    max-width: 38ch;
+    max-width: 46ch;
     /* --kura on --kamen = 9.96:1 */
     color: var(--color-kura);
   }
 
+  /* ---- The plate --------------------------------------------------------- */
+
   .mapa-figure {
-    margin: 0;
+    margin: 2.5rem 0 0;
+    /*
+     * ⚠ `min-width: 0` is what stops this section putting a horizontal scrollbar
+     * on the PAGE. The plate inside carries `min-width: 40rem` for the phone pan,
+     * and a block's automatic minimum size would otherwise force the whole
+     * section to 40rem on a 390 px screen. The pan container is the only thing on
+     * this page allowed to scroll sideways.
+     */
+    min-width: 0;
   }
 
-  .mapa-figure :global(img) {
+  /*
+   * ⚠ Nothing carrying `data-drift` may ever go inside this. `overflow-x: auto`
+   * makes it a scroll container, and `view()` resolves against the nearest
+   * ancestor scroll container   a drifting layer in here would take its timeline
+   * from a box that scrolls sideways and would sit frozen. See `[data-drift]` in
+   * global.css.
+   */
+  .mapa-pan {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .mapa-plate {
+    min-width: 40rem;
+    background-color: var(--color-les);
+  }
+
+  @media (width >= 48rem) {
+    .mapa-plate {
+      min-width: 0;
+      /*
+       * ---- AS WIDE AS IT CAN BE WITHOUT GETTING TALLER THAN THE SCREEN ----
+       *
+       * A true 100vw bleed at 1440 makes this plate 1078 px tall, which is more
+       * than a laptop viewport   so the reader can never see the whole map at
+       * once, which is the one thing a map has to allow. The first pass shipped
+       * that and it was worse than the small version it replaced: bigger type,
+       * and you still could not take it in.
+       *
+       * So the width is driven by the HEIGHT budget. The drawing is 1280 �  958,
+       * a ratio of 1.336; 88svh of height at that ratio is the widest the plate
+       * can be and still fit under the fixed header with room to spare. The
+       * 90rem ceiling is the second limit: the raster is 1280 px native, and
+       * past about 1440 the browser is upscaling the small baked-in type that is
+       * the whole value of the image.
+       *
+       * At 1440 �  900 that resolves to ~1058 px, at 1920 �  1080 to the native
+       * 1280. Both are far past the ~760 px this used to render at inside a
+       * two-column grid, and both fit on the screen.
+       *
+       * ⚠ The 1.336 is the image's aspect ratio. Change the plate and change it.
+       */
+      max-width: min(90rem, calc(88svh * 1.336));
+      margin-inline: auto;
+    }
+  }
+
+  .mapa-plate :global(img) {
+    display: block;
     width: 100%;
     height: auto;
   }
 
-  @media (width >= 64rem) {
-    .mapa-header {
-      /* Stick the text panel to the top of its grid cell while the image
-         column can grow as tall as it needs. */
-      position: sticky;
-      top: 7rem;
+  .mapa-hint {
+    margin-top: 0.625rem;
+    padding-inline: 1.5rem;
+    font-size: var(--text-caption);
+    /* --kura on --kamen = 9.96:1 */
+    color: var(--color-kura);
+  }
+
+  @media (width >= 48rem) {
+    .mapa-hint {
+      display: none;
     }
   }
 </style>

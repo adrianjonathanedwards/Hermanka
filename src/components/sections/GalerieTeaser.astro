@@ -1,16 +1,16 @@
----
+﻿---
 /**
  * Gallery teaser + video.
  *
- * NO YouTube iframe anywhere — not on load and not on click. The poster is a
+ * NO YouTube iframe anywhere   not on load and not on click. The poster is a
  * plain image inside a link that opens the video on YouTube in a new tab. A
  * single embed is roughly 500 kB and several third-party connections, five times
  * this page's whole budget, for a video most visitors never play
  * (docs/03-tech.md §5). Opening YouTube properly also gives the guest the real
- * player — captions, quality, full screen, watch later — instead of a stripped
+ * player   captions, quality, full screen, watch later   instead of a stripped
  * one bolted into a section that is not about video.
  *
- * The bento: the flat strip of six squares became a grid with a 2 × 2 opener, so
+ * The bento: the flat strip of six squares became a grid with a 2 �  2 opener, so
  * the room the cottage is actually let for gets the tile it deserves rather than
  * one sixth of a row. Every tile opens a lightbox, but each is still a real
  * <a href="/galerie">, so with JavaScript off a click goes to the gallery page.
@@ -67,7 +67,7 @@ const VIDEO_ID = '-U_w_kwtzjI';
       </p>
     </div>
 
-    {/* 55 ms apart — six tiles land in a third of a second. */}
+    {/* 55 ms apart   six tiles land in a third of a second. */}
     <ul class="galerie-bento" data-reveal-group="55">
       {
         fotky.map((f, i) => (
@@ -112,11 +112,11 @@ const VIDEO_ID = '-U_w_kwtzjI';
       </div>
 
       {/*
-        No iframe — not on load, and no longer on click either. The poster is a
+        No iframe   not on load, and no longer on click either. The poster is a
         plain lazy image inside a link that opens the video on YouTube in a new
         tab, which is what the client asked for and is strictly better here: the
         third-party weight stays at zero (an embed is ~500 kB and several extra
-        connections, five times this whole page's budget — docs/03-tech.md §5),
+        connections, five times this whole page's budget   docs/03-tech.md §5),
         and it needs no JavaScript, so it works with scripting off.
 
         The link's accessible name is the poster's alt plus the visible label,
@@ -176,7 +176,7 @@ const VIDEO_ID = '-U_w_kwtzjI';
 
   /* ---- Bento ----------------------------------------------------------
    * Two columns with a full-width opener on a phone; three columns with a
-   * 2 × 2 opener from tablet up. Six tiles, nine cells, no holes.
+   * 2 �  2 opener from tablet up. Six tiles, nine cells, no holes.
    */
   .galerie-bento {
     display: grid;
@@ -213,7 +213,7 @@ const VIDEO_ID = '-U_w_kwtzjI';
   }
 
   /* The opener is two cells tall, so its own aspect ratio must not fight the
-     grid — let the row height decide. */
+     grid   let the row height decide. */
   @media (width >= 48rem) {
     .galerie-tile:first-child .galerie-item {
       aspect-ratio: auto;
@@ -293,7 +293,7 @@ const VIDEO_ID = '-U_w_kwtzjI';
    * the gallery is FOR, so it should not have been sitting at the same weight as
    * a caption.
    *
-   * Still a <p>, not a heading — the section already has its h2, and a second
+   * Still a <p>, not a heading   the section already has its h2, and a second
    * one here would put a heading in the outline for a sentence that structures
    * nothing. Size is doing the work, not semantics.
    */
@@ -362,12 +362,12 @@ const VIDEO_ID = '-U_w_kwtzjI';
     border: 2px solid var(--color-omitka);
     border-radius: var(--radius-pill);
     /*
-     * ⚠ No padding here — it was `padding-left: 4px`, and that was the whole
+     * ⚠ No padding here   it was `padding-left: 4px`, and that was the whole
      * reason the triangle sat off-centre.
      *
      * Two things stack up. The `prehrat` path is already drawn for optical
      * centring: its vertices are (8, 5.2), (8, 18.8) and (19, 12), so its
-     * centroid — which is what the eye reads as the centre of a triangle — is at
+     * centroid   which is what the eye reads as the centre of a triangle   is at
      * x 11.67 against a viewBox centre of 12. Near enough exact. Its *bounding
      * box* centre is 13.5, and correcting toward that is the mistake: it pushes
      * the glyph 1.5 units right of where it already belonged.

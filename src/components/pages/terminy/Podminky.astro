@@ -1,35 +1,35 @@
----
+﻿---
 /**
- * Podmínky — payment terms and the terms that are still missing.
+ * Podmínky   payment terms and the terms that are still missing.
  *
  * Two parts, both required:
  *
- * 1. PODMINKY — the terms that ARE known, rewritten from the old site's
+ * 1. PODMINKY   the terms that ARE known, rewritten from the old site's
  *    120-word paragraph into a list of named steps. Every fact matches the
  *    old text; only the structure changes (docs/01-content.md §6.4 REWRITE).
  *
- * 2. CHYBEJICI_PODMINKY — the terms that are NOT known, rendered honestly as
+ * 2. CHYBEJICI_PODMINKY   the terms that are NOT known, rendered honestly as
  *    "na tohle se nás zeptejte". This is not a placeholder and must not be
  *    dropped because the page looks tidier without it. Bed linen is "the
  *    single most-asked question for a Czech chalupa let and this site answers
  *    it nowhere" (docs/01-content.md §6.4). A guest who cannot find the
- *    answer writes to us — which is the site's entire job — whereas a guest
+ *    answer writes to us   which is the site's entire job   whereas a guest
  *    who does not know the question was askable books elsewhere.
  *
  * Section band: --kamen. Previous section (Poplatky) is --omitka.
  * Poptavka below passes band="omitka" because this section is stone.
  *
- * TODO(client) — docs/01-content.md §9 items 9–12. Each answer from the
+ * TODO(client)   docs/01-content.md §9 items 9–12. Each answer from the
  * client removes one line from CHYBEJICI_PODMINKY and adds one to PODMINKY:
  *   item 9:  check-in / check-out times
  *   item 10: cancellation terms
  *   item 11: what the price includes (bed linen, towels, firewood, pellets)
- *   item 12: pets — allowed, charged, how limited?
+ *   item 12: pets   allowed, charged, how limited?
  *
- * TODO(client) — docs/01-content.md §9 item 8: the discount rule.
+ * TODO(client)   docs/01-content.md §9 item 8: the discount rule.
  * The old homepage promises a flat 10 % for under-occupancy; the old price
  * list says a discount "is possible". The PODMINKY entry for "Menší skupina"
- * deliberately states neither number — only the client knows which is correct.
+ * deliberately states neither number   only the client knows which is correct.
  */
 import IconLucide from '../../IconLucide.astro';
 import { PODMINKY, CHYBEJICI_PODMINKY } from '../../../data/cenik';
@@ -66,7 +66,7 @@ const NBSP = ' ';
 
     {/*
       ⚠ This section is not decoration and not a placeholder. It is the honest
-      answer to "what does this site not yet tell you?" — and each item on the
+      answer to "what does this site not yet tell you?"   and each item on the
       list is something a real guest will ask before booking a mountain cottage.
       Bed linen is the canonical example: no Czech guest assumes it is provided,
       and the old site is silent on the question. A guest who has to ask finds
@@ -78,7 +78,7 @@ const NBSP = ' ';
     <div class="chybi" data-reveal data-reveal-delay="120">
       <h3 class="chybi-nadpis">Na{NBSP}tohle se{NBSP}nás zeptejte</h3>
       <p class="chybi-lead">
-        Odpovědi máme — jen je zatím nemáme na webu. Napište nám a ozveme
+        Odpovědi máme   jen je zatím nemáme na webu. Napište nám a ozveme
         se obratem.
       </p>
 
@@ -128,7 +128,7 @@ const NBSP = ' ';
   /* ---- Steps list ------------------------------------------------------ */
 
   /*
-   * Ordered list — the numbers are semantic (step 1, step 2, ...) and the
+   * Ordered list   the numbers are semantic (step 1, step 2, ...) and the
    * visual counter next to the icon reinforces that. Using `list-style: none`
    * here because we render the number ourselves inside `.krok-cislo`.
    */
@@ -161,7 +161,7 @@ const NBSP = ' ';
   }
 
   /*
-   * The step number — a small brass circle in the heading row. It pairs with
+   * The step number   a small brass circle in the heading row. It pairs with
    * the icon so a reader who skims the headings can count the steps.
    */
   .krok-cislo {
@@ -175,9 +175,9 @@ const NBSP = ' ';
     background-color: var(--color-mosaz);
     font-size: var(--text-caption);
     font-weight: var(--font-weight-semibold);
-    /* --omitka on --mosaz = 5.14:1 ✓ — primary button pairing */
+    /* --omitka on --mosaz = 5.14:1 ✓   primary button pairing */
     color: var(--color-omitka);
-    /* Tabular for the digit itself, but it's decorative here — no line-up needed. */
+    /* Tabular for the digit itself, but it's decorative here   no line-up needed. */
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
@@ -213,7 +213,7 @@ const NBSP = ' ';
 
   /*
    * A distinct panel, visually separated from the steps above.
-   * Uses a left-border accent — the same device KalendarSlot uses for the
+   * Uses a left-border accent   the same device KalendarSlot uses for the
    * booking rules, because both are "information you must have before you act".
    */
   .chybi {

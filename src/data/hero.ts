@@ -1,10 +1,10 @@
-/**
+﻿/**
  * The hero slides, in one place.
  *
  * ---------------------------------------------------------------------------
  * ⚠ THIS IS A CAROUSEL, AND THE PROJECT DOCUMENTATION SAYS NOT TO BUILD ONE.
  *
- * docs/01-content.md §4.1 is explicit — "DROP the carousel itself", on the
+ * docs/01-content.md §4.1 is explicit   "DROP the carousel itself", on the
  * grounds that five auto-rotating slides on the highest-value screen on the site
  * are five chances to show a guest the one thing they did not want, and cost a
  * hero-sized image download per slide. docs/02-design-system.md §5.3 lists
@@ -22,8 +22,8 @@
  *     keyboard focus anywhere in the hero holds it.
  *
  *     ⚠ It no longer carries a pause control. That was the WCAG 2.2.2 mechanism
- *     — the success criterion asks for a way to stop anything moving on its own
- *     for more than five seconds and does not accept hover/focus as one — and it
+ *       the success criterion asks for a way to stop anything moving on its own
+ *     for more than five seconds and does not accept hover/focus as one   and it
  *     was removed by request in favour of plain autoplay. Recorded here rather
  *     than quietly dropped, same as the carousel itself. The markup and the
  *     `setPaused` half of src/scripts/motion.ts are both in git.
@@ -31,7 +31,7 @@
  * ---------------------------------------------------------------------------
  * `SLIDE_IMAGE_PROPS` is spread into BOTH the <Image> in Hero.astro and the
  * getImage() call that feeds the <link rel="preload"> in index.astro. They must
- * describe *exactly* the same transform — any divergence produces a different
+ * describe *exactly* the same transform   any divergence produces a different
  * file hash, and the browser then preloads one file and renders another,
  * downloading the hero twice. That is the worst possible outcome for the one
  * image we are trying to make fast, so the options live here and are never
@@ -54,7 +54,7 @@ export const HERO_SIZES = '100vw';
 
 /**
  * Shared transform. Quality is held against the 150 kB per-image hero budget
- * (docs/03-tech.md §5) — measure the largest variant after any change here, not
+ * (docs/03-tech.md §5)   measure the largest variant after any change here, not
  * just the visual result.
  */
 export const SLIDE_IMAGE_PROPS = {
@@ -69,12 +69,12 @@ export interface HeroSlide {
   src: ImageMetadata;
   /** Czech alt text. Every one of these describes the photograph, not the room. */
   alt: string;
-  /** Shown beside the slide controls. Short — it is a label, not a sentence. */
+  /** Shown beside the slide controls. Short   it is a label, not a sentence. */
   caption: string;
   /**
    * `object-position`. Each photograph has a different subject in a different
    * part of the frame, and a portrait viewport keeps about a quarter of the
-   * width — so the crop is a per-slide decision, not a global one.
+   * width   so the crop is a per-slide decision, not a global one.
    */
   position: string;
 }
@@ -90,8 +90,8 @@ export interface HeroSlide {
  * is actually buying; then the hot tub and the garden, which are what the
  * children are.
  *
- * TODO(client): `zastrwsena-veranda` is only 1000 × 667, so slide two is soft on
- * a large screen — Astro will not upscale, and it should not. A replacement
+ * TODO(client): `zastrwsena-veranda` is only 1000 �  667, so slide two is soft on
+ * a large screen   Astro will not upscale, and it should not. A replacement
  * shot of the covered terrace at 1920 wide is the single most valuable new
  * photograph this site could be given. docs/01-content.md §10.
  */

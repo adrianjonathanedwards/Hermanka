@@ -1,0 +1,180 @@
+﻿---
+/**
+ * /ubytovani   the accommodation page.
+ *
+ * ---------------------------------------------------------------------------
+ * ⚠ THIS PAGE WAS `/chalupa` AND WAS RENAMED BACK. DO NOT RENAME IT AGAIN.
+ *
+ * An earlier pass invented `/chalupa` and merged the old `/o-nas/`,
+ * `/ubytovani/` and `/video/` into it. Reverted by decision: the URL, the
+ * heading and the copy go back to the ones the site has actually had since
+ * 2019. `/ubytovani` has been indexed under that path for years and the client
+ * calls this page `Ubytování`; there was no reason to spend that on a new word.
+ *
+ * `/chalupa` now 301s here, so the short-lived URL does not dangle.
+ *
+ * ---------------------------------------------------------------------------
+ * SCOPE: DESIGN, NOT CONTENT.
+ *
+ * Every paragraph on this page is the old site's, verbatim, apart from three
+ * spelling fixes listed in docs/01-content.md §1 (`poskutuje` → `poskytuje`,
+ * `koupena` → `koupelna` twice). Two factual contradictions the old site
+ * contains are reproduced rather than resolved, each argued in place   see the
+ * headers of Loznice.astro and Prakticke.astro. Resolving them is the client's
+ * call, not a side effect of a redesign.
+ *
+ * What DID change is the layout, and it is now the homepage's:
+ *
+ *   PageHero          --les     photograph + title
+ *   Loznice           --omitka  full-bleed split, media RIGHT
+ *   Vybaveni          --kamen   full-bleed split, media LEFT   ← alternates
+ *   Vytapeni          --les     the one dark band; no photograph exists for it
+ *   Prakticke         --omitka  two short blocks side by side
+ *   Video             --kamen   facade, /video redirects to #video
+ *   CtaBand           --omitka  ← last section is light, see below
+ *
+ * No two adjacent bands share a ground (docs/02-design-system.md §3), and the
+ * last one is light because the footer's treeline is a `--les` silhouette that
+ * rises out of it and would be invisible on a dark band.
+ *
+ * The old page's eight stacked headings in one narrow column became four
+ * sections. Nothing was deleted to get there: `Sociální zařízení` sits under
+ * the bedrooms it belongs to, `Přehled vybavení` under the equipment prose it
+ * summarises, and `Doprava` and `Stravování` share a band because they answer
+ * the same question and are three sentences each.
+ *
+ * ---------------------------------------------------------------------------
+ * HERO PRELOAD   the standard subpage pattern. PAGE_HERO_PRELOAD_PROPS goes to
+ * getImage() here AND is spread into the <Image> inside PageHero via
+ * PAGE_HERO_IMAGE_PROPS. Same props → same hash → one file, one download. Pass
+ * a different `image` to <PageHero> and you must build the matching getImage()
+ * call too, or the browser fetches the hero twice.
+ */
+import { getImage } from 'astro:assets';
+import { PAGE_HERO_PRELOAD_PROPS, PAGE_HERO_SIZES } from '../data/pageHero';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/sections/CtaBand.astro';
+
+import Loznice from '../components/pages/ubytovani/Loznice.astro';
+import Vybaveni from '../components/pages/ubytovani/Vybaveni.astro';
+import Vytapeni from '../components/pages/ubytovani/Vytapeni.astro';
+import Prakticke from '../components/pages/ubytovani/Prakticke.astro';
+import Video from '../components/pages/ubytovani/Video.astro';
+
+import { SITE } from '../data/site';
+import { VYBAVENI } from '../data/vybaveni';
+import { KAPACITA } from '../data/cenik';
+
+const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
+
+/*
+ * ---------------------------------------------------------------------------
+ * STRUCTURED DATA   schema.org LodgingBusiness.
+ *
+ * This is the page a search engine should understand as "the accommodation",
+ * and JSON-LD is the only way to tell it so in terms it can act on: the rich
+ * result for a holiday let is built from capacity, room count, location and
+ * amenities, none of which are inferable from Czech prose.
+ *
+ * ⚠ TWO EXCLUSIONS, AND BOTH MATTER MORE THAN THE INCLUSIONS.
+ *
+ * 1. **`Možnosti zábavy v okolí` is not in `amenityFeature`.** Bike hire, a
+ *    riding school, tennis courts and a golf course are things NEAR the
+ *    cottage, not things it has. In prose the group heading says so; in
+ *    structured data there is no heading, so emitting them would be telling
+ *    Google this property has a golf course. That is a false claim in
+ *    machine-readable form, and the fact it would be a flattering one is
+ *    exactly why it has to be caught here.
+ *
+ * 2. **Anything carrying an `overit` caveat is excluded**   today that is the
+ *    accessibility claim. If a statement is not confident enough to print
+ *    without a qualifier next to it, it is not confident enough to assert to a
+ *    crawler that cannot read the qualifier.
+ *
+ * Everything else is derived from src/data/, so an amenity added there appears
+ * here without anyone remembering to do it.
+ */
+const VLASTNI_SKUPINY = ['obecne', 'vnitrni', 'venkovni', 'okoli'];
+
+const amenityFeature = VYBAVENI.filter((g) => VLASTNI_SKUPINY.includes(g.klic))
+  .flatMap((g) => g.polozky)
+  .filter((p) => !p.overit)
+  .map((p) => ({
+    '@type': 'LocationFeatureSpecification',
+    name: p.nazev,
+    value: true,
+  }));
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LodgingBusiness',
+  '@id': new URL('/ubytovani', Astro.site).href,
+  name: SITE.name,
+  url: new URL('/ubytovani', Astro.site).href,
+  telephone: SITE.telefon,
+  address: {
+    '@type': 'PostalAddress',
+    /* TODO(client)   no house number and no postcode are published anywhere on
+       the site (docs/01-content.md §8.1). A locality alone is weaker than a
+       full address here, and it is the one field a crawler most wants. */
+    addressLocality: SITE.obec,
+    addressRegion: 'Pardubický kraj',
+    addressCountry: 'CZ',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: SITE.gps.lat,
+    longitude: SITE.gps.lon,
+  },
+  numberOfRooms: 3,
+  petsAllowed: true,
+  smokingAllowed: false,
+  amenityFeature,
+};
+---
+
+<BaseLayout
+  title="Ubytování   chalupa pro 2 až 15 osob"
+  description="Ubytování v chalupě Heřmanka u Králík: 3 ložnice pro 2 až 15 osob, obývací pokoj s krbem, dvě terasy, sauna a vířivka. Vybavení, vytápění a parkování u objektu."
+  heroPreload={{ src: hero.src, srcset: hero.srcSet.attribute, sizes: PAGE_HERO_SIZES }}
+>
+  {/*
+    `is:inline` keeps Astro's script pipeline out of it   this is data, not
+    code, and must reach the page exactly as serialised. `set:html` with
+    JSON.stringify rather than a template literal so a quote or a diacritic in
+    an amenity name can never break out of the block.
+  */}
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(schema)}
+  />
+
+  {/*
+    The lead is the old page's opening line, with `poskutuje` → `poskytuje`
+    (docs/01-content.md §1 error #1). The upper figure comes from KAPACITA so
+    this page can never drift from the one the price list and the hero use; the
+    lower one is the client's own `2`.
+  */}
+  <PageHero
+    title="Ubytování"
+    lead={`Chalupa k pronajmutí poskytuje ubytování pro 2 až ${KAPACITA} osob ve 3 ložnicích.`}
+  />
+
+  <Loznice />
+  <Vybaveni />
+  <Vytapeni />
+  <Prakticke />
+  <Video />
+
+  <CtaBand
+    nadpis="Zaujala vás chalupa?"
+    text="Napište nám termín a počet osob. Ozveme se co nejdříve s dostupností a cenou."
+    href="/terminy-a-ceny"
+    cta="Zjistit volné termíny"
+    band="omitka"
+  />
+</BaseLayout>

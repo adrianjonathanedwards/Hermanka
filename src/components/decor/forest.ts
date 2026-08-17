@@ -1,9 +1,9 @@
-/**
+﻿/**
  * Plants the two treelines.
  *
  * The first version of both was hand-authored: forty-odd `[x, scale, shape, dy]`
  * tuples typed out by hand per rank. That is unmaintainable at the density a wood
- * actually needs — and worse, a human typing coordinates produces an obvious
+ * actually needs   and worse, a human typing coordinates produces an obvious
  * rhythm. Spacing landed on a beat, scales alternated big-small-big, and the
  * result read as a stamped border rather than as trees.
  *
@@ -21,7 +21,7 @@
 
 /**
  * mulberry32. Thirty-two bits of state, no dependencies, and well-distributed
- * enough for scattering trees — this is decoration, not cryptography.
+ * enough for scattering trees   this is decoration, not cryptography.
  */
 export function makeRng(seed: number): () => number {
   let a = seed >>> 0;
@@ -40,7 +40,7 @@ export interface Tree {
   dy: number;
   /** Height scale. The shapes are drawn 112 units tall at scale 1. */
   s: number;
-  /** Width scale — `s` nudged a little either way. See `girth`. */
+  /** Width scale   `s` nudged a little either way. See `girth`. */
   sx: number;
   /** Index into the caller's shape list. */
   shape: number;
@@ -66,7 +66,7 @@ export interface RankOptions {
    * How much the width may differ from the height scale, plus or minus. A stand
    * of spruce is not one tree at eight sizes: some are lanky, some are squat.
    *
-   * Keep it small. Past about 0.2 the notches stop reading as notches — the same
+   * Keep it small. Past about 0.2 the notches stop reading as notches   the same
    * reason `preserveAspectRatio` on both treelines is `slice` and never `none`.
    */
   girth?: number;
@@ -75,7 +75,7 @@ export interface RankOptions {
    * the rank level; 0.5 halves the trees across the middle.
    *
    * The footer treeline needs this. It overflows UPWARD out of the footer into
-   * the section above, where the inquiry form sits — so the middle of the wood
+   * the section above, where the inquiry form sits   so the middle of the wood
    * has to stay low enough to leave that card in clear air, and only the outer
    * sixth at each edge is free to grow to full height.
    */
@@ -89,7 +89,7 @@ function envelope(t: number, saddle: number): number {
    * How much of each end stays at full height. Narrow, on purpose: the low middle
    * is what lets the last section on the page end close to the footer instead of
    * reserving room for trees that only stand at the far edges. See the clearance
-   * rule in global.css — these two numbers are a pair.
+   * rule in global.css   these two numbers are a pair.
    */
   const shoulder = 0.12;
   if (t <= shoulder || t >= 1 - shoulder) return 1;
@@ -106,7 +106,7 @@ const round = (n: number, places: number): number => {
 
 /**
  * Walks the width dropping trees at irregular intervals. Trunks run off both
- * ends — a rank that starts and stops exactly at the viewBox edge leaves two
+ * ends   a rank that starts and stops exactly at the viewBox edge leaves two
  * bald spots the moment the SVG is cropped.
  */
 export function plantRank(o: RankOptions): Tree[] {
@@ -153,7 +153,7 @@ export function transformFor(t: Tree, baseY: number): string {
    The ranks above were generated from the start; the TREES were not. Both
    treelines were drawn from five hand-typed silhouettes, and those five were the
    thing that kept reading as clip art however they were coloured, faded or
-   blurred. The reason is proportion. They were 60 units tall and 33 wide — a
+   blurred. The reason is proportion. They were 60 units tall and 33 wide   a
    ratio of about 1.8, which is a Christmas-card tree. A Norway spruce standing
    in a wood is 3.5 to 4 times as tall as it is wide, and the difference between
    those two numbers is the whole difference between "forest" and "border
@@ -194,7 +194,7 @@ export interface SpruceOptions {
   seed: number;
   /** Tip to ground line, in viewBox units. The tip sits at `-height`. */
   height: number;
-  /** Half-width of the skirt at the ground line. height / (2 × this) is the ratio. */
+  /** Half-width of the skirt at the ground line. height / (2 �  this) is the ratio. */
   halfWidth: number;
   /** [fewest, most] tiers per flank. Drawn per flank, so the two rarely agree. */
   tiers: [number, number];
@@ -219,7 +219,7 @@ function flank(rnd: () => number, height: number, halfWidth: number, n: number):
   for (let k = 1; k <= n; k++) {
     /*
      * Jittered tier position, clamped so it can never fall level with or above
-     * the tier before it — see the note on monotonicity above. `SKIRT` holds the
+     * the tier before it   see the note on monotonicity above. `SKIRT` holds the
      * lowest tier just clear of the ground so there is room for the foot.
      */
     const jitter = ((rnd() * 2 - 1) * 0.55) / n;
@@ -229,8 +229,8 @@ function flank(rnd: () => number, height: number, halfWidth: number, n: number):
     /* `u ** 1.35` rather than `u`: tiers crowd toward the tip and open out
        toward the skirt, which is how a spruce actually grows. */
     const yOut = -height * (1 - u ** 1.35);
-    /* Reach grows slightly FASTER than linearly. Slower — the first version's
-       0.82 — fattens the crown and the tree stops being conical. */
+    /* Reach grows slightly FASTER than linearly. Slower   the first version's
+       0.82   fattens the crown and the tree stops being conical. */
     const xOut = halfWidth * u ** 1.12 * (0.85 + rnd() * 0.3);
 
     pts.push([round(xOut, 1), round(yOut, 1)]);

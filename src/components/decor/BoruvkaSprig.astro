@@ -1,6 +1,6 @@
----
+﻿---
 /**
- * Bilberry sprig — `borůvka`. A small hand-drawn mark for the hero eyebrow.
+ * Bilberry sprig   `borůvka`. A small hand-drawn mark for the hero eyebrow.
  *
  * It exists because the hero has to smell of the place, and a bilberry sprig is
  * the shortest way to say "spruce forest under the Sněžník" without a word of
@@ -20,7 +20,7 @@
  *    three different stalks. A symmetrical sprig drawn from a primitive would
  *    stand next to the 2019 mark and read as a different brand.
  *  - `vector-effect: non-scaling-stroke` so the line stays 1.15px whatever size
- *    the mark is set at — a scaled SVG otherwise thins out or fattens up.
+ *    the mark is set at   a scaled SVG otherwise thins out or fattens up.
  *
  * Decorative: `aria-hidden`, and `pointer-events: none` comes from the global
  * `svg[aria-hidden='true']` rule.
@@ -29,18 +29,32 @@ interface Props {
   class?: string;
 }
 
-const { class: className } = Astro.props;
+/*
+ * ⚠ `...rest` IS LOAD-BEARING   see the long note in HermanekSprig.astro.
+ *
+ * Astro hands a child the parent's `data-astro-cid-…` as a prop and expects it
+ * on the root element. Without the spread, a caller's scoped rule such as
+ * `.divider-sprig { width: 2.125rem }` compiles to a selector carrying that
+ * attribute, matches nothing, and the mark quietly renders at its fallback
+ * size instead. It fails silently, which is why it is called out here.
+ *
+ * This component was drawn for the hero, lost its place when the hero was
+ * stripped back, and sat unused   so the omission never showed until
+ * SprigDivider.astro started sizing it.
+ */
+const { class: className, ...rest } = Astro.props;
 ---
 
 {/*
   The viewBox is cropped to the drawing, not to a tidy round number. It was
-  `0 0 40 46` and the sprig only ever occupied the middle 23 units of it — so a
+  `0 0 40 46` and the sprig only ever occupied the middle 23 units of it   so a
   mark set to 40px rendered 23px of line inside 17px of nothing, and looked thin
   and lost however large the box was made. It also clipped the lowest berry,
   which reaches y=46.8.
 */}
 <svg
   class:list={['sprig', className]}
+  {...rest}
   viewBox="6.5 1.5 27 47.5"
   fill="none"
   stroke="currentColor"
@@ -51,7 +65,7 @@ const { class: className } = Astro.props;
   aria-hidden="true"
   focusable="false"
 >
-  {/* Stem. Three shallow reversals — a bilberry twig is never straight. */}
+  {/* Stem. Three shallow reversals   a bilberry twig is never straight. */}
   <path d="M20.6 45 C19.4 37.5 21.3 30 19.6 22.4 C18.4 16.8 20.2 10.5 21.4 4" />
 
   {/* Upper leaf, right. Longer and narrower than its opposite. */}
@@ -60,12 +74,12 @@ const { class: className } = Astro.props;
   {/* Lower leaf, left. Shorter, blunter, and set lower than the pair would be. */}
   <path d="M19.7 21.6 C14.1 21.1 10 17.7 8.6 12.6 C14.2 12.4 18.5 15.6 19.7 21.6 Z" />
 
-  {/* A third leaf, half-turned away — breaks the two-leaf symmetry. */}
+  {/* A third leaf, half-turned away   breaks the two-leaf symmetry. */}
   <path d="M21 30.2 C25.1 30.6 28.4 29 30.2 25.7 C26.3 24.6 22.9 26.2 21 30.2 Z" />
 
   {/*
     Three berries on three stalks. Sizes 3.5 / 3 / 2.6 and no two hanging at the
-    same angle — the largest is furthest from the stem, as a heavy one is.
+    same angle   the largest is furthest from the stem, as a heavy one is.
   */}
   <path d="M19.8 24.6 C17.3 26.4 15.2 28.2 14.4 30.4" />
   <circle cx="12.6" cy="33.6" r="3.5" />

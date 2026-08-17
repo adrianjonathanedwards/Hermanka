@@ -1,35 +1,77 @@
----
+﻿---
 /**
- * /okoli — Tipy na výlety.
+ * /okoli   Tipy na výlety.
  *
  * The page for someone who has decided the cottage looks right and now wants to
  * know what they can do from it. It answers the same question as the homepage's
  * Okolí and DolníMorava sections, but in full.
  *
- * SECTION ORDER — docs/04-pages.md §/okoli:
+ * SECTION ORDER   docs/04-pages.md §/okoli:
  *   1. PageHero
- *   2. Intro — Dolní Morava, Stezka v oblacích, Sky Bridge 721 (§7.1 rewrite)
- *   3. Regional map — the illustrated aerial photograph with full alt text
- *   4. Výlety a atrakce — card grid from VYLETY
- *   5. Lyžování — LYZOVANI (--jinovatka winter section, legitimately)
- *   6. Koupání — KOUPANI_BLIZKO with chips, KOUPANI_DALSI secondary
+ *   2. Intro   Dolní Morava, Stezka v oblacích, Sky Bridge 721 (§7.1 rewrite)
+ *   3. Regional map   the illustrated aerial photograph with full alt text
+ *   4. Výlety a atrakce   the trip index, from VYLETY
+ *   5. Lyžování   LYZOVANI (--jinovatka winter section, legitimately)
+ *   6. Koupání   KOUPANI_BLIZKO and KOUPANI_DALSI
  *   7. CtaBand → /terminy-a-ceny
  *
+ * ---------------------------------------------------------------------------
+ * THIS PAGE IS FIVE LISTS AND THE SHAPES HAVE TO DIFFER
+ *
+ * The order above is unchanged and the content is unchanged; what changed is
+ * that the sections no longer all look alike. Every one of items 4, 5 and 6 is
+ * "some places, with a distance on each", and each of them was rendered as
+ * bordered rectangles in a grid   so the page was a photograph, a map, and then
+ * three screens of near-identical boxes. There is not a single `.card` left on
+ * it now. In order down the page:
+ *
+ *   2. a three-layer parallax stage, the copy on an opaque panel in front of it
+ *        OkoliIntro.astro
+ *   3. one wide plate, as big as it can be and still fit on the screen, with
+ *      nothing beside it   OkoliMapa.astro
+ *   4. a catalogue: name / description / figures in three columns, with the
+ *      distances forming a second column of display type down the right-hand
+ *      edge the way page numbers do in a contents list   OkoliVylety.astro
+ *   5. a single statement   one name, two figures, one paragraph   and the six
+ *      unmeasured areas as a run of names   OkoliLyzovani.astro
+ *   6. two figures across the measure, then ten names in three quiet columns
+ *        OkoliKoupani.astro
+ *
+ * Four of the six are lists of places with distances on them, so the SHAPES are
+ * what keep them apart: a plate, a table, a statement, a column set. Nothing on
+ * this page is boxed and there is no `.card` on it anywhere. Each component's own
+ * header comment carries the argument for its shape.
+ *
+ * The one rule that binds them: the difference between an entry WITH a verified
+ * distance and one WITHOUT is always carried by typography and position, never
+ * by an invented figure and never by decoration. Three of these layouts make the
+ * distance the loudest thing in the row, which means a missing one leaves a
+ * visible hole   and that hole is the correct rendering. See the null rule in
+ * src/data/okoli.ts.
+ * ---------------------------------------------------------------------------
+ *
  * BAND SEQUENCE (after the dark page hero):
- *   --omitka → --kamen → --omitka → --jinovatka → --kamen → --omitka
+ *   photograph → --kamen → --omitka → --jinovatka → --kamen → --omitka
  * No two adjacent sections share a colour. Last section is light (--omitka) ✓
  * so the footer treeline (--les silhouette) rises out of it visibly.
  *
- * HISTORIE A PAMÁTKY (§/okoli section 6) — NOT A SEPARATE SECTION.
+ * ⚠ The intro is now the second full-bleed photograph in a row, directly under
+ * the page hero. That is deliberate and it is the one place on this site where
+ * it happens: the hero is dark summer timber with type laid straight on it, the
+ * intro is a lit winter snowfield with the copy on an opaque --omitka panel, and
+ * the pair reads as a cover followed by an opening spread rather than as two
+ * heroes. Do not add a third.
+ *
+ * HISTORIE A PAMÁTKY (§/okoli section 6)   NOT A SEPARATE SECTION.
  * Klášter Hedeč, Vojenské muzeum Králíky and Králíky are included in the main
  * VYLETY card grid in OkoliVylety.astro. A separate section would show the same
  * cards a second time with only a heading change. See OkoliVylety.astro for the
  * full reasoning comment.
  *
- * HERO PRELOAD PATTERN — docs/04-pages.md "PAGE HERO PRELOAD":
+ * HERO PRELOAD PATTERN   docs/04-pages.md "PAGE HERO PRELOAD":
  * getImage() resolves the same transform that PageHero.astro renders, so the
  * browser's preload finds the exact file it will need. If they drift apart, the
- * image is downloaded twice — the worst outcome for this site's one fast image.
+ * image is downloaded twice   the worst outcome for this site's one fast image.
  */
 import { getImage } from 'astro:assets';
 

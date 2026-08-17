@@ -1,6 +1,6 @@
----
+﻿---
 /**
- * The inquiry form itself — the single most important component on the site.
+ * The inquiry form itself   the single most important component on the site.
  *
  * SPLIT OUT OF Poptavka.astro ON PURPOSE. The form now appears on three pages
  * (`/`, `/terminy-a-ceny`, `/kontakt`) and docs/04-pages.md is explicit that
@@ -9,25 +9,25 @@
  * appears everywhere, and a field that exists on two of three pages is a bug
  * nobody notices until the owner asks why some inquiries have no dates on them.
  *
- * `Poptavka.astro` is the *section* — band colour, heading, lead — and it renders
+ * `Poptavka.astro` is the *section*   band colour, heading, lead   and it renders
  * this. A page that wants the form inside its own layout renders this directly.
  *
  * A native <form method="POST">. No fetch, no preventDefault, no framework form
  * library: it must work with JavaScript disabled (docs/03-tech.md §2). Any
  * enhancement added later sits on top of a form that already works without it.
- * That is also why there is no component library here — docs/03-tech.md §1 rules
+ * That is also why there is no component library here   docs/03-tech.md §1 rules
  * out React/Vue/Svelte, so the card, the icon-prefixed controls and the checkbox
  * are built from the design tokens directly and ship zero bytes of JavaScript.
  *
  * The date field is deliberately free text, not a picker. Someone typing
- * `20.-27.9.` must not be rejected — the Worker parses leniently and passes the
+ * `20.-27.9.` must not be rejected   the Worker parses leniently and passes the
  * raw string through to the email.
  */
 import Icon from './Icon.astro';
 import { POPTAVKA_ENDPOINT, SITE } from '../data/site';
 
 interface Props {
-  /** Extra classes on the <form> — a page wanting a different card width. */
+  /** Extra classes on the <form>   a page wanting a different card width. */
   class?: string;
 }
 
@@ -35,7 +35,7 @@ const { class: className } = Astro.props;
 
 /*
  * Which page the inquiry was sent from. The form is on three of them now and the
- * owner's email should say which — an inquiry from /terminy-a-ceny is somebody
+ * owner's email should say which   an inquiry from /terminy-a-ceny is somebody
  * who has just read the price list, and one from /kontakt usually is not.
  * Hidden rather than a field: it is metadata, not something to ask a guest.
  */
@@ -43,7 +43,7 @@ const odkud = Astro.url.pathname;
 ---
 
 {/*
-  TODO(worker): POPTAVKA_ENDPOINT is a placeholder — the Cloudflare Worker is
+  TODO(worker): POPTAVKA_ENDPOINT is a placeholder   the Cloudflare Worker is
   not written yet (worker/README.md). It must respond 303 to
   /kontakt/dekujeme on success and 303 back here with an error parameter on
   failure, so a no-JS browser follows both.
@@ -157,7 +157,7 @@ const odkud = Astro.url.pathname;
   </div>
 
   {/*
-    TODO(client) — LAUNCH-BLOCKING: this form emails personal data to the
+    TODO(client)   LAUNCH-BLOCKING: this form emails personal data to the
     owner and needs a GDPR line plus a link to how the data is handled.
     docs/01-content.md §9 item 14.
   */}
@@ -165,7 +165,7 @@ const odkud = Astro.url.pathname;
 
 <style>
   /*
-   * The card. Same shape as .card in global.css — hairline border, --radius-sm,
+   * The card. Same shape as .card in global.css   hairline border, --radius-sm,
    * a shallow shadow to lift it off the band behind it. Not the class itself:
    * .card has no shadow, and this one is the destination of the whole site.
    */
@@ -276,7 +276,7 @@ const odkud = Astro.url.pathname;
     border-color: var(--color-mosaz);
   }
 
-  /* The focus ring itself is the global :focus-visible rule — never overridden. */
+  /* The focus ring itself is the global :focus-visible rule   never overridden. */
   .control:focus-within .control-icon {
     color: var(--color-mosaz-tmava);
     opacity: 1;
@@ -294,7 +294,7 @@ const odkud = Astro.url.pathname;
   }
 
   /* ---- Checkbox --------------------------------------------------------
-   * Native input, restyled — not a hidden input with a fake box next to it, so
+   * Native input, restyled   not a hidden input with a fake box next to it, so
    * it keeps the native focus ring, the native tab stop and label semantics.
    */
   .check {

@@ -1,17 +1,17 @@
----
+﻿---
 /**
- * Where the cottage is — THE RESERVED SLOT, NOT AN EMBEDDED MAP.
+ * Where the cottage is   THE RESERVED SLOT, NOT AN EMBEDDED MAP.
  *
  * ---------------------------------------------------------------------------
  * ⚠ DO NOT PUT AN INTERACTIVE MAP IN HERE.
  *
  * docs/04-pages.md, `/kontakt` item 4, in as many words: "Static map image
- * linking out. **Not** an embedded interactive map — third-party bytes and a
+ * linking out. **Not** an embedded interactive map   third-party bytes and a
  * cookie problem for one pin."
  *
  * The old site embedded the Mapy.cz widget. That is roughly a third of a megabyte
  * of third-party JavaScript, a set of cookies this site would then owe a consent
- * banner for, and a live connection to Seznam on every page load — all to show a
+ * banner for, and a live connection to Seznam on every page load   all to show a
  * pin at a coordinate that fits in fourteen characters. The two things a guest
  * actually needs from it are the coordinate, so they can paste it into whatever
  * navigation they already use, and a link that opens a real map in a real map
@@ -19,13 +19,13 @@
  *
  * WHAT IS STILL MISSING is the static image: a screenshot of the valley with the
  * cottage marked, exported once, shipped as a WebP, wrapped in the link that is
- * already below. TODO(client) — it needs to come from the client or from a
+ * already below. TODO(client)   it needs to come from the client or from a
  * licensed map export; scraping a tile from Mapy.cz and shipping it is a
  * licensing problem, not a technical one. Until it arrives the panel is a real
  * panel with the real address, coordinates and link in it, not a grey rectangle
  * with "mapa" written on it.
  *
- * The coordinates are the ONLY copy of these numbers on the site — `SITE.gps` in
+ * The coordinates are the ONLY copy of these numbers on the site   `SITE.gps` in
  * src/data/site.ts. Never retype them into a page.
  */
 import IconLucide from '../IconLucide.astro';
@@ -42,7 +42,7 @@ const { class: className } = Astro.props;
 <div class:list={['mapa card', className]}>
   {/*
     TODO(client): the static map export goes here, as
-    <a href={mapyUrl}><Image src={mapa} alt="…" …/></a> — a photograph of a map,
+    <a href={mapyUrl}><Image src={mapa} alt="…" …/></a>   a photograph of a map,
     linked, with no script behind it. See the header of this file.
   */}
   <div class="mapa-plocha" aria-hidden="true">
@@ -90,7 +90,7 @@ const { class: className } = Astro.props;
   .mapa-plocha {
     display: grid;
     place-content: center;
-    /* 16:10 — the shape the export will be, so nothing reflows when it lands. */
+    /* 16:10   the shape the export will be, so nothing reflows when it lands. */
     aspect-ratio: 16 / 10;
     background-color: var(--color-kamen);
     border-bottom: 1px solid rgb(62 50 38 / 0.14);

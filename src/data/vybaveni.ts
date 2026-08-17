@@ -1,192 +1,143 @@
-/**
- * The amenity checklist, as data.
- *
- * docs/01-content.md §5.9 asks for the old site's five bullet lists to ship "as
- * structured data rather than five bullet lists". This is that: five groups,
- * every item typed, three of them carrying a flag that stops them being printed
- * as a plain tick.
+﻿/**
+ * The amenity checklist and the room descriptions for /ubytovani.
  *
  * ---------------------------------------------------------------------------
- * ⚠ THE `overit` FLAG IS A SAFETY MECHANISM, NOT A STYLE CHOICE.
+ * ⚠ THIS IS THE OLD SITE'S CONTENT, ON PURPOSE. DO NOT "IMPROVE" IT.
  *
- * Three items on the old list cannot be reproduced as bare ticks:
+ * An earlier pass rewrote these lists to follow docs/01-content.md §5.9  
+ * regrouped, reworded, entries dropped for being unverifiable. That was
+ * reverted by decision: **this rebuild changes the design, not the copy.** The
+ * five groups below, their order, and the wording of every entry are the ones
+ * from the 2019 `/ubytovani/` page. If an entry reads oddly, that is the
+ * client's own voice and it stays until the client asks otherwise.
  *
- *   - `bezbariérové ubytování` — LAUNCH-BLOCKING (docs/01-content.md §9 item 2).
- *     A two-storey cottage on a forested slope with two mezzanine bedrooms is
- *     claiming step-free access. If that is wrong, the wrong ends with a
- *     wheelchair user at a door they cannot get through. The ground floor does
- *     have a bedroom, a WC and a shower, so a narrower claim may well be true —
- *     but it has to be stated precisely, and nobody has stated it yet.
- *   - `domácí mazlíček povolen` — the amenity list says yes and the terms are
- *     silent on charges or limits (§9 item 12).
- *   - `sauna nebo infrasauna` — "sauna or infrared sauna" reads as though we do
- *     not know which one we own. It is an outdoor wood-fired sauna; §5.9 says to
- *     say so, and this file does.
+ * Three things WERE changed, and each is a typo fix rather than an edit:
+ * `poskutuje` → `poskytuje`, `koupena` → `koupelna` (twice). They are listed in
+ * docs/01-content.md §1 as spelling errors on the live site.
  *
- * An item with `overit` renders with its caveat next to it, never as a tick on
- * its own. A page that drops the caveat has reintroduced the problem.
+ * The one substantive departure is `overit` on the accessibility entry, and it
+ * is argued in place below.
  * ---------------------------------------------------------------------------
- *
- * The old `Možnosti zábavy v okolí` group — bike hire, riding school, tennis
- * courts, golf course — is NOT here. It is third-party, undated, distance-free
- * and last verified in 2019 (§5.9, §9 item 20): "A bare list with no distances is
- * close to useless anyway; give each a distance or drop it." Dropped from the
- * cottage's own amenity list, where it never belonged; what survives of it lives
- * in src/data/okoli.ts with the rest of the surroundings.
  */
 import type { LucideName } from '../components/IconLucide.astro';
 
 export interface VybaveniPolozka {
   nazev: string;
   /**
-   * Present only where the item is not simply true. Renders as a caveat beside
-   * the item — never suppressed, never turned back into a plain tick.
+   * Present only where the entry cannot stand as a bare tick. Renders as a
+   * caveat beside the item   never suppressed, never turned back into a tick.
    */
   overit?: string;
 }
 
 export interface VybaveniSkupina {
   klic: string;
+  /** The old site's own group heading, verbatim. */
   nazev: string;
   icon: LucideName;
   polozky: VybaveniPolozka[];
 }
 
+/**
+ * `Přehled vybavení`   the five lists from the old `/ubytovani/`, in the old
+ * order, with the old wording.
+ *
+ * Design note: they were five bulleted columns of plain text and they are still
+ * five columns here. The change is typographic   a tick glyph, a group icon,
+ * real columns instead of a three-across float   not editorial.
+ */
 export const VYBAVENI: VybaveniSkupina[] = [
   {
     klic: 'obecne',
     nazev: 'Obecně',
     icon: 'info',
     polozky: [
-      { nazev: 'Wi-Fi a internet' },
-      { nazev: 'Nekuřácký objekt' },
-      { nazev: 'Společenská místnost' },
+      { nazev: 'domácí mazlíček povolen' },
+      { nazev: 'wifi, internet' },
+      { nazev: 'nekuřácký objekt' },
+      { nazev: 'společenská místnost' },
       {
-        nazev: 'Domácí mazlíček po domluvě',
-        // TODO(client) — docs/01-content.md §9 item 12.
-        overit: 'Napište nám předem, jaké zvíře a kolik jich bude.',
-      },
-      {
-        nazev: 'Přízemí bez schodů',
-        // TODO(client) — LAUNCH-BLOCKING, docs/01-content.md §9 item 2.
-        overit:
-          'V přízemí je ložnice, WC i sprchový kout. Bezbariérovost celého objektu zatím nepotvrzujeme — ozvěte se a domluvíme se konkrétně.',
+        nazev: 'bezbariérové ubytování',
+        /*
+         * ⚠ THE ONE ENTRY THAT IS NOT REPRODUCED AS A BARE TICK, AND THE ONLY
+         * DEPARTURE FROM "COPY THE OLD SITE" IN THIS FILE.
+         *
+         * docs/01-content.md §9 item 2 lists it as launch-blocking, and the
+         * reason is not editorial. This is a two-storey building on a forested
+         * slope whose two upper bedrooms are mezzanines reached by a ladder
+         * stair. If the blanket claim is wrong, the way that goes wrong is a
+         * wheelchair user arriving at a door they cannot get through, having
+         * driven three hours on the strength of one word on this page.
+         *
+         * The ground floor genuinely does have a bedroom, a WC and a shower, so
+         * a narrower claim is probably true   but nobody has yet said which. So
+         * the entry stays, with one sentence next to it inviting the question.
+         * Delete the sentence the day the client answers, not before.
+         */
+        overit: 'Ozvěte se nám prosím předem   domluvíme se podle vašich potřeb.',
       },
     ],
   },
   {
     klic: 'vnitrni',
-    nazev: 'Uvnitř',
+    nazev: 'Vnitřní vybavení',
     icon: 'sofa',
     polozky: [
-      { nazev: 'Krb a krbová kamna' },
-      { nazev: 'Televize se satelitním příjmem' },
-      { nazev: 'Plně vybavená kuchyně' },
-      { nazev: 'Trouba a varná deska' },
-      { nazev: 'Lednice' },
-      { nazev: 'Myčka nádobí' },
-      { nazev: 'Mikrovlnná trouba' },
-      { nazev: 'Kávovar a rychlovarná konvice' },
-      { nazev: 'Pračka a sušička' },
-      { nazev: 'Sprchový kout' },
-      { nazev: 'Vana' },
+      { nazev: 'krb / krbová kamna' },
+      { nazev: 'televize' },
+      { nazev: 'přehrávač' },
+      { nazev: 'satelitní příjem' },
+      { nazev: 'rychlovarná konvice' },
+      { nazev: 'lednička' },
+      { nazev: 'myčka nádobí' },
+      { nazev: 'mikrovlnná trouba' },
+      { nazev: 'pračka' },
+      { nazev: 'sprchový kout' },
+      { nazev: 'vana' },
+      { nazev: 'sauna nebo infrasauna' },
+      { nazev: 'hot tube' },
     ],
   },
   {
     klic: 'venkovni',
-    nazev: 'Venku',
+    nazev: 'Venkovní vybavení',
     icon: 'tent-tree',
     polozky: [
-      { nazev: 'Krytá terasa s venkovním krbem' },
-      { nazev: 'Horní otevřená terasa' },
-      {
-        nazev: 'Venkovní dřevem vytápěná sauna',
-        // §5.9 REWRITE: `sauna nebo infrasauna` reads as not knowing which we own.
-        overit: 'Za poplatek — 1 000 Kč/den nebo 3 000 Kč/týden, společně s vířivkou.',
-      },
-      { nazev: 'Vířivka pod širým nebem' },
-      { nazev: 'Jezírko' },
-      { nazev: 'Ohniště a gril' },
-      { nazev: 'Zahradní nábytek' },
-      { nazev: 'Houpačky a skluzavka' },
+      { nazev: 'terasa' },
+      { nazev: 'krb' },
+      { nazev: 'zahradní nábytek' },
+      { nazev: 'ohniště' },
+      { nazev: 'gril' },
     ],
   },
   {
     klic: 'okoli',
-    nazev: 'Pozemek a okolí',
+    nazev: 'Okolí chalupy',
     icon: 'trees',
     polozky: [
-      { nazev: 'Parkování u objektu pro 4 auta' },
-      { nazev: 'Vlastní příjezdová cesta' },
-      { nazev: 'Zahrada a travnatá plocha' },
-      { nazev: 'Potok podél pozemku' },
-      { nazev: 'Les 10 metrů za chalupou' },
+      { nazev: 's parkováním' },
+      { nazev: 'se zahradou' },
+      { nazev: 'travnatá plocha' },
+      { nazev: 'u potoku' },
+      { nazev: 'u lesa' },
     ],
   },
   {
-    klic: 'vytapeni',
-    nazev: 'Vytápění',
-    icon: 'thermometer-sun',
+    klic: 'zabava',
+    nazev: 'Možnosti zábavy v okolí',
+    icon: 'bike',
     polozky: [
-      { nazev: 'Peletkový kotel' },
-      { nazev: 'Krbová vložka na dřevo' },
-      { nazev: 'Akumulační nádrž s elektrickými spirálami' },
-      { nazev: 'Horkovzdušné rozvody do horních ložnic' },
+      { nazev: 'půjčovna kol' },
+      { nazev: 'přírodní koupání' },
+      { nazev: 'koupaliště nebo bazén' },
+      { nazev: 'cykloturistika' },
+      { nazev: 'jízdárna' },
+      { nazev: 'tenisové kurty' },
+      { nazev: 'golfové hřiště' },
+      { nazev: 'rybaření' },
     ],
   },
 ];
-
-/* ---- The rooms ---------------------------------------------------------- */
-
-export interface Loznice {
-  nazev: string;
-  patro: string;
-  kapacita: string;
-  /** Number of people, for the total. */
-  osob: number;
-  poznamka?: string;
-}
-
-/**
- * ⚠ THE CAPACITY CONFLICT, AND WHY THESE NUMBERS AND NOT THE OTHER ONES.
- *
- * The old `/ubytovani/` prose gives per-room ranges that total up to NINETEEN
- * against a stated house maximum of fifteen (docs/01-content.md §5.3, §9 item 1 —
- * launch-blocking). The site plan graphic gives 2 / 2+3 / 6+2 = 15, which agrees
- * with the brief and with every other page.
- *
- * Fifteen is authoritative until the client says otherwise. These are the site
- * plan's numbers. Do not "restore" the ranges from the old prose; they are the
- * source of the conflict, not a second opinion on it.
- *
- * Floor naming: `přízemí` / `patro` throughout. The old site used `1. NP`/`2. NP`
- * in one section and `prvním patře`/`druhém patře` in the next for the same two
- * floors (§5.4). One scheme, and this is it.
- */
-export const LOZNICE: Loznice[] = [
-  {
-    nazev: 'Ložnice v přízemí',
-    patro: 'Přízemí',
-    kapacita: '2 osoby',
-    osob: 2,
-    poznamka: 'Sousedí přímo s krytou terasou.',
-  },
-  {
-    nazev: 'Menší mezonetová ložnice',
-    patro: 'Patro',
-    kapacita: '2 + 3 osoby',
-    osob: 5,
-    poznamka: 'Má vlastní vstup na otevřenou terasu.',
-  },
-  {
-    nazev: 'Větší mezonetová ložnice',
-    patro: 'Patro',
-    kapacita: '6 + 2 osoby',
-    osob: 8,
-  },
-];
-
-export const LUZEK_CELKEM = LOZNICE.reduce((n, l) => n + l.osob, 0);
 
 /* ---- Bathrooms ---------------------------------------------------------- */
 
@@ -195,18 +146,36 @@ export interface Zarizeni {
   polozky: string[];
 }
 
-/** §5.4, with `koupena` → `koupelna` fixed twice (error #8). */
+/**
+ * `Sociální zařízení`, from the old page's own paragraph:
+ *
+ *   "V prvním patře je jedno samostatné WC, dále koupelna se sprchovým koutem,
+ *    umyvadlem a zrcadlem a žebříkovým topením. V druhém patře je opět
+ *    samostatné WC, koupelna s prostornou vanou, umyvadlem a žebříkovým
+ *    topením."
+ *
+ * Split into two labelled lists rather than reworded. Every noun below appears
+ * in that sentence; nothing has been added and nothing dropped. A reader
+ * comparing two floors should not have to hold a 40-word sentence in their head
+ * to do it   that is a layout problem, and this is the layout fix.
+ *
+ * `koupena` → `koupelna` in both places (docs/01-content.md §1 error #8).
+ */
 export const SOCIALNI_ZARIZENI: Zarizeni[] = [
   {
-    patro: 'Přízemí',
-    polozky: ['Samostatné WC', 'Koupelna se sprchovým koutem, umyvadlem a žebříkovým topením'],
-  },
-  {
-    patro: 'Patro',
+    patro: 'První patro',
     polozky: [
       'Samostatné WC',
-      'Koupelna s prostornou vanou, umyvadlem a žebříkovým topením',
-      'Prací a sušicí kout',
+      'Koupelna se sprchovým koutem, umyvadlem a zrcadlem',
+      'Žebříkové topení',
+    ],
+  },
+  {
+    patro: 'Druhé patro',
+    polozky: [
+      'Samostatné WC',
+      'Koupelna s prostornou vanou a umyvadlem',
+      'Žebříkové topení',
     ],
   },
 ];
