@@ -86,6 +86,13 @@ const NBSP = ' ';
       aria-label="Ilustrovaná mapa okolí   na malé obrazovce ji lze posouvat do stran"
     >
       <div class="mapa-plate">
+        {/*
+          `quality` below is 68, and it must stay 68 as long as Okoli.astro on
+          the homepage also renders situace1-1.webp at 68. Quality is part of the
+          asset hash, so the same map at two different qualities is two complete
+          sets of variants built and deployed, for a difference measured at
+          0.16 dB. If you change one, change both.
+        */}
         <Image
           src={mapa}
           alt="Ilustrovaný letecký snímek okolí chalupy Heřmanka v Heřmanicích u Králík s vyznačenými destinacemi: Polsko a Międzygórze na severu se sjezdovkami 30–60 minut, hora Klepáč 1145 m n. m. jako rozvodí do trojice evropských moří, Králický Sněžník 1423 m n. m. nejvyšší hora Čech s pramenem řeky Moravy, lyžařské středisko Dolní Morava se Stezkou v oblacích a Sky Bridge 721, barokní klášter Hedeč mariánské poutní místo a město Králíky"
@@ -94,7 +101,7 @@ const NBSP = ' ';
           width={1280}
           height={958}
           format="webp"
-          quality={72}
+          quality={68}
           loading="lazy"
         />
       </div>

@@ -8,8 +8,13 @@
  *
  * DESIGN: the split again, mirrored   media-LEFT this time, because the section
  * above is media-right and alternating sides down the page is the rule
- * (docs/02-design-system.md §3). The photograph is the covered terrace with its
- * outdoor fireplace, which is what the third paragraph is about.
+ * (docs/02-design-system.md §3). UPDATE: the photograph is now the living room
+ * (obyvak, DSC_4579-scaled-1-1.jpg), matching the first and most substantial
+ * paragraph ("Obývací pokoj je vybaven krbem, stolem, koženou sedačkou a
+ * velkou plochou TV..."). It used to be the covered terrace, which only the
+ * third and shortest paragraph is about; Loznice.astro's split-media above
+ * took a bedroom photo instead, which freed this one up for the room its own
+ * copy actually opens on.
  *
  * ---------------------------------------------------------------------------
  * THE OVERVIEW WAS FIVE COLUMNS OF PLAIN TEXT AND IT STILL IS.
@@ -27,9 +32,9 @@
  * content decisions.
  */
 import { Image } from 'astro:assets';
-import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import IconLucide from '../../IconLucide.astro';
-import SprigDivider from '../../decor/SprigDivider.astro';
+import RoofDivider from '../../decor/RoofDivider.astro';
 import { VYBAVENI } from '../../../data/vybaveni';
 ---
 
@@ -37,19 +42,18 @@ import { VYBAVENI } from '../../../data/vybaveni';
   <div class="split split--media-left">
     <div class="split-media">
       {/*
-        ⚠ This file is only 1000 �  667. It must never be asked for a variant
-        wider than 1000   Astro will not upscale, and a soft photograph is worse
-        than a small one. Half of a 1280 container is 640, so the split is
-        exactly where this image still holds up. docs/01-content.md §10 lists a
-        replacement shot as the most valuable photograph the site could be given.
+        UPDATE: this was zastrwsena-veranda-krb-14e3-.jpeg, 1000 x 667   the
+        "replacement shot" docs/01-content.md §10 called the most valuable
+        photograph the site could be given. It has arrived (DSC_5192.webp,
+        3096 x 2064, the same terrace and fireplace) and now renders here.
       */}
       <Image
-        src={terasa}
-        alt="Krytá terasa chalupy Heřmanka s venkovním zděným krbem, dřevěným stolem a proutěnými křesly, v pozadí les"
-        widths={[500, 750, 1000]}
+        src={obyvak}
+        alt="Obývací pokoj chalupy Heřmanka s krbem, koženou sedačkou a dlouhým jídelním stolem pod dřevěným trámovým stropem"
+        widths={[500, 750, 1000, 1500]}
         sizes="(min-width: 64rem) 50vw, 100vw"
-        width={1000}
-        height={667}
+        width={1920}
+        height={1282}
         format="webp"
         quality={68}
         loading="lazy"
@@ -80,8 +84,7 @@ import { VYBAVENI } from '../../../data/vybaveni';
   </div>
 
   <div class="wrap prehled">
-    {/* Chamomile here, bilberry in the section above   see the note there. */}
-    <SprigDivider rostlina="hermanek" class="prehled-divider" />
+    <RoofDivider class="prehled-divider" />
 
     <h3 id="prehled-nadpis" data-reveal="up">Přehled vybavení</h3>
 
@@ -138,6 +141,41 @@ import { VYBAVENI } from '../../../data/vybaveni';
   /* `p` has no margin in global.css by design   see the note in Loznice.astro. */
   .split-body p {
     margin-top: 1.25rem;
+  }
+
+  /*
+   * ---- Photo bleed, media-left only -------------------------------------
+   *
+   * The photograph runs taller than the text beside it and overflows the
+   * row itself, top and bottom   so it reads as the bigger of the two halves
+   * instead of matching the text column's height like every other split on
+   * the page. Desktop only, same threshold as the rest of the split
+   * (docs/02-design-system.md's two-column split activates at 64rem); below
+   * that the two stack and there is no row height to break out of.
+   *
+   * Taking the photo out of flow with `position: absolute` is what makes the
+   * overflow possible: a grid item sized by `min-height` still gets clamped
+   * to the row's own height, but an absolutely positioned box with `top` and
+   * `bottom` both set is sized directly from its containing block, ignoring
+   * the row entirely. `.split-body` needs `grid-column: 2` because it is now
+   * the only item left in flow, and a lone grid item auto-places into the
+   * first column, not the second.
+   */
+  @media (width >= 64rem) {
+    .split {
+      position: relative;
+    }
+
+    .split-media {
+      position: absolute;
+      inset-block: -3rem;
+      inset-inline-start: 0;
+      width: 50%;
+    }
+
+    .split-body {
+      grid-column: 2;
+    }
   }
 
   /* ---- Přehled vybavení ------------------------------------------------ */

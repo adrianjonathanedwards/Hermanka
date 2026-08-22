@@ -45,7 +45,7 @@
 import type { ImageMetadata } from 'astro';
 
 import exterier from '@img/header-bg-02.webp';
-import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+import terasa from '@img/DSC_5192.webp';
 import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import virivka from '@img/DSC_4684-scaled-1.jpg';
 import zahrada from '@img/DSC_5166-scaled-1-1.jpg';
@@ -90,10 +90,13 @@ export interface HeroSlide {
  * is actually buying; then the hot tub and the garden, which are what the
  * children are.
  *
- * TODO(client): `zastrwsena-veranda` is only 1000 �  667, so slide two is soft on
- * a large screen   Astro will not upscale, and it should not. A replacement
- * shot of the covered terrace at 1920 wide is the single most valuable new
- * photograph this site could be given. docs/01-content.md §10.
+ * UPDATE: slide two used to be `zastrwsena-veranda-krb-14e3-.jpeg`, 1000 x 667
+ * and soft on a large screen   Astro will not upscale, and it should not. That
+ * file is exactly the "replacement shot of the covered terrace at 1920 wide"
+ * docs/01-content.md §10 called "the single most valuable new photograph this
+ * site could be given", and it has now arrived: `DSC_5192.webp`, 3096 x 2064 of
+ * the same terrace and fireplace. It replaces the old file here and everywhere
+ * else it was used on the site.
  */
 export const HERO_SLIDES: HeroSlide[] = [
   {
@@ -104,7 +107,7 @@ export const HERO_SLIDES: HeroSlide[] = [
   },
   {
     src: terasa,
-    alt: 'Krytá terasa s venkovním zděným krbem a posezením pro celou skupinu, za zábradlím les',
+    alt: 'Krytá terasa s venkovním zděným krbem a skleněným stolem s proutěnými židlemi, za zábradlím les',
     caption: 'Krytá terasa s krbem',
     position: 'center 60%',
   },

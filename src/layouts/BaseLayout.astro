@@ -29,8 +29,14 @@ interface Props {
   heroPreload?: { src: string; srcset?: string; sizes?: string };
   /**
    * Social share image. Absolute or site-root path.
-   * TODO: /og-default.webp does not exist yet   it needs a 1200� 630 crop once
-   * the photography is chosen (docs/01-content.md §10).
+   *
+   * `/og-default.jpg` is a 1200x630 crop of the hero photograph, generated into
+   * public/ (it is a fixed asset, not an astro:assets import   a share card has
+   * to live at a stable URL that a scraper can fetch without parsing HTML).
+   *
+   * JPEG on purpose. Facebook, X, LinkedIn, Slack and Discord all read WebP now;
+   * WhatsApp still does not reliably, and a share card that silently fails on the
+   * one channel a Czech guest is most likely to use is not worth the 40 kB.
    */
   ogImage?: string;
   /** Set true on pages that must not be indexed. */
@@ -50,7 +56,7 @@ const {
   title,
   description,
   heroPreload,
-  ogImage = '/og-default.webp',
+  ogImage = '/og-default.jpg',
   noindex = false,
   headerSolid = false,
 } = Astro.props;
@@ -136,21 +142,33 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
+    {/* Dimensions let a scraper reserve the card before it has fetched the file,
+        and stop Facebook falling back to a small summary card on a slow crawl. */}
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t('site.name')} />
     <meta name="twitter:card" content="summary_large_image" />
 
     {/*
       The client's own favicon, copied from img/cropped-favicon-1-32x32.png.
 
-      It is listed ALONE and deliberately. A browser offered both this and an SVG
-      picks the SVG wherever it can, so leaving the old one in place would have
-      meant the client's icon never rendering in the browsers that matter.
-      public/favicon.svg is now unreferenced and safe to delete.
+      It is listed ALONE among the *tab* icons and deliberately. A browser offered
+      both this and an SVG picks the SVG wherever it can, so leaving one in place
+      would have meant the client's icon never rendering in the browsers that
+      matter. The mark's SVG source now lives in src/assets/icon/ instead of
+      public/, so it is no longer served at all.
 
-      32� 32 is the only size supplied, so there is no apple-touch-icon (that
-      wants 180� 180) and it will be resampled on a high-DPI tab. A 180 px source
-      would fix both.
+      The apple-touch-icon is a different slot   iOS never uses `rel=icon`   so
+      there is no conflict. It is generated at 180� 180 by tools/build-icons.mjs
+      from that same SVG, flattened onto --color-les because iOS composites a
+      transparent icon onto black.
+
+      ⚠ favicon.png is 32� 32 and the mark is dark on transparent, so it is
+      near-invisible in a dark tab strip. Replacing it needs a light-on-dark
+      source from the client   see tools/build-icons.mjs.
     */}
     <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#16241C" />
 
     {/*

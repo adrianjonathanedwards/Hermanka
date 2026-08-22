@@ -33,11 +33,12 @@ import Icon from './Icon.astro';
   <figure class="lightbox-figure">
     {/*
       `alt` is filled in from the trigger's thumbnail when the dialog opens, so
-      the description is written once, in the gallery data, and never twice.
+      the description lives once, in the gallery data, on the <img> itself   not
+      repeated as visible text underneath it. A screen reader announces the alt
+      when the image receives focus; there is nothing sighted-only about it.
     */}
     <img class="lightbox-img" alt="" width="1600" height="1067" />
     <figcaption class="lightbox-caption">
-      <span class="lightbox-text"></span>
       <span class="lightbox-count tabular"></span>
     </figcaption>
   </figure>

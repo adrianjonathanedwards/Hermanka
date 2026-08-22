@@ -1,74 +1,37 @@
-﻿---
+---
 /**
  * Lyžování v okolí   nearby ski areas.
  *
- * Rewrites docs/01-content.md §7.3: "REWRITE   same treatment. Distances and
- * drive times." Most distances are not available yet.
- *
  * DATA: src/data/okoli.ts LYZOVANI. Only the first entry (Dolní Morava) has a
- * verified distance   it is the one in the distance table (§5.2). The remaining
- * six entries have vzdalenost: null and cas: null and will stay that way until
- * the client supplies the figures.
+ * verified distance   it is the one in the distance table (§5.2 of
+ * docs/01-content.md). The remaining six entries have vzdalenost: null and
+ * cas: null and stay that way until the client supplies figures (§9 item 21).
  *
- * TODO(client)   docs/01-content.md §9 item 21: distances for the remaining ski
- * areas. Once they arrive, add vzdalenost and cas to each entry in LYZOVANI in
- * src/data/okoli.ts, and this section becomes seven rows of the catalogue shape
- * OkoliVylety.astro uses rather than one statement and a run of names.
+ * Same shape as OkoliKoupani.astro on purpose: a bordered "here is a verified
+ * place" block built from OkoliMistoKarta, then a footnote run of the
+ * unmeasured names built from OkoliDalsiSeznam. Two sections about "nearby
+ * things with mostly-missing distances" now look like one system instead of
+ * two different attempts at the same problem.
  *
- * ---------------------------------------------------------------------------
- * WHY ONE BIG LINE AND A RUN OF NAMES
- *
- * This section has been a bordered panel and then a two-column split, and the
- * honest description of its content defeats both: it is ONE ski area anybody can
- * plan around, and six place names nobody has measured. A panel gives the six
- * names a container that implies they are data. A split gives them a column,
- * which implies they are half the section.
- *
- * They are a footnote. So Dolní Morava is set as a single statement across the
- * full measure   the name in the display face, the two figures under it at the
- * size of a heading, because on a page whose entire argument is distances those
- * two numbers ARE the content   and the six others are a plain run separated by
- * middots, the way a guidebook sets a list of names it has nothing further to say
- * about. The run is deliberately not a list with rules and marks: rules and marks
- * would be columns, and columns are a promise of data in each one.
- *
- * It is also the one section on this page with no repeating unit at all. Between
- * a catalogue of six rows above and a pair of figures plus ten names below, the
- * page needs one beat that is a single object.
- *
- * ---- THE TILE, AT THREE SCALES ----
- * OkoliVylety.astro pairs every row with a photo-or-icon tile (OkoliMedia.astro).
- * The same idea repeats here at the scale this section's content earns it: a
- * large tile beside the one statement   a real photograph, the only one on the
- * page usable for a ski area   and a small inline snowflake before each of the
- * six unmeasured names, never a tile of their own. A tile per unmeasured name
- * would be six placeholders in a row, which is the bordered-panel mistake again
- * in icon form; one mark per name is the same footnote treatment the middots
- * already give them, just with something to look at as well as read.
- *
- * WHY --jinovatka FOR THIS SECTION
- * docs/02-design-system.md §1 reserves --jinovatka as a WINTER ACCENT ONLY  
- * ski content, snow content, and the cold months of the calendar. The design
- * system is explicit that this is one of the very few places it may appear.
- * A full section background reads as a clear, immediate visual signal: "this
- * is the ski section." No other section on this page may use this colour.
- *
- * Contrast on --jinovatka:
- *   --les text:        12.17:1  (the statement, the run of names)
- *   --kura text:        9.39:1  (descriptions, the note)
- *   --mosaz-tmava text: 4.81:1  (headings, figures)   passes the 4.5:1 floor ✓
- *
- * Band: --jinovatka. Follows --omitka (vylety) and precedes --kamen (koupani).
+ * Band: --jinovatka, docs/02-design-system.md §1's WINTER ACCENT ONLY colour.
+ * Follows --omitka (vylety) and precedes --kamen (koupani).
  */
 import { LYZOVANI } from '../../../data/okoli';
-import IconLucide from '../../IconLucide.astro';
-import OkoliMedia from './OkoliMedia.astro';
+import OkoliMistoKarta from './OkoliMistoKarta.astro';
+import OkoliDalsiSeznam from './OkoliDalsiSeznam.astro';
 
 /* U+00A0   non-breaking space. */
 const NBSP = ' ';
 
 /* The first entry is the only one with a verified distance. */
 const [dolniMorava, ...ostatni] = LYZOVANI;
+
+const fakta = [
+  ...(dolniMorava.vzdalenost ? [{ hodnota: dolniMorava.vzdalenost, popis: 'vzdušnou čarou' }] : []),
+  ...(dolniMorava.cas ? [{ hodnota: dolniMorava.cas, popis: 'autem z chalupy' }] : []),
+];
+
+const popis = `Deset kilometrů sjezdovek s umělým zasněžováním, Stezka${NBSP}v oblacích, Sky Bridge${NBSP}721, bobová dráha a dětské zábavní areály.`;
 ---
 
 <section class="lyzovani section" aria-labelledby="lyzovani-nadpis">
@@ -77,76 +40,29 @@ const [dolniMorava, ...ostatni] = LYZOVANI;
       <h2 id="lyzovani-nadpis">Lyžování v okolí</h2>
     </header>
 
-    {/* ---- The one area anybody can plan around ---- */}
     <div class="lyzovani-hlavni" data-reveal>
-      <OkoliMedia icon="cable-car" foto={dolniMorava.foto} class="lyzovani-media" />
-
-      <div class="lyzovani-hlavni-text">
-        <p class="lyzovani-stitek">
-          <IconLucide name="cable-car" size={16} />
-          <span>Nejbližší středisko</span>
-        </p>
-
-        <h3 class="lyzovani-nazev">{dolniMorava.nazev}</h3>
-
-        {/*
-          The figures, set at heading size and side by side under a brass rule.
-          Not `aria-hidden`: `9 km vzdušnou čarou` and `12 min autem` are the only
-          place in this section those two facts are stated, so hiding them would
-          delete them from the accessibility tree. It is a real definition list.
-        */}
-        {(dolniMorava.vzdalenost || dolniMorava.cas) && (
-          <dl class="lyzovani-fakta">
-            {dolniMorava.vzdalenost && (
-              <div>
-                <dt>{dolniMorava.vzdalenost}</dt>
-                <dd>vzdušnou čarou</dd>
-              </div>
-            )}
-            {dolniMorava.cas && (
-              <div>
-                <dt>{dolniMorava.cas}</dt>
-                <dd>autem z chalupy</dd>
-              </div>
-            )}
-          </dl>
-        )}
-
-        <p class="lyzovani-popis">
-          Deset kilometrů sjezdovek s umělým zasněžováním, Stezka{NBSP}v oblacích, Sky
-          Bridge{NBSP}721, bobová dráha a dětské zábavní areály.
-        </p>
-      </div>
+      <OkoliMistoKarta
+        icon="cable-car"
+        foto={dolniMorava.foto}
+        stitek="Nejbližší středisko"
+        nazev={dolniMorava.nazev}
+        fakta={fakta}
+        popis={popis}
+      />
     </div>
 
-    {/* ---- The rest: names, and honestly nothing else ---- */}
-    {ostatni.length > 0 && (
-      <div class="lyzovani-ostatni" data-reveal>
-        <h3 class="lyzovani-ostatni-nadpis">Další střediska v okolí</h3>
-        <p class="lyzovani-ostatni-pozn">
-          Vzdálenosti k těmto střediskům zatím nejsou ověřeny, a proto zde nejsou uvedeny.
-        </p>
-        {/*
-          A run, not a list with rules and marks. See the header comment: giving
-          six unmeasured place names a column each promises a figure in every one
-            a tile each would be the same mistake in icon form. One small
-          snowflake per name is the supporting mark this run gets instead.
-
-          It is still a <ul>   it is a list, and a screen reader should say so and
-          count it. The snowflake is `aria-hidden`; the middots are `::before`
-          content on `li + li`, so neither is announced, and the accessibility
-          tree hears six plain names.
-        */}
-        <ul class="lyzovani-run" role="list">
-          {ostatni.map((s) => (
-            <li>
-              <IconLucide name="snowflake" size={13} class="lyzovani-run-ikona" />
-              <span>{s.nazev}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
+    {
+      ostatni.length > 0 && (
+        <OkoliDalsiSeznam
+          class="lyzovani-dalsi"
+          icon="snowflake"
+          nadpis="Další střediska v okolí"
+          poznamka="Vzdálenosti k těmto střediskům zatím nejsou ověřeny, a proto zde nejsou uvedeny."
+          polozky={ostatni.map((s) => s.nazev)}
+          data-reveal
+        />
+      )
+    }
   </div>
 </section>
 
@@ -160,181 +76,24 @@ const [dolniMorava, ...ostatni] = LYZOVANI;
     background-color: var(--color-jinovatka);
   }
 
-  h2,
-  h3 {
+  h2 {
     /* --mosaz-tmava on --jinovatka = 4.81:1   the tightest passing case here. */
     color: var(--color-mosaz-tmava);
   }
 
-  /* ---- The statement -----------------------------------------------------
-   *
-   * A flex pair from the smallest viewport up   tile then text   same motif as
-   * `.vylety-radek`'s tile-plus-body, at a scale that matches this section's one
-   * object. `align-items: flex-start` keeps the tile pinned to the top when the
-   * text block grows taller than it on a phone.
-   */
   .lyzovani-hlavni {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
     margin-top: 2.5rem;
     padding-top: 2rem;
     border-top: 2px solid var(--color-mosaz);
   }
 
-  .lyzovani-media {
-    width: 5.5rem;
-  }
-
-  @media (width >= 48rem) {
-    .lyzovani-media {
-      width: 8rem;
-    }
-  }
-
-  @media (width >= 64rem) {
-    .lyzovani-media {
-      width: 10rem;
-    }
-  }
-
-  .lyzovani-hlavni-text {
-    flex: 1;
-    min-width: 0;
-  }
-
-  /*
-   * A label rather than a heading: it says which of the seven areas this is,
-   * which the name alone does not. Caption size, brass, uppercase tracking   the
-   * one place on the page it appears, so it reads as a tag on a single object
-   * rather than as a section eyebrow the site stamps on everything.
-   */
-  .lyzovani-stitek {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: var(--text-caption);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    /* --mosaz-tmava on --jinovatka = 4.81:1 */
-    color: var(--color-mosaz-tmava);
-  }
-
-  .lyzovani-nazev {
-    margin-top: 0.75rem;
-    font-size: var(--text-title-m);
-    line-height: 1.15;
-    max-width: 20ch;
-    /* --les on --jinovatka = 12.17:1 */
-    color: var(--color-les);
-  }
-
-  @media (width >= 64rem) {
-    .lyzovani-nazev {
-      /* The section's one object, at the size of a page heading. There is no h2
-         competing with it   `Lyžování v okolí` sits above the rule at title-l and
-         this is the thing under it. */
-      font-size: var(--text-title-l);
-    }
-  }
-
-  .lyzovani-fakta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem 3.5rem;
-    margin: 1.75rem 0 0;
-  }
-
-  .lyzovani-fakta dt {
-    font-family: var(--font-display);
-    font-weight: var(--font-weight-semibold);
-    font-size: var(--text-title-m);
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-mosaz-tmava);
-  }
-
-  .lyzovani-fakta dd {
-    margin: 0.35rem 0 0;
-    font-size: var(--text-caption);
-    line-height: 1.4;
-    /* --kura on --jinovatka = 9.39:1 */
-    color: var(--color-kura);
-  }
-
-  .lyzovani-popis {
-    margin-top: 1.75rem;
-    font-size: var(--text-lead);
-    max-width: 46ch;
-    color: var(--color-kura);
-  }
-
-  /* ---- The footnote ------------------------------------------------------ */
-
-  .lyzovani-ostatni {
-    margin-top: 3.5rem;
+  /* A hairline, not the 2px brass rule above: this list is subordinate to the
+     verified card, and the weight of the rule is what says so.
+     ⚠ Matches via the cid `OkoliDalsiSeznam` forwards onto its own root
+     through `...rest`   see the note in that file. No :global() needed. */
+  .lyzovani-dalsi {
+    margin-top: 3rem;
     padding-top: 1.75rem;
-    /* A hairline, not the 2px brass rule above: this is subordinate to the
-       statement, and the weight of the rule is what says so. */
     border-top: 1px solid rgb(22 36 28 / 0.14);
-  }
-
-  .lyzovani-ostatni-nadpis {
-    font-size: var(--text-title-s);
-  }
-
-  .lyzovani-ostatni-pozn {
-    margin-top: 0.5rem;
-    font-size: var(--text-caption);
-    max-width: 56ch;
-    /* --kura on --jinovatka = 9.39:1 */
-    color: var(--color-kura);
-  }
-
-  .lyzovani-run {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 1.25rem 0 0;
-    padding: 0;
-    list-style: none;
-    font-size: var(--text-lead);
-    /* --les on --jinovatka = 12.17:1 */
-    color: var(--color-les);
-  }
-
-  /*
-   * Each `<li>` is its own inline-flex row of icon + name, so the snowflake sits
-   * on the text baseline instead of stacking above it   `svg { display: block }`
-   * in global.css would otherwise drop it onto its own line.
-   */
-  .lyzovani-run li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-  }
-
-  .lyzovani-run-ikona {
-    flex: none;
-    /* --mosaz-tmava on --jinovatka = 4.81:1 */
-    color: var(--color-mosaz-tmava);
-  }
-
-  /*
-   * ⚠ The middot goes BEFORE each name after the first, never after each name
-   * before the last. It is inside the <li>, so it wraps with the name it belongs
-   * to: put it in `::after` and a wrapped line ends on a dangling brass dot with
-   * nothing following it, which reads as a typo. Leading it means a wrapped line
-   * begins with the mark, which reads as a continued list.
-   */
-  .lyzovani-run li + li::before {
-    content: '·';
-    margin-inline: 0 0.75em;
-    color: var(--color-mosaz);
-  }
-
-  .lyzovani-run li + li {
-    /* The gap the ::before does not provide on the left of the mark itself. */
-    margin-left: 0.75em;
   }
 </style>

@@ -180,9 +180,8 @@ function setUpLightbox(): void {
   if (!dialog || triggers.length === 0 || typeof dialog.showModal !== 'function') return;
 
   const img = dialog.querySelector<HTMLImageElement>('.lightbox-img');
-  const caption = dialog.querySelector<HTMLElement>('.lightbox-text');
   const counter = dialog.querySelector<HTMLElement>('.lightbox-count');
-  if (!img || !caption || !counter) return;
+  if (!img || !counter) return;
 
   let index = 0;
 
@@ -195,7 +194,6 @@ function setUpLightbox(): void {
     /* `data-lightbox` carries the large variant; the strip thumbnail is not it. */
     img.src = trigger.dataset.lightbox || source.currentSrc || source.src;
     img.alt = source.alt;
-    caption.textContent = source.alt;
     counter.textContent = `${index + 1} / ${triggers.length}`;
 
     if (withSwap && !reducedMotion.matches) {

@@ -21,15 +21,18 @@ import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import jidelna from '@img/DSC_5123-scaled-1-1.jpg';
 import virivka from '@img/DSC_4684-scaled-1.jpg';
 import houpacky from '@img/DSC_5166-scaled-1-1.jpg';
-import sauna from '@img/DSC_5204-scaled-1.jpg';
-import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+import sauna from '@img/DSC_5204.webp';
+import terasa from '@img/DSC_5192.webp';
 
 import Icon from '../Icon.astro';
 
 /**
- * TODO(client): the whole site runs on nine photographs and every one of them is
- * empty of people. A gallery of six is the most this asset set supports without
- * repetition. docs/01-content.md §10.
+ * UPDATE: a second batch of photographs arrived (see src/data/galerie.ts), so
+ * "the whole site runs on nine photographs" is no longer true. Six stays the
+ * count here anyway   this is a homepage TEASER, and a curated six that sends a
+ * curious guest on to `/galerie` for the rest is the point of a teaser, not a
+ * limitation of the asset set any more. `terasa` is the new, much larger
+ * DSC_5192.webp; the old zastrwsena-veranda-krb-14e3-.jpeg is retired.
  */
 const fotky = [
   { src: obyvak, alt: 'Obývací pokoj s krbem a dlouhým jídelním stolem pod dřevěným trámovým stropem' },
@@ -37,17 +40,23 @@ const fotky = [
   { src: virivka, alt: 'Dřevěná vířivka na terase obklopená lesem' },
   { src: houpacky, alt: 'Dřevěná houpačka se dvěma sedátky a zelenou skluzavkou na zatravněné zahradě' },
   { src: sauna, alt: 'Otevřené dveře do venkovní finské sauny s dřevěnými lavicemi' },
-  { src: terasa, alt: 'Krytá terasa s venkovním zděným krbem a posezením pro celou skupinu' },
+  { src: terasa, alt: 'Krytá terasa s venkovním zděným krbem a skleněným stolem pro celou skupinu' },
 ];
 
 /*
  * The large variant the lightbox loads. Generated at build time and referenced
  * from `data-lightbox`; nothing fetches it until a tile is actually opened, so
  * it costs bytes on disk and none on load.
+ *
+ * ⚠ `layout: 'none'` for the reason spelled out in src/pages/galerie.astro:
+ * getImage() inherits `image.layout: 'constrained'` from astro.config.mjs, and
+ * would otherwise render the whole responsive ladder per photograph for a srcset
+ * that is discarded   only `.src` is read below. Bytes on disk are still bytes
+ * someone has to deploy.
  */
 const velke = await Promise.all(
   fotky.map((f) =>
-    getImage({ src: f.src, width: 1600, format: 'webp', quality: 72 }),
+    getImage({ src: f.src, width: 1600, format: 'webp', quality: 72, layout: 'none' }),
   ),
 );
 

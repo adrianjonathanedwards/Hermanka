@@ -16,8 +16,13 @@
  * (docs/02-design-system.md §3)   this one is media-right, so the next section
  * is media-left.
  *
- * The photograph is the living room, because the first sentence of the copy is
- * about the living room. That is the whole rule for picture choice on this page.
+ * UPDATE: the photograph is now a bedroom, not the living room. `DSC_4614.webp`
+ * is the mezonetová ložnice itself, door to its own outdoor terrace visible in
+ * frame   the exact room the second paragraph describes ("Tato ložnice má
+ * vstup na venkovní nekrytou terasu"). A section titled `Ložnice a pokoje`
+ * showing a bedroom is the more direct match than the living room ever was;
+ * the living room photograph moved to Vybaveni.astro, where the copy is
+ * actually about it.
  *
  * ---------------------------------------------------------------------------
  * ⚠ TWO CONTRADICTIONS ARE REPRODUCED HERE ON PURPOSE. DO NOT SILENTLY FIX.
@@ -40,8 +45,9 @@
  *    the same place. That is a label, which is design.
  */
 import { Image } from 'astro:assets';
-import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
-import SprigDivider from '../../decor/SprigDivider.astro';
+import loznice from '@img/DSC_4614.webp';
+import RoofDivider from '../../decor/RoofDivider.astro';
+import IconLucide from '../../IconLucide.astro';
 import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
 ---
 
@@ -49,12 +55,12 @@ import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
   <div class="split split--media-right">
     <div class="split-media">
       <Image
-        src={obyvak}
-        alt="Obývací pokoj chalupy Heřmanka s krbem a dlouhým jídelním stolem pod dřevěným trámovým stropem, propojený s kuchyní"
+        src={loznice}
+        alt="Podkrovní mezonetová ložnice chalupy Heřmanka s trámovým stropem, žebříkem k patrové posteli a dveřmi na terasu"
         widths={[640, 960, 1280]}
         sizes="(min-width: 64rem) 50vw, 100vw"
-        width={1920}
-        height={1282}
+        width={1840}
+        height={1228}
         format="webp"
         quality={62}
         loading="lazy"
@@ -91,21 +97,27 @@ import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
     floor in their head while they read the other.
   */}
   <div class="wrap zarizeni">
-    {/*
-      Bilberry, not chamomile, and the two are alternated deliberately down the
-      page so the ornament reads as a pair of local plants rather than as one
-      motif stamped twice. BoruvkaSprig was drawn for the hero, lost its place
-      when the hero was stripped back, and had been sitting unused since.
-    */}
-    <SprigDivider rostlina="boruvka" class="zarizeni-divider" />
+    <RoofDivider class="zarizeni-divider" />
 
     <h3 id="zarizeni-nadpis" data-reveal="up">Sociální zařízení</h3>
 
+    {/*
+      The shower/bath icon is the one real difference between the floors
+      the copy says a shower on 1. NP and a tub on 2. NP   so it is what tells
+      the two cards apart at a glance, rather than a repeated generic mark.
+    */}
     <ul class="zarizeni-grid" role="list" data-reveal="up" data-reveal-delay="80">
       {
         SOCIALNI_ZARIZENI.map((z, i) => (
           <li class="card zarizeni-karta">
-            <p class="zarizeni-patro">{i === 0 ? '1. NP' : '2. NP'}</p>
+            <p class="zarizeni-patro">
+              <IconLucide
+                name={i === 0 ? 'shower-head' : 'bath'}
+                size={18}
+                class="zarizeni-ikona"
+              />
+              <span>{i === 0 ? '1. NP' : '2. NP'}</span>
+            </p>
             <ul role="list">
               {z.polozky.map((p) => <li>{p}</li>)}
             </ul>
@@ -171,8 +183,8 @@ import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
     margin: 1.5rem 0 0;
     padding: 0;
     list-style: none;
-    /* The measure rule still applies: two cards of short lines do not need the
-       full 1280, and at full width the pair reads as two distant columns. */
+    /* Two cards of short lines do not need the full 1280   at full width the
+       pair reads as two distant columns. */
     max-width: 48rem;
   }
 
@@ -184,11 +196,20 @@ import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
   }
 
   .zarizeni-patro {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-size: var(--text-caption);
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-mosaz-tmava);
+  }
+
+  .zarizeni-ikona {
+    flex: none;
+    /* An icon is a fill, so plain brass is correct here (§1.2). */
+    color: var(--color-mosaz);
   }
 
   .zarizeni-karta ul {

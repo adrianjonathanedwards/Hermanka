@@ -8,15 +8,14 @@
  * ---------------------------------------------------------------------------
  * WHY A TILE, AND WHY THE SAME TILE FOR BOTH CASES
  *
- * This site has nine photographs total (src/data/galerie.ts) and exactly one of
- * them is usable here   `dolnimorava.webp`, because it is a photograph OF the
- * ski resort and two-and-a-bit entries across this page are literally that
- * resort. Klepáč, Králický Sněžník, Klášter Hedeč, Vojenské muzeum Králíky,
- * Bazén Králíky, Přehrada Pastviny and every other name on the page are
- * third-party places nobody has photographed for this project, and there is no
- * honest photograph to put next to them. Inventing one   a generic stock shot of
- * "a mountain" or "a lake"   would show the reader something that is not the
- * place named beside it, which is worse than showing nothing.
+ * The cottage's own photographs (src/data/galerie.ts) never show a third-party
+ * place, so this component only ever gets a real photograph when one has been
+ * separately sourced for the named place itself   see the note on `Vylet.foto`
+ * in src/data/okoli.ts for the full list and provenance of each. Bazén Králíky,
+ * Přehrada Pastviny and every other name without a sourced photograph fall back
+ * to the icon tile. Inventing a photo   a generic stock shot of "a mountain" or
+ * "a lake"   would show the reader something that is not the place named beside
+ * it, which is worse than showing nothing.
  *
  * So both cases render in the SAME frame: `.media-frame` from global.css,
  * `--color-kamen` fill, square corners, no rounding. A photograph fills it; an

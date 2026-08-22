@@ -1,0 +1,100 @@
+---
+/**
+ * The footnote every unmeasured-place list ends with: a heading, one line
+ * saying why there is no figure, and the names themselves as a run   a small
+ * icon before each one, a middot between them, wrapping like a guidebook's
+ * index rather than sitting in a bordered box. Shared by OkoliLyzovani and
+ * OkoliKoupani so their two "we don't have a distance for these yet" lists
+ * are the same component, not two hand-built lookalikes.
+ */
+import IconLucide from '../../IconLucide.astro';
+import type { LucideName } from '../../IconLucide.astro';
+
+interface Props {
+  icon: LucideName;
+  nadpis: string;
+  poznamka: string;
+  polozky: string[];
+  class?: string;
+}
+
+const { icon, nadpis, poznamka, polozky, class: className, ...rest } = Astro.props;
+---
+
+<div class:list={['dalsiseznam', className]} {...rest}>
+  <h3 class="dalsiseznam-nadpis">{nadpis}</h3>
+  <p class="dalsiseznam-pozn">{poznamka}</p>
+
+  {/*
+    A run, not a list with rules and marks: giving each unmeasured name its own
+    column or box would promise a figure that is not there. It is still a
+    <ul>   a screen reader hears a list of N items   but the snowflake/wave icon
+    is `aria-hidden` and the middot is `::before` content, so what it hears is
+    the plain names, nothing else.
+  */}
+  <ul class="dalsiseznam-run" role="list">
+    {
+      polozky.map((nazev) => (
+        <li>
+          <IconLucide name={icon} size={13} class="dalsiseznam-ikona" />
+          <span>{nazev}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .dalsiseznam-nadpis {
+    font-size: var(--text-title-s);
+  }
+
+  .dalsiseznam-pozn {
+    margin-top: 0.5rem;
+    font-size: var(--text-caption);
+    max-width: 56ch;
+    color: var(--color-kura);
+  }
+
+  .dalsiseznam-run {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-lead);
+    color: var(--color-les);
+  }
+
+  /*
+   * Each `<li>` is its own inline-flex row of icon + name, so the icon sits on
+   * the text baseline instead of stacking above it   `svg { display: block }`
+   * in global.css would otherwise drop it onto its own line.
+   */
+  .dalsiseznam-run li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+
+  .dalsiseznam-ikona {
+    flex: none;
+    color: var(--color-mosaz-tmava);
+  }
+
+  /*
+   * The middot goes BEFORE each name after the first, never after each name
+   * before the last: a `::after` mark would leave a wrapped line ending on a
+   * dangling brass dot with nothing following it. Leading it means a wrapped
+   * line begins with the mark, which reads as a continued list.
+   */
+  .dalsiseznam-run li + li::before {
+    content: '·';
+    margin-inline: 0 0.75em;
+    color: var(--color-mosaz);
+  }
+
+  .dalsiseznam-run li + li {
+    margin-left: 0.75em;
+  }
+</style>

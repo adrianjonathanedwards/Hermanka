@@ -46,8 +46,8 @@ import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import jidelna from '@img/DSC_5123-scaled-1-1.jpg';
 import virivka from '@img/DSC_4684-scaled-1.jpg';
 import houpacky from '@img/DSC_5166-scaled-1-1.jpg';
-import sauna from '@img/DSC_5204-scaled-1.jpg';
-import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
+import sauna from '@img/DSC_5204.webp';
+import terasa from '@img/DSC_5192.webp';
 
 const NBSP = ' ';
 
@@ -111,7 +111,7 @@ const SPOTS: Spot[] = [
     x: 69.1,
     y: 40.8,
     foto: terasa,
-    alt: 'Krytá terasa s venkovním zděným krbem, stolem a proutěnými křesly, v pozadí les',
+    alt: 'Krytá terasa s venkovním zděným krbem, skleněným stolem a proutěnými křesly, v pozadí les',
   },
   {
     id: 'balkon',
@@ -241,6 +241,14 @@ const LINKS = SPOTS.map(
       }
 
       <figure class="plan-map">
+        {/*
+          `quality` below is 62, not 72. situace2.webp is already a compressed
+          WebP, so this is a re-encode   and measured against the source pixels,
+          q=72 scored WORSE than q=62 (36.50 dB against 37.13) while costing
+          10 kB more, because the extra bits go into faithfully reproducing the
+          source's own compression artefacts. 62 is the peak of the curve for
+          this file, not a saving taken out of it.
+        */}
         <Image
           src={plan}
           alt="Letecký snímek chalupy Heřmanka a jejího pozemku"
@@ -249,7 +257,7 @@ const LINKS = SPOTS.map(
           width={1205}
           height={902}
           format="webp"
-          quality={72}
+          quality={62}
           loading="lazy"
           class="plan-photo"
         />

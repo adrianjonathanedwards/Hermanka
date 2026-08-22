@@ -18,36 +18,17 @@
  *
  * ⚠ `--omitka` on `--les` is 15.45:1, the site's default inverse pairing. The
  * heading must NOT be `--mosaz`: brass on the dark ground is 3.00:1 and fails
- * for text (docs/02-design-system.md §1.2). On dark, brass type is
- * `--mosaz-svetla`   used below for the icon and the link only.
+ * for text (docs/02-design-system.md §1.2).
  */
 import IconLucide from '../../IconLucide.astro';
-import HermanekSprig from '../../decor/HermanekSprig.astro';
 ---
 
 <section id="vytapeni" class="section vytapeni" aria-labelledby="vytapeni-nadpis">
-  {/*
-    ⚠ THE ONE PLACE ON THIS PAGE WHERE THE LINE WORK IS WHITE.
-
-    docs/02-design-system.md §4 rule 5 lists exactly three grounds for white
-    line: over photography, in the two maps, and over `--les`. This band is
-    `--les`, so this is the sanctioned case   and it is also the only band on
-    the page with no photograph, which is what left its right-hand two thirds
-    empty. The plant fills it with the site's own drawing language rather than
-    with a stock texture or a gradient.
-
-    Rule 3 keeps it unfilled: this is a big outline drawing, not a watermark
-    shape. It is held well back at 0.16 so it reads as ground behind the type
-    rather than as a second thing competing with it   measured, not guessed:
-    at 0.16 over --les it is about the same value as the hairline rules
-    elsewhere on the page, and the body copy above it keeps its full 12.91:1.
-  */}
-  <HermanekSprig class="vytapeni-rostlina" />
+  {/* Full colour, not brass   deliberately outside the line system below. */}
+  <IconLucide name="flame" size={380} class="vytapeni-flame" />
 
   <div class="wrap">
     <div class="vytapeni-inner" data-reveal="up">
-      <IconLucide name="flame" size={34} class="vytapeni-ikona" />
-
       <h2 id="vytapeni-nadpis">Vytápění</h2>
 
       <p>
@@ -86,42 +67,26 @@ import HermanekSprig from '../../decor/HermanekSprig.astro';
     isolation: isolate;
   }
 
-  .vytapeni-rostlina {
+  .vytapeni-flame {
     position: absolute;
-    z-index: -1;
-    /*
-     * Anchored to the band's right edge and allowed to run off it top and
-     * bottom. A decorative mark that fits neatly inside its box reads as a
-     * sticker; one that is cropped reads as something the page is standing on.
-     */
-    top: -12%;
-    inset-inline-end: -2rem;
-    width: auto;
-    height: 124%;
-    color: var(--color-omitka);
-    opacity: 0.16;
+    z-index: 0;
+    top: 50%;
+    inset-inline-end: -7rem;
+    transform: translateY(-50%);
+    /* Real fire colour, filled solid   the one deliberate break from the
+       brass/stone/spruce palette on the whole rest of the page. */
+    color: #e2691f;
+    fill: currentColor;
   }
 
-  /*
-   * Hidden below 64rem, and not just scaled down. On a phone the copy runs the
-   * full width of the band, so the drawing would sit directly behind the
-   * paragraph rather than beside it   and a 0.16 line under body text is
-   * exactly the sort of thing that survives review on a desktop and makes the
-   * page look dirty on the device most of these readers actually use.
-   */
   @media (width < 64rem) {
-    .vytapeni-rostlina {
+    .vytapeni-flame {
       display: none;
     }
   }
 
   .vytapeni-inner {
     max-width: 44rem;
-  }
-
-  .vytapeni-ikona {
-    /* --mosaz-svetla on --les = 6.19:1. Plain --mosaz would be 3.00:1. */
-    color: var(--color-mosaz-svetla);
   }
 
   h2 {

@@ -1030,8 +1030,10 @@
   .lightbox-caption {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    /* Only the counter lives here now   no description text runs beside it
+       (see Lightbox.astro), so it sits at the row's own edge rather than
+       spread across an otherwise-empty row. */
+    justify-content: flex-end;
     padding: 1rem 1.25rem;
     font-size: var(--text-caption);
     /* --jinovatka on --les = 12.17:1 */

@@ -1,24 +1,85 @@
-﻿/**
+/**
  * The photographs, in one place.
  *
  * ---------------------------------------------------------------------------
- * ⚠ THERE ARE NINE PHOTOGRAPHS OF THIS PROPERTY AND THAT IS THE WHOLE SUPPLY.
+ * ⚠ UPDATE: A SECOND BATCH OF PHOTOGRAPHS ARRIVED. THE "NINE PHOTOGRAPHS"
+ * ERA OF THIS FILE IS OVER.
  *
- * Eight of the cottage plus the aerial of the valley, and one of Dolní Morava,
- * which is not the cottage. Every one of them is empty of people, and
- * docs/01-content.md §10 asks for that to be fixed at source: "The audience is a
- * group of twelve; show a table with twelve people at it."
+ * The original nine (eight of the cottage plus the aerial of the valley, and
+ * one of Dolní Morava, which is not the cottage) are all still here. The
+ * client supplied a second, much larger batch on top of them, and most of
+ * docs/01-content.md §10's list is now answered from it: bedrooms, a kitchen's
+ * absence aside, a winter exterior, and a sauna in winter all now have real
+ * photographs, so their placeholders are deleted below (the rule two
+ * paragraphs down is followed, not overridden). `Chalupa a sauna za soumraku`
+ * even carries a person in it, walking to the cottage through snow, so
+ * "photography with people in it" is no longer flatly zero, if still far from
+ * "a table with twelve people at it."
  *
- * What that means for `/galerie`: every tile in the gallery is either a real
- * photograph or an explicitly labelled PLACEHOLDER saying which photograph is
- * still missing. The placeholders are listed in `PLACEHOLDERY` below, they are
- * never links, and they never enter the lightbox sequence, so the counter in the
- * lightbox stays honest. When a photograph arrives, it replaces its placeholder
- * and the entry here is deleted.
+ * UPDATE 3: `kralicky-sneznik.png` fills the Sněžník hole   the client supplied
+ * a URL to it and confirmed it is the right mountain (see the note on
+ * `Vylet.foto` in src/data/okoli.ts, including the one open item it carries:
+ * usage rights have not been separately confirmed, unlike every other
+ * photograph on the site, which is the client's own). One hole remains and is
+ * not invented: a kitchen, which nobody has photographed yet.
  *
- * TODO(client) do docs/01-content.md §10: bedrooms, a kitchen, a winter exterior,
- * an interior with the fire lit, and photography with people in it. Each of those
- * is a labelled hole on the gallery page right now.
+ * The new batch also supplied a much larger `terasa` (the covered terrace with
+ * its outdoor fireplace): 3096 x 2064 against the old file's 1000 x 667. That
+ * was, in so many words, "the single most valuable new photograph this site
+ * could be given" (src/data/hero.ts, src/components/pages/ubytovani/Vybaveni.astro).
+ * It now replaces the old file everywhere on the site, not only here. `sauna`
+ * gets the same treatment for the same reason: `DSC_5204.webp` is the same
+ * shot as the old `DSC_5204-scaled-1.jpg` at 2064 x 3096 against 1280 x 1920,
+ * so it replaces the scaled file rather than sitting beside it as a duplicate
+ * tile.
+ *
+ * ⚠ CORRECTION: `83698096...webp` was captioned as Dolní Morava/Sky Bridge in
+ * an earlier pass. The client has since confirmed it is the lookout tower ON
+ * KLEPÁČ, a different place entirely (see src/data/okoli.ts). It has been
+ * moved out of the Dolní Morava figures and captioned correctly below.
+ *
+ * UPDATE 2: every remaining photograph from the batch was used somewhere on
+ * the site at one point. Nothing was left unused for being merely similar to
+ * another shot   each one got its own honest caption for what was actually
+ * different in its frame (an angle, a time of day, a detail). One has since
+ * been removed anyway (see UPDATE 4): "not literally a duplicate" turned out
+ * not to be the bar once the client looked at the gallery in a browser.
+ *
+ * UPDATE 4: two corrections after seeing the built page.
+ *
+ *   1. The opener   the big tile at the top of `chalupa` a bento always needs
+ *      one   used to be `exterier` (`header-bg-02.webp`). That file carries a
+ *      dark gradient baked into the pixels, put there deliberately for the
+ *      white text laid over it in the hero and every page header (see
+ *      src/data/hero.ts, src/data/pageHero.ts, where it stays). With no text
+ *      on top of it here, the same gradient just reads as a grey, oddly lit
+ *      photograph next to the gallery's other bright, naturally lit ones   an
+ *      artifact of reuse, not a property of the room. `DSC_5228.webp`
+ *      (`chalupaOdLesa`) is the same three-quarter angle of the house, shot
+ *      undarkened, so it replaces `exterier` as the opener and the plain
+ *      `header-bg-02.webp` is no longer imported by this file at all.
+ *
+ *   2. `chalupaCP28` (`IMG_20240113_163631.webp`) is gone. It was one of three
+ *      near-identical winter dusk shots of the house and sauna together
+ *      (`chalupaSoumrak`, `chalupaVecerSnih` are the other two); on the built
+ *      page the tiles crowded rather than varied, and it was the weakest of
+ *      the three. The file is still in img/ but no longer imported here.
+ *
+ * UPDATE 5: `skyBridge` (`sky-bridge-721.webp`) and `klasterHedec`
+ * (`klaster-hedec.webp`) join the `okoli` group   real, correctly identified
+ * shots of two of the third-party places in src/data/okoli.ts's `VYLETY`
+ * (see the note on `Vylet.foto` there). A third file supplied alongside them,
+ * `vojenske-muzeum-kraliky.webp`, is NOT used anywhere: it shows an
+ * industrial building with solar panels and grain silos, not the 1930s
+ * fortification the filename claims. Same usage-rights caveat as
+ * `kralicky-sneznik.png` applies to the two that are used.
+ *
+ * What all this means for `/galerie`: every tile in the gallery is either a
+ * real photograph or an explicitly labelled PLACEHOLDER saying which
+ * photograph is still missing. The placeholders are listed in `PLACEHOLDERY`
+ * below, they are never links, and they never enter the lightbox sequence, so
+ * the counter in the lightbox stays honest. When a photograph arrives, it
+ * replaces its placeholder and the entry here is deleted.
  * ---------------------------------------------------------------------------
  *
  * `alt` is Czech and describes the PHOTOGRAPH, what is in the frame, not the
@@ -34,11 +95,46 @@ import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import jidelna from '@img/DSC_5123-scaled-1-1.jpg';
 import virivka from '@img/DSC_4684-scaled-1.jpg';
 import houpacky from '@img/DSC_5166-scaled-1-1.jpg';
-import sauna from '@img/DSC_5204-scaled-1.jpg';
-import terasa from '@img/zastrwsena-veranda-krb-14e3-.jpeg';
-import exterier from '@img/header-bg-02.webp';
+import sauna from '@img/DSC_5204.webp';
+import terasa from '@img/DSC_5192.webp';
 import udoli from '@img/situace1-1.webp';
 import dolniMorava from '@img/dolnimorava.webp';
+
+/* ---- Second batch ------------------------------------------------------- */
+import chalupaVZime from '@img/130166198_400963927690742_6965117673572395367_n.webp';
+import chalupaSoumrak from '@img/IMG_20240113_163624.webp';
+import jezirko from '@img/DSC00852-1.webp';
+import posezeniZahrada from '@img/DSC_5189.webp';
+import chalupaZeZahrady from '@img/DSC_5173.webp';
+import verandaVchod from '@img/7H6A0113.jpg';
+import chalupaStit from '@img/DSC_4678.webp';
+import kvetinyZahrada from '@img/DSC_5106.webp';
+import chalupaOdLesa from '@img/DSC_5228.webp';
+import chalupaMeziStromy from '@img/DSC_5233.webp';
+import chalupaVecerSnih from '@img/IMG_20240113_163558.webp';
+import chalupaZimniRano from '@img/IMG_20240114_095211.webp';
+
+import obyvakZelenaSedacka from '@img/DSC_4556.webp';
+import loznice from '@img/DSC_4552.webp';
+import loznicePatro from '@img/DSC_4554.webp';
+import loznicePodkrovi from '@img/DSC_4614.webp';
+import loznicePodkroviStit from '@img/DSC_4638.webp';
+import podkrovniPokoj from '@img/DSC_4656.webp';
+import koupelna from '@img/DSC_4621.webp';
+import loznicePodkroviDvere from '@img/DSC_4600.webp';
+import sedaciKoutPodkrovi from '@img/DSC_4612.webp';
+
+import saunaZvenku from '@img/DSC_5151.webp';
+import virivkaShora from '@img/DSC_4677.webp';
+import saunaVZime from '@img/IMG_20240107_160007.webp';
+import saunaZevnitr from '@img/IMG_20240107_161001.webp';
+import saunaKamna from '@img/IMG_20240107_161130.webp';
+import saunaSoumrak from '@img/IMG_20240107_160927.webp';
+
+import klepacRozhledna from '@img/83698096_2495795774008675_6681197929793507424_n.webp';
+import kralickySneznik from '@img/kralicky-sneznik.png';
+import skyBridge from '@img/sky-bridge-721.webp';
+import klasterHedec from '@img/klaster-hedec.webp';
 
 export type GalerieSkupina = 'chalupa' | 'interier' | 'wellness' | 'okoli';
 
@@ -57,7 +153,12 @@ export interface Fotka {
   src: ImageMetadata;
   alt: string;
   skupina: GalerieSkupina;
-  /** Short label under the tile in the lightbox caption. */
+  /**
+   * A short internal label for the photograph, distinct from `alt`. Not
+   * rendered anywhere on the page: the lightbox shows no caption text at all
+   * (only `alt`, on the `<img>` itself, and the position counter), by
+   * decision   the description lives once, for assistive tech, not twice.
+   */
   popisek: string;
 }
 
@@ -164,14 +265,14 @@ export const SKUPINY: Skupina[] = [
 
 export const FOTKY: Fotka[] = [
   {
-    src: exterier,
-    alt: 'Chalupa Heřmanka zvenku: bílý dvoupodlažní objekt se strmou sedlovou střechou a krytou terasou, kolem dokola les',
+    src: chalupaOdLesa,
+    alt: 'Chalupa Heřmanka zvenku: bílý dvoupodlažní objekt se strmou sedlovou střechou, kolem dokola les, v popředí piknikový stůl',
     skupina: 'chalupa',
     popisek: 'Chalupa a zahrada',
   },
   {
     src: terasa,
-    alt: 'Krytá terasa chalupy s venkovním zděným krbem, dřevěným stolem a proutěnými křesly, v pozadí les',
+    alt: 'Krytá terasa chalupy s venkovním zděným krbem, skleněným stolem a proutěnými křesly, v pozadí les',
     skupina: 'chalupa',
     popisek: 'Krytá terasa s krbem',
   },
@@ -180,6 +281,72 @@ export const FOTKY: Fotka[] = [
     alt: 'Dřevěná houpačka se dvěma sedátky a zelenou skluzavkou na zatravněné zahradě',
     skupina: 'chalupa',
     popisek: 'Houpačky na zahradě',
+  },
+  {
+    src: chalupaVZime,
+    alt: 'Chalupa Heřmanka v zimě, pohled přes zasněženou jehličnanovou větev na bílý dům se zasněženou střechou a komínem',
+    skupina: 'chalupa',
+    popisek: 'Chalupa v zimě',
+  },
+  {
+    src: jezirko,
+    alt: 'Chalupa Heřmanka v létě, v popředí přírodní koupací jezírko s kamenným obložením a odrazem domu na hladině',
+    skupina: 'chalupa',
+    popisek: 'Jezírko u chalupy',
+  },
+  {
+    src: chalupaZeZahrady,
+    alt: 'Chalupa Heřmanka ze zahrady, vidět je horní nekrytá terasa s balkonem a štěrková cesta k domu',
+    skupina: 'chalupa',
+    popisek: 'Chalupa a horní terasa',
+  },
+  {
+    src: posezeniZahrada,
+    alt: 'Dřevěný piknikový stůl s lavicemi na zatravněné zahradě, kolem vzrostlé stromy a kamenná cesta',
+    skupina: 'chalupa',
+    popisek: 'Posezení na zahradě',
+  },
+  {
+    src: chalupaSoumrak,
+    alt: 'Chalupa Heřmanka a venkovní sauna za zimního večera, sníh na střeše i na zamrzlém jezírku, v popředí osoba jde ke chalupě',
+    skupina: 'chalupa',
+    popisek: 'Chalupa a sauna za soumraku',
+  },
+  {
+    src: verandaVchod,
+    alt: 'Prosklená krytá veranda vedoucí ke vchodu chalupy, v pozadí bílé patro s balkonem',
+    skupina: 'chalupa',
+    popisek: 'Krytá veranda u vchodu',
+  },
+  {
+    src: chalupaStit,
+    alt: 'Chalupa Heřmanka, pohled na štítovou stranu s bílou fasádou a lesem v pozadí',
+    skupina: 'chalupa',
+    popisek: 'Chalupa, štítová strana',
+  },
+  {
+    src: kvetinyZahrada,
+    alt: 'Fialové květiny na zahradě, v pozadí rozostřená bílá chalupa',
+    skupina: 'chalupa',
+    popisek: 'Květiny na zahradě',
+  },
+  {
+    src: chalupaMeziStromy,
+    alt: 'Chalupa Heřmanka mezi stromy, v popředí piknikový stůl na zahradě',
+    skupina: 'chalupa',
+    popisek: 'Chalupa mezi stromy',
+  },
+  {
+    src: chalupaVecerSnih,
+    alt: 'Chalupa Heřmanka a venkovní sauna za zimního večera se zasněženými střechami a zamrzlým jezírkem',
+    skupina: 'chalupa',
+    popisek: 'Chalupa a sauna, zimní večer',
+  },
+  {
+    src: chalupaZimniRano,
+    alt: 'Chalupa Heřmanka a venkovní sauna zasněženým zimním ránem',
+    skupina: 'chalupa',
+    popisek: 'Chalupa v zimě, ráno',
   },
   {
     src: obyvak,
@@ -194,6 +361,60 @@ export const FOTKY: Fotka[] = [
     popisek: 'Jídelní stůl',
   },
   {
+    src: obyvakZelenaSedacka,
+    alt: 'Obývací pokoj s velkou rohovou koženou sedačkou v zelené barvě, dřevěným trámovým stropem a okny do zahrady',
+    skupina: 'interier',
+    popisek: 'Obývací pokoj',
+  },
+  {
+    src: loznice,
+    alt: 'Ložnice se dvěma spojenými postelemi a dřevěnou skříní, obložena světlým dřevem',
+    skupina: 'interier',
+    popisek: 'Ložnice',
+  },
+  {
+    src: loznicePatro,
+    alt: 'Ložnice se dvěma spojenými postelemi a velkou dřevěnou skříní se zásuvkami',
+    skupina: 'interier',
+    popisek: 'Ložnice v patře',
+  },
+  {
+    src: loznicePodkrovi,
+    alt: 'Podkrovní ložnice s trámovým stropem, žebříkem k patrové posteli, televizí a dveřmi na terasu',
+    skupina: 'interier',
+    popisek: 'Mezonetová ložnice',
+  },
+  {
+    src: loznicePodkroviStit,
+    alt: 'Podkrovní ložnice s postelí pod šikmým trámovým stropem ve tvaru štítu a oknem s výhledem do lesa',
+    skupina: 'interier',
+    popisek: 'Ložnice ve štítu',
+  },
+  {
+    src: podkrovniPokoj,
+    alt: 'Podkrovní pokoj s manželskou postelí, kulatým jídelním stolem se židlemi a žebříkem do dalšího patra',
+    skupina: 'interier',
+    popisek: 'Podkrovní pokoj',
+  },
+  {
+    src: koupelna,
+    alt: 'Koupelna v podkroví s prostornou vanou, umyvadlem a dřevěnou stoličkou',
+    skupina: 'interier',
+    popisek: 'Koupelna s vanou',
+  },
+  {
+    src: loznicePodkroviDvere,
+    alt: 'Podkrovní ložnice od dveří, s patrovou postelí po žebříku a televizí',
+    skupina: 'interier',
+    popisek: 'Podkrovní ložnice od dveří',
+  },
+  {
+    src: sedaciKoutPodkrovi,
+    alt: 'Sedací kout v podkroví s křesílky, komodou a žebříkem k patrové posteli',
+    skupina: 'interier',
+    popisek: 'Sedací kout v podkroví',
+  },
+  {
     src: sauna,
     alt: 'Otevřené dveře do venkovní finské sauny s dřevěnými lavicemi',
     skupina: 'wellness',
@@ -204,6 +425,42 @@ export const FOTKY: Fotka[] = [
     alt: 'Dřevěná vířivka s vyhřívanými schody na terase, kolem dokola vzrostlý les',
     skupina: 'wellness',
     popisek: 'Vířivka v lese',
+  },
+  {
+    src: saunaZvenku,
+    alt: 'Venkovní finská sauna jako samostatný dřevěný domek u lesního jezírka, obklopený vzrostlými stromy',
+    skupina: 'wellness',
+    popisek: 'Sauna u jezírka',
+  },
+  {
+    src: virivkaShora,
+    alt: 'Dřevěná vířivka s bublinkovou lázní, pohled shora přes větve stromů',
+    skupina: 'wellness',
+    popisek: 'Vířivka shora',
+  },
+  {
+    src: saunaVZime,
+    alt: 'Venkovní sauna a zakrytá vířivka v zimě u zamrzlého jezírka, za soumraku',
+    skupina: 'wellness',
+    popisek: 'Sauna v zimě',
+  },
+  {
+    src: saunaZevnitr,
+    alt: 'Interiér venkovní sauny s dřevěnými lavicemi a rozsvíceným svítidlem',
+    skupina: 'wellness',
+    popisek: 'Uvnitř sauny',
+  },
+  {
+    src: saunaKamna,
+    alt: 'Kamna Harvia uvnitř sauny, na okenním parapetu svíčky, za oknem zasněžená zahrada',
+    skupina: 'wellness',
+    popisek: 'Kamna v sauně',
+  },
+  {
+    src: saunaSoumrak,
+    alt: 'Venkovní sauna za zimního soumraku, okno sauny svítí teplým světlem, vedle zakrytá vířivka',
+    skupina: 'wellness',
+    popisek: 'Sauna za soumraku',
   },
   {
     src: udoli,
@@ -217,6 +474,30 @@ export const FOTKY: Fotka[] = [
     skupina: 'okoli',
     popisek: 'Dolní Morava v zimě',
   },
+  {
+    src: klepacRozhledna,
+    alt: 'Rozhledna na vrcholu Klepáče při východu slunce nad mraky',
+    skupina: 'okoli',
+    popisek: 'Rozhledna na Klepáči',
+  },
+  {
+    src: kralickySneznik,
+    alt: 'Králický Sněžník s rozhlednou na vrcholu, v popředí zalesněné kopce',
+    skupina: 'okoli',
+    popisek: 'Králický Sněžník',
+  },
+  {
+    src: skyBridge,
+    alt: 'Visutý most Sky Bridge 721 nad zalesněným údolím, pod ním moře mraků',
+    skupina: 'okoli',
+    popisek: 'Sky Bridge 721',
+  },
+  {
+    src: klasterHedec,
+    alt: 'Letecký pohled na barokní klášter Hedeč s kostelem a zahradami uprostřed polí',
+    skupina: 'okoli',
+    popisek: 'Klášter Hedeč',
+  },
 ];
 
 /**
@@ -225,29 +506,9 @@ export const FOTKY: Fotka[] = [
  */
 export const PLACEHOLDERY: Placeholder[] = [
   {
-    skupina: 'chalupa',
-    popisek: 'Chalupa v zimě',
-    poznamka: 'Zimní snímek připravujeme',
-  },
-  {
-    skupina: 'interier',
-    popisek: 'Ložnice',
-    poznamka: 'Fotografie ložnic připravujeme',
-  },
-  {
     skupina: 'interier',
     popisek: 'Kuchyň',
     poznamka: 'Fotografii kuchyně připravujeme',
-  },
-  {
-    skupina: 'wellness',
-    popisek: 'Sauna v zimě',
-    poznamka: 'Zimní snímek připravujeme',
-  },
-  {
-    skupina: 'okoli',
-    popisek: 'Králický Sněžník',
-    poznamka: 'Fotografii z hřebene připravujeme',
   },
 ];
 

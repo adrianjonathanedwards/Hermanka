@@ -1,0 +1,138 @@
+---
+/**
+ * One verified place: a tile (photo or icon), a name, and the figures that back
+ * it up. Shared by OkoliLyzovani (one card, full width) and OkoliKoupani (two
+ * cards, side by side) so both sections' "here is a place we can put a number
+ * on" moment reads as the same idea, not two different components that happen
+ * to look similar.
+ */
+import type { ImageMetadata } from 'astro';
+import IconLucide from '../../IconLucide.astro';
+import type { LucideName } from '../../IconLucide.astro';
+import OkoliMedia from './OkoliMedia.astro';
+
+interface Fakt {
+  hodnota: string;
+  popis: string;
+}
+
+interface Props {
+  icon: LucideName;
+  foto?: ImageMetadata;
+  stitek?: string;
+  nazev: string;
+  fakta?: Fakt[];
+  popis?: string;
+  class?: string;
+}
+
+const { icon, foto, stitek, nazev, fakta = [], popis, class: className, ...rest } = Astro.props;
+---
+
+<div class:list={['mistokarta', className]} {...rest}>
+  <OkoliMedia icon={icon} foto={foto} class="mistokarta-media" />
+
+  <div class="mistokarta-text">
+    {
+      stitek && (
+        <p class="mistokarta-stitek">
+          <IconLucide name={icon} size={15} />
+          <span>{stitek}</span>
+        </p>
+      )
+    }
+
+    <h3 class="mistokarta-nazev">{nazev}</h3>
+
+    {
+      fakta.length > 0 && (
+        <dl class="mistokarta-fakta">
+          {fakta.map((f) => (
+            <div>
+              <dt>{f.hodnota}</dt>
+              <dd>{f.popis}</dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+
+    {popis && <p class="mistokarta-popis">{popis}</p>}
+  </div>
+</div>
+
+<style>
+  .mistokarta {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .mistokarta-media {
+    width: 5rem;
+  }
+
+  @media (width >= 48rem) {
+    .mistokarta-media {
+      width: 6.5rem;
+    }
+  }
+
+  .mistokarta-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mistokarta-stitek {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .mistokarta-nazev {
+    margin-top: 0.4rem;
+    font-size: var(--text-title-s);
+    line-height: 1.2;
+    color: var(--color-les);
+  }
+
+  @media (width >= 48rem) {
+    .mistokarta-nazev {
+      font-size: var(--text-title-m);
+    }
+  }
+
+  .mistokarta-fakta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    margin: 0.85rem 0 0;
+  }
+
+  .mistokarta-fakta dt {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-title-s);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .mistokarta-fakta dd {
+    margin: 0.3rem 0 0;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+  }
+
+  .mistokarta-popis {
+    margin-top: 0.85rem;
+    font-size: var(--text-body);
+    max-width: 46ch;
+    color: var(--color-kura);
+  }
+</style>

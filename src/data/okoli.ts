@@ -25,6 +25,10 @@
 import type { ImageMetadata } from 'astro';
 import type { LucideName } from '../components/IconLucide.astro';
 import dolniMoravaFoto from '@img/dolnimorava.webp';
+import klepacFoto from '@img/83698096_2495795774008675_6681197929793507424_n.webp';
+import kralickySneznikFoto from '@img/kralicky-sneznik.png';
+import skyBridgeFoto from '@img/sky-bridge-721.webp';
+import klasterHedecFoto from '@img/klaster-hedec.webp';
 
 const NBSP = ' ';
 
@@ -96,14 +100,29 @@ export interface Vylet {
    */
   icon: LucideName;
   /**
-   * A real photograph, where one exists. `dolnimorava.webp` is the only usable
-   * photograph of any place in this file   it is a shot OF the resort, so it is
-   * true for the two entries that are literally that resort and not for anything
-   * else. Nine photographs exist for this whole property (src/data/galerie.ts);
-   * none of the others show a third-party place, and inventing a crop that LOOKS
-   * like Klepáč or Klášter Hedeč would be showing the reader a lie. Absent
-   * everywhere else on purpose   the component falls back to `icon`, not to a
-   * stock photo of a mountain that is not this one.
+   * A real photograph, where one exists. `dolnimorava.webp` (a shot OF the
+   * resort, true for the Ski areál entry and nothing else), `83698096...webp`
+   * (client confirmed: sunrise above the clouds from the lookout tower ON
+   * KLEPÁČ, not Dolní Morava   it was misidentified as a Sky Bridge photo in
+   * an earlier pass and has been moved to the `Klepáč` entry below), and
+   * `kralicky-sneznik.png` (see the note two paragraphs down) are the
+   * client's own or client-sourced photographs. Absent everywhere else on
+   * purpose: the component falls back to `icon`, not to a stock photo of a
+   * place that is not this one.
+   *
+   * `sky-bridge-721.webp` and `klaster-hedec.webp` are two more the client
+   * supplied to close that gap: an actual shot of the Sky Bridge 721
+   * suspension bridge (the `dolnimorava.webp` resort shot it used to borrow
+   * was never a picture of the bridge itself) and the baroque pilgrimage
+   * complex at Klášter Hedeč. Same unverified-usage-rights caveat as
+   * `kralicky-sneznik.png` below applies to both until the client confirms
+   * provenance.
+   * TODO(client): confirm you hold the right to use these images
+   * commercially before launch, or swap them for ones you own.
+   *
+   * A third file, `vojenske-muzeum-kraliky.webp`, was supplied for the
+   * Vojenské muzeum Králíky entry but is NOT wired in: see the note beside
+   * that entry below for why.
    */
   foto?: ImageMetadata;
 }
@@ -137,7 +156,7 @@ export const VYLETY: Vylet[] = [
     sezona: 'celoročně',
     doprava: 'autem',
     icon: 'mountain-snow',
-    foto: dolniMoravaFoto,
+    foto: skyBridgeFoto,
   },
   {
     nazev: 'Králický Sněžník',
@@ -151,6 +170,7 @@ export const VYLETY: Vylet[] = [
     sezona: 'leto',
     doprava: 'pesky',
     icon: 'footprints',
+    foto: kralickySneznikFoto,
   },
   {
     nazev: 'Klášter Hedeč',
@@ -161,6 +181,7 @@ export const VYLETY: Vylet[] = [
     sezona: 'celoročně',
     doprava: 'autem',
     icon: 'landmark',
+    foto: klasterHedecFoto,
   },
   {
     nazev: 'Vojenské muzeum Králíky',
@@ -171,6 +192,13 @@ export const VYLETY: Vylet[] = [
     sezona: 'celoročně',
     doprava: 'autem',
     icon: 'landmark',
+    // `vojenske-muzeum-kraliky.webp` is NOT used here. It shows a green
+    // industrial building with a solar-panelled roof and grain silos   a farm
+    // or processing facility, not a 1930s fortification or a museum. Wrong
+    // subject entirely, whatever the filename claims. Same rule as Klepáč
+    // earlier in this file: a wrong photo is worse than the plain icon.
+    // TODO(client): the file stays in img/ in case a correct photo turns up
+    // under the same name later; a real one still needs finding.
   },
   {
     nazev: 'Klepáč',
@@ -181,6 +209,7 @@ export const VYLETY: Vylet[] = [
     sezona: 'leto',
     doprava: 'pesky',
     icon: 'footprints',
+    foto: klepacFoto,
   },
 ];
 

@@ -1,0 +1,366 @@
+---
+/**
+ * /galerie   every photograph, grouped.
+ *
+ * TWO THINGS HERE ARE LOAD-BEARING AND EASY TO UNDO BY ACCIDENT:
+ *
+ * 1. The first tile of the first group is the LCP element of this page   it is
+ *    the one spanning two columns   and it gets the hero treatment the heroes on
+ *    every other page get, for the reasons Hero.astro and PageHero.astro set out
+ *    at length. Two halves, and both are needed:
+ *
+ *      `loading="eager"` + `fetchpriority="high"`, where every other tile is
+ *      lazy. A lazy image cannot be found by the preload scanner: the browser
+ *      has to parse, style and lay the page out before it even knows to ask for
+ *      it. `loading="lazy"` on an image in the first viewport is not a saving,
+ *      it is a delay   3.3 s to 1.9 s on a throttled phone.
+ *
+ *      NO `data-reveal`. That system hides its target until IntersectionObserver
+ *      has booted and then fades it in over 620 ms, and a fade on the LCP
+ *      element is counted as LCP   which put the remaining 700 ms back. This is
+ *      the same rule as docs/02-design-system.md §5.3, which bans animating the
+ *      hero image; on this page, this tile is the hero image. Its neighbours
+ *      still reveal.
+ *
+ * 2. Every tile's `href` is the large variant itself, not `#`. The lightbox in
+ *    src/scripts/motion.ts calls preventDefault, so with JavaScript the href is
+ *    never followed and behaviour is unchanged   but without it, `#` scrolled to
+ *    the top of the page and showed nobody anything. Now the picture opens.
+ *    Same contract as every other progressive enhancement on this site.
+ */
+import { Image, getImage } from 'astro:assets';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { SKUPINY, fotkySkupiny, placeholderySkupiny } from '../data/galerie';
+
+/*
+ * The one large variant per photograph that the lightbox swaps in.
+ *
+ * ⚠ `layout: 'none'` is not decoration. astro.config.mjs sets `image.layout` to
+ * 'constrained' for the whole site, and getImage() honours it   so without this
+ * every call here also renders Astro's full responsive ladder (640, 750, 828,
+ * 1080, 1280, 1668, 2048, 2560, 3200) for a srcset that is then thrown away,
+ * because all we keep is `.src`. That was 260 files and 36 MB of the deploy, on
+ * a site whose entire referenced image set is 16 MB. One width is wanted here,
+ * so ask for one width.
+ */
+const velkeFotkyMap = new Map();
+for (const fotka of fotkySkupiny('chalupa')
+  .concat(fotkySkupiny('interier'))
+  .concat(fotkySkupiny('wellness'))
+  .concat(fotkySkupiny('okoli'))) {
+  const img = await getImage({
+    src: fotka.src,
+    width: 1600,
+    format: 'webp',
+    quality: 72,
+    layout: 'none',
+  });
+  velkeFotkyMap.set(fotka, img.src);
+}
+
+function getVelkaFotka(fotka: any): string {
+  return velkeFotkyMap.get(fotka) || '';
+}
+---
+
+<BaseLayout
+  title="Galerie"
+  description="Prohlédněte si kompletní galerii chalupy Heřmanka: interiér, exteriér, saunu, vířivku a okolí."
+  headerSolid
+>
+  {/*
+    The document's heading. It was missing entirely   this was the only page of
+    the eight with no <h1> at all, so the outline started at <h2> and both a
+    crawler and a screen reader met a page with no name.
+
+    `.sr-only` rather than a visible block, which is what that utility exists for
+    (see the note beside it in global.css). The design opens straight into the
+    first group by intent, and the visible answer to "which page is this" is the
+    current item in the nav and the <title>. Nothing moves; the outline is fixed.
+  */}
+  <h1 class="sr-only">Galerie</h1>
+
+  {
+    SKUPINY.map((skupina, idx) => {
+      const fotky = fotkySkupiny(skupina.klic);
+      const placeholdery = placeholderySkupiny(skupina.klic);
+      const isBento = skupina.rozvrzeni === 'bento';
+
+      return (
+        <section
+          class="section galerie"
+          aria-labelledby={`galerie-${skupina.klic}`}
+        >
+          <div class="wrap">
+            <div class="galerie-header" data-reveal="up">
+              <h2 id={`galerie-${skupina.klic}`}>{skupina.nazev}</h2>
+              <p class="galerie-popis">{skupina.popis}</p>
+            </div>
+
+            {/* Bento layout for first group */}
+            {isBento && (
+              <ul class="galerie-bento" data-reveal-group="55">
+                {fotky.map((fotka, i) => (
+                  <li
+                    class="galerie-tile"
+                    data-reveal={idx === 0 && i === 0 ? undefined : 'scale'}
+                  >
+                    <a
+                      href={getVelkaFotka(fotka)}
+                      class="galerie-item photo-frame"
+                      data-lightbox={getVelkaFotka(fotka)}
+                      aria-label={`Zvětšit fotografii: ${fotka.alt}`}
+                    >
+                      <Image
+                        src={fotka.src}
+                        alt={fotka.alt}
+                        widths={[280, 420, 560, 840]}
+                        sizes={i === 0 ? '(min-width: 48rem) 50vw, 100vw' : '(min-width: 48rem) 25vw, 50vw'}
+                        width={i === 0 ? 840 : 420}
+                        height={i === 0 ? 630 : 315}
+                        format="webp"
+                        quality={62}
+                        {...(idx === 0 && i === 0
+                          ? { loading: 'eager' as const, fetchpriority: 'high' as const }
+                          : { loading: 'lazy' as const })}
+                      />
+                      <span class="galerie-overlay" aria-hidden="true">
+                        <span class="galerie-expand">
+                          <Icon name="zvetsit" size={20} strokeWidth={1.6} />
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+
+                {placeholdery.map((placeholder) => (
+                  <li class="galerie-tile galerie-placeholder" data-reveal="scale">
+                    <div class="galerie-item">
+                      <div class="placeholder-inner">
+                        <p class="placeholder-title">{placeholder.popisek}</p>
+                        <p class="placeholder-note">{placeholder.poznamka}</p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {/* Grid layout for other groups */}
+            {!isBento && (
+              <ul class="galerie-grid" data-reveal-group="55">
+                {fotky.map((fotka) => (
+                  <li class="galerie-tile" data-reveal="scale">
+                    <a
+                      href={getVelkaFotka(fotka)}
+                      class="galerie-item photo-frame"
+                      data-lightbox={getVelkaFotka(fotka)}
+                      aria-label={`Zvětšit fotografii: ${fotka.alt}`}
+                    >
+                      <Image
+                        src={fotka.src}
+                        alt={fotka.alt}
+                        widths={[280, 420, 560, 840]}
+                        sizes="(min-width: 48rem) 33vw, 50vw"
+                        width={840}
+                        height={630}
+                        format="webp"
+                        quality={62}
+                        loading="lazy"
+                      />
+                      <span class="galerie-overlay" aria-hidden="true">
+                        <span class="galerie-expand">
+                          <Icon name="zvetsit" size={20} strokeWidth={1.6} />
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+
+                {placeholdery.map((placeholder) => (
+                  <li class="galerie-tile galerie-placeholder" data-reveal="scale">
+                    <div class="galerie-item">
+                      <div class="placeholder-inner">
+                        <p class="placeholder-title">{placeholder.popisek}</p>
+                        <p class="placeholder-note">{placeholder.poznamka}</p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      );
+    })
+  }
+</BaseLayout>
+
+<style>
+  .galerie {
+    background-color: var(--color-omitka);
+  }
+
+  .galerie:nth-child(even) {
+    background-color: var(--color-kamen);
+  }
+
+  .galerie:last-child {
+    background-color: transparent;
+  }
+
+  .galerie-header {
+    margin-bottom: 3rem;
+  }
+
+  .galerie-header h2 {
+    color: var(--color-mosaz-tmava);
+    font-size: var(--text-title-l);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .galerie-popis {
+    color: var(--color-text);
+    font-size: var(--text-body);
+    max-width: 60rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* ---- Bento layout ---- */
+  .galerie-bento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .galerie-bento .galerie-tile:first-child {
+    grid-column: span 2;
+  }
+
+  @media (width >= 48rem) {
+    .galerie-bento {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .galerie-bento .galerie-tile:first-child {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+  }
+
+  /* ---- Regular grid layout ---- */
+  .galerie-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (width >= 48rem) {
+    .galerie-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+  }
+
+  /* ---- Tile ---- */
+  .galerie-tile {
+    position: relative;
+  }
+
+  .galerie-item {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background-color: var(--color-les);
+  }
+
+  .galerie-bento .galerie-tile:first-child .galerie-item {
+    aspect-ratio: auto;
+  }
+
+  @media (width >= 48rem) {
+    .galerie-bento .galerie-tile:first-child .galerie-item {
+      aspect-ratio: auto;
+    }
+  }
+
+  .galerie-item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---- Hover overlay ---- */
+  .galerie-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to top, rgb(22 36 28 / 0.55), rgb(22 36 28 / 0.15));
+    opacity: 0;
+    transition: opacity 320ms var(--ease-out);
+  }
+
+  .galerie-expand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid rgb(251 250 248 / 0.7);
+    border-radius: var(--radius-pill);
+    color: var(--color-omitka);
+    transform: scale(0.75);
+    transition: transform 380ms var(--ease-spring);
+  }
+
+  .galerie-item:hover .galerie-overlay,
+  .galerie-item:focus-visible .galerie-overlay {
+    opacity: 1;
+  }
+
+  .galerie-item:hover .galerie-expand,
+  .galerie-item:focus-visible .galerie-expand {
+    transform: scale(1);
+  }
+
+  /* ---- Placeholder ---- */
+  .galerie-placeholder .galerie-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-les) 0%, var(--color-kura) 100%);
+  }
+
+  .placeholder-inner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-omitka);
+  }
+
+  .placeholder-title {
+    font-family: var(--font-display);
+    font-size: var(--text-title-s);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+  }
+
+  .placeholder-note {
+    font-size: var(--text-caption);
+    margin: 0;
+    opacity: 0.8;
+  }
+</style>

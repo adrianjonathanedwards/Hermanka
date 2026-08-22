@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
+import headers from './tools/headers.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -51,10 +52,22 @@ export default defineConfig({
   // 0 kB of JavaScript, and that is worth more than a warm cache on hover.
   prefetch: false,
 
-  // Emits /sitemap-index.xml, referenced from public/robots.txt.
+  // sitemap: emits /sitemap-index.xml, referenced from public/robots.txt.
   // `i18n` here is intentionally omitted until a second locale is live   see the
   // note on LIVE_LOCALES in src/i18n/config.ts.
-  integrations: [sitemap()],
+  //
+  // The filter keeps /kontakt/dekujeme out. That page sends `noindex` (it is a
+  // form receipt, and one indexed is one people arrive on having sent nothing),
+  // and listing a noindex URL in a sitemap is a contradiction Search Console
+  // reports back as an error. A page is in one or the other, never both.
+  //
+  // headers: writes dist/_headers   the CSP, the transport-security set and the
+  // cache policy for Cloudflare Pages. Generated rather than committed because
+  // the CSP pins the one inline script by hash; see tools/headers.mjs.
+  integrations: [
+    sitemap({ filter: (page) => !page.includes('/kontakt/dekujeme') }),
+    headers(),
+  ],
 
   vite: {
     plugins: [tailwindcss()],

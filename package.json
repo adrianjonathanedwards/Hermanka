@@ -15,6 +15,7 @@
     "sync": "astro sync",
     "check": "astro check",
     "build:fonts": "node tools/build-fonts.mjs",
+    "build:icons": "node tools/build-icons.mjs",
     "verify:fonts": "node tools/verify-font-coverage.mjs public/fonts/fraunces-var.woff2 public/fonts/public-sans-var.woff2"
   },
   "dependencies": {
