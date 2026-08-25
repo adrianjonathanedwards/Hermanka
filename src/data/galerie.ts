@@ -69,10 +69,15 @@
  * (`klaster-hedec.webp`) join the `okoli` group   real, correctly identified
  * shots of two of the third-party places in src/data/okoli.ts's `VYLETY`
  * (see the note on `Vylet.foto` there). A third file supplied alongside them,
- * `vojenske-muzeum-kraliky.webp`, is NOT used anywhere: it shows an
+ * `vojenske-muzeum-kraliky.webp`, was NOT used at the time: it showed an
  * industrial building with solar panels and grain silos, not the 1930s
- * fortification the filename claims. Same usage-rights caveat as
- * `kralicky-sneznik.png` applies to the two that are used.
+ * fortification the filename claimed.
+ *
+ * UPDATE 6: the client re-supplied `vojenske-muzeum-kraliky.webp` under the
+ * same filename, this time the right subject   a concrete fortification bunker
+ * with two gun turrets and its wartime slogans still painted on. `vojenskeMuzeum`
+ * now joins the `okoli` group alongside the other three. Same usage-rights
+ * caveat as `kralicky-sneznik.png` applies to all four.
  *
  * What all this means for `/galerie`: every tile in the gallery is either a
  * real photograph or an explicitly labelled PLACEHOLDER saying which
@@ -135,6 +140,7 @@ import klepacRozhledna from '@img/83698096_2495795774008675_6681197929793507424_
 import kralickySneznik from '@img/kralicky-sneznik.png';
 import skyBridge from '@img/sky-bridge-721.webp';
 import klasterHedec from '@img/klaster-hedec.webp';
+import vojenskeMuzeum from '@img/vojenske-muzeum-kraliky.webp';
 
 export type GalerieSkupina = 'chalupa' | 'interier' | 'wellness' | 'okoli';
 
@@ -497,6 +503,12 @@ export const FOTKY: Fotka[] = [
     alt: 'Letecký pohled na barokní klášter Hedeč s kostelem a zahradami uprostřed polí',
     skupina: 'okoli',
     popisek: 'Klášter Hedeč',
+  },
+  {
+    src: vojenskeMuzeum,
+    alt: 'Betonový pevnostní srub s dělovými věžemi a dobovými nápisy Byli jsme a budem, vytrváme',
+    skupina: 'okoli',
+    popisek: 'Vojenské muzeum Králíky',
   },
 ];
 

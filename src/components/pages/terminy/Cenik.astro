@@ -73,9 +73,18 @@ const NBSP = ' ';
         <div class="hranice-pozn" role="note">
           <IconLucide name="info" size={16} class="hranice-ikona" />
           <p>
-            Přesné hranice sezón ještě čekají na potvrzení od klienta{NBSP} 
-            zatím platí přibližné vymezení z původního ceníku.
-            {/* TODO(client)   docs/01-content.md §9 item 5 */}
+            {/*
+              ⚠ Guest-facing copy. This sentence used to read "ještě čekají na
+              potvrzení od klienta"   the agency's view of the job, printed on
+              the price page for people who have no idea who "the client" is and
+              no reason to be told a supplier is late. Say what it means for the
+              reader instead: the dates below are approximate and we will confirm
+              theirs. Keep any future wording here in the second person.
+              TODO(client)   docs/01-content.md §9 item 5
+            */}
+            Přesné hranice sezón ještě dolaďujeme, zatím platí přibližné
+            vymezení z původního ceníku. Váš termín vám rádi potvrdíme předem,
+            stačí napsat.
           </p>
         </div>
       )}

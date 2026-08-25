@@ -84,6 +84,35 @@ function reveal(el: HTMLElement): void {
   animate(el, REVEAL, { duration: DURATION, ease: EASE });
 }
 
+/*
+ * The trigger geometry, named once because two things depend on it agreeing:
+ * the observer below and the backstop under it. AMOUNT is the fraction of the
+ * element that must be showing; ROOT_BOTTOM_INSET trims the bottom of the
+ * viewport so a block starts moving just before its top edge is reached rather
+ * than the instant it appears.
+ */
+const AMOUNT = 0.2;
+const ROOT_BOTTOM_INSET = 0.08;
+
+/**
+ * Would the observer consider this element in view right now?
+ *
+ * Computed synchronously from a rectangle, deliberately mirroring the `inView`
+ * options below. The backstop needs the SAME bar as the observer: a looser one
+ * (the old `top < innerHeight`) reveals blocks the moment a pixel of them
+ * appears, which is a different and worse piece of motion design than the one
+ * that was chosen.
+ */
+function isInView(el: HTMLElement): boolean {
+  const r = el.getBoundingClientRect();
+  /* Scrolled clean past the top: it has had its moment, show it. */
+  if (r.bottom <= 0) return true;
+  if (r.height === 0) return false;
+  const rootBottom = window.innerHeight * (1 - ROOT_BOTTOM_INSET);
+  const showing = Math.min(r.bottom, rootBottom) - Math.max(r.top, 0);
+  return showing >= r.height * AMOUNT;
+}
+
 function setUpReveals(): void {
   document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
     const stop = inView(
@@ -92,7 +121,7 @@ function setUpReveals(): void {
         reveal(el);
         stop();
       },
-      { amount: 0.2, margin: '0px 0px -8% 0px' },
+      { amount: AMOUNT, margin: `0px 0px -${ROOT_BOTTOM_INSET * 100}% 0px` },
     );
   });
 
@@ -101,22 +130,58 @@ function setUpReveals(): void {
    *
    * The `.js-motion` failsafe in <head> is cancelled the moment this module
    * loads, so from then on the only thing that un-hides a `[data-reveal]` is its
-   * observer firing. Anything the observer never reports is invisible for good  
+   * observer firing. Anything the observer never reports is invisible for good
    * and there are real ways for that to happen: a target clipped to zero area, a
    * zero-height box, an ancestor with `overflow: hidden` and no scroll, a
    * `content-visibility` skip.
    *
-   * So once loading has settled, sweep for anything still unrevealed that is
-   * already at or above the fold and reveal it outright. Below-fold elements are
-   * left alone   they are legitimately waiting their turn.
+   * ⚠ AND ONE MORE, WHICH IS NOT HYPOTHETICAL   this is why the sweep runs on
+   * scroll and not once after `load`.
+   *
+   * IntersectionObserver samples at frame boundaries. If a jump moves an element
+   * from below the viewport to above it between two samples, the observer sees
+   * un-intersecting before and un-intersecting after, never reports a crossing,
+   * and the element stays at `opacity: 0` for the rest of the visit. Landing on
+   * an in-page anchor does exactly that   and `_redirects` sends the long-indexed
+   * /video to /ubytovani#video, so this is a URL the site publishes. Measured on
+   * a 390px viewport, arriving there and scrolling back up left the footer
+   * contact block, the footer nav and the footer CTA permanently blank: the
+   * telephone number and the enquiry link, which is as bad as this gets.
+   *
+   * The old sweep could not save them. It ran once, 400 ms after `load`, and
+   * only for elements already at or above the fold   and at that moment the
+   * reader is down at the anchor with the whole footer still below them.
+   *
+   * So: re-sweep on scroll and resize, rAF-throttled to one pass per frame, and
+   * take the listeners back off the moment nothing is left hidden. On a page
+   * whose reveals have all fired that is a handful of frames of work in total,
+   * and the guarantee is absolute rather than probabilistic.
    */
+  let queued = false;
+
   const sweep = (): void => {
-    document.querySelectorAll<HTMLElement>('[data-reveal]').forEach((el) => {
-      if (el.classList.contains('is-revealed')) return;
-      if (el.getBoundingClientRect().top < window.innerHeight) reveal(el);
+    queued = false;
+    const pending = document.querySelectorAll<HTMLElement>('[data-reveal]:not(.is-revealed)');
+    pending.forEach((el) => {
+      if (isInView(el)) reveal(el);
     });
+    if (!document.querySelector('[data-reveal]:not(.is-revealed)')) {
+      window.removeEventListener('scroll', queueSweep);
+      window.removeEventListener('resize', queueSweep);
+    }
   };
 
+  function queueSweep(): void {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(sweep);
+  }
+
+  window.addEventListener('scroll', queueSweep, { passive: true });
+  window.addEventListener('resize', queueSweep, { passive: true });
+  /* Still worth one pass once loading settles: images landing late change every
+     rectangle on the page, and a reader who has not scrolled yet fires neither
+     listener above. */
   window.addEventListener('load', () => setTimeout(sweep, 400), { once: true });
 }
 

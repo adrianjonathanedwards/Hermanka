@@ -29,6 +29,9 @@ import klepacFoto from '@img/83698096_2495795774008675_6681197929793507424_n.web
 import kralickySneznikFoto from '@img/kralicky-sneznik.png';
 import skyBridgeFoto from '@img/sky-bridge-721.webp';
 import klasterHedecFoto from '@img/klaster-hedec.webp';
+import vojenskeMuzeumFoto from '@img/vojenske-muzeum-kraliky.webp';
+import bazenKralikyFoto from '@img/bazen-kraliky.jpg';
+import prehradaPastvinyFoto from '@img/prehrada-pastviny-letecky.webp';
 
 const NBSP = ' ';
 
@@ -114,15 +117,17 @@ export interface Vylet {
    * supplied to close that gap: an actual shot of the Sky Bridge 721
    * suspension bridge (the `dolnimorava.webp` resort shot it used to borrow
    * was never a picture of the bridge itself) and the baroque pilgrimage
-   * complex at Klášter Hedeč. Same unverified-usage-rights caveat as
-   * `kralicky-sneznik.png` below applies to both until the client confirms
-   * provenance.
+   * complex at Klášter Hedeč. `vojenske-muzeum-kraliky.webp` is a fourth: a
+   * genuine 1930s fortification bunker, its two gun turrets and painted
+   * wartime slogans plainly visible   replacing an earlier file of the same
+   * name that turned out to show an unrelated farm building (§ the client
+   * re-supplied it under the same filename once the mismatch was found; see
+   * git history for the original if it's ever needed).
+   *
+   * Same unverified-usage-rights caveat as `kralicky-sneznik.png` below
+   * applies to all four until the client confirms provenance.
    * TODO(client): confirm you hold the right to use these images
    * commercially before launch, or swap them for ones you own.
-   *
-   * A third file, `vojenske-muzeum-kraliky.webp`, was supplied for the
-   * Vojenské muzeum Králíky entry but is NOT wired in: see the note beside
-   * that entry below for why.
    */
   foto?: ImageMetadata;
 }
@@ -192,13 +197,7 @@ export const VYLETY: Vylet[] = [
     sezona: 'celoročně',
     doprava: 'autem',
     icon: 'landmark',
-    // `vojenske-muzeum-kraliky.webp` is NOT used here. It shows a green
-    // industrial building with a solar-panelled roof and grain silos   a farm
-    // or processing facility, not a 1930s fortification or a museum. Wrong
-    // subject entirely, whatever the filename claims. Same rule as Klepáč
-    // earlier in this file: a wrong photo is worse than the plain icon.
-    // TODO(client): the file stays in img/ in case a correct photo turns up
-    // under the same name later; a real one still needs finding.
+    foto: vojenskeMuzeumFoto,
   },
   {
     nazev: 'Klepáč',
@@ -250,6 +249,18 @@ export const LYZOVANI: Stredisko[] = [
 export interface Koupani {
   nazev: string;
   vzdalenost: string | null;
+  /** One line, grounded in what's publicly known about the place   never invented. */
+  popis?: string;
+  /**
+   * A real photograph. `bazen-kraliky.jpg` is a frame from the pool's own
+   * photo gallery on the town's official site (smkraliky.cz), not the
+   * client's own   its usage rights have not been separately confirmed.
+   * `prehrada-pastviny-letecky.webp` (an autumn aerial over the lake and dam)
+   * IS client-supplied, same as the photos noted on `Vylet.foto` above.
+   * TODO(client): confirm you may use bazen-kraliky.jpg commercially before
+   * launch, or swap it for one you own.
+   */
+  foto?: ImageMetadata;
 }
 
 /**
@@ -262,8 +273,18 @@ export interface Koupani {
  * the two arrays, sort, and cut at four.
  */
 export const KOUPANI_BLIZKO: Koupani[] = [
-  { nazev: 'Bazén Králíky', vzdalenost: `3${NBSP}km` },
-  { nazev: 'Přehrada Pastviny', vzdalenost: `17${NBSP}km` },
+  {
+    nazev: 'Bazén Králíky',
+    vzdalenost: `3${NBSP}km`,
+    popis: 'Venkovní bazén s dětským brouzdalištěm, hřištěm na plážový volejbal a travnatou plochou na slunění.',
+    foto: bazenKralikyFoto,
+  },
+  {
+    nazev: 'Přehrada Pastviny',
+    vzdalenost: `17${NBSP}km`,
+    popis: 'Sedm kilometrů dlouhé jezero na Divoké Orlici se zděnou hrází z let 1933–1938, pláží a půjčovnou lodí.',
+    foto: prehradaPastvinyFoto,
+  },
 ];
 
 export const KOUPANI_DALSI: string[] = [

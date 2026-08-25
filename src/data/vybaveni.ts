@@ -74,7 +74,7 @@ export const VYBAVENI: VybaveniSkupina[] = [
          * the entry stays, with one sentence next to it inviting the question.
          * Delete the sentence the day the client answers, not before.
          */
-        overit: 'Ozvěte se nám prosím předem   domluvíme se podle vašich potřeb.',
+        overit: 'Ozvěte se nám prosím předem, domluvíme se podle vašich potřeb.',
       },
     ],
   },

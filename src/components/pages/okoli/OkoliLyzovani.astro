@@ -7,11 +7,12 @@
  * docs/01-content.md). The remaining six entries have vzdalenost: null and
  * cas: null and stay that way until the client supplies figures (§9 item 21).
  *
- * Same shape as OkoliKoupani.astro on purpose: a bordered "here is a verified
- * place" block built from OkoliMistoKarta, then a footnote run of the
- * unmeasured names built from OkoliDalsiSeznam. Two sections about "nearby
- * things with mostly-missing distances" now look like one system instead of
- * two different attempts at the same problem.
+ * Same shape as OkoliKoupani.astro on purpose: a "here is a verified place"
+ * block built from OkoliMistoKarta, then a footnote grid of the unmeasured
+ * names built from OkoliDalsiSeznam. No rules between the pieces in either
+ * section   the spacing alone carries the grouping. Two sections about
+ * "nearby things with mostly-missing distances" now look like one system
+ * instead of two different attempts at the same problem.
  *
  * Band: --jinovatka, docs/02-design-system.md §1's WINTER ACCENT ONLY colour.
  * Follows --omitka (vylety) and precedes --kamen (koupani).
@@ -26,10 +27,7 @@ const NBSP = ' ';
 /* The first entry is the only one with a verified distance. */
 const [dolniMorava, ...ostatni] = LYZOVANI;
 
-const fakta = [
-  ...(dolniMorava.vzdalenost ? [{ hodnota: dolniMorava.vzdalenost, popis: 'vzdušnou čarou' }] : []),
-  ...(dolniMorava.cas ? [{ hodnota: dolniMorava.cas, popis: 'autem z chalupy' }] : []),
-];
+const fakta = [dolniMorava.vzdalenost, dolniMorava.cas].filter((f): f is string => f !== null);
 
 const popis = `Deset kilometrů sjezdovek s umělým zasněžováním, Stezka${NBSP}v oblacích, Sky Bridge${NBSP}721, bobová dráha a dětské zábavní areály.`;
 ---
@@ -82,18 +80,13 @@ const popis = `Deset kilometrů sjezdovek s umělým zasněžováním, Stezka${N
   }
 
   .lyzovani-hlavni {
-    margin-top: 2.5rem;
-    padding-top: 2rem;
-    border-top: 2px solid var(--color-mosaz);
+    margin-top: 3.5rem;
   }
 
-  /* A hairline, not the 2px brass rule above: this list is subordinate to the
-     verified card, and the weight of the rule is what says so.
+  /* No rule here either   see the header comment.
      ⚠ Matches via the cid `OkoliDalsiSeznam` forwards onto its own root
      through `...rest`   see the note in that file. No :global() needed. */
   .lyzovani-dalsi {
-    margin-top: 3rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid rgb(22 36 28 / 0.14);
+    margin-top: 3.5rem;
   }
 </style>

@@ -11,17 +11,13 @@ import IconLucide from '../../IconLucide.astro';
 import type { LucideName } from '../../IconLucide.astro';
 import OkoliMedia from './OkoliMedia.astro';
 
-interface Fakt {
-  hodnota: string;
-  popis: string;
-}
-
 interface Props {
   icon: LucideName;
   foto?: ImageMetadata;
   stitek?: string;
   nazev: string;
-  fakta?: Fakt[];
+  /** Bare figures, e.g. `9 km`, `12 min`   no explanatory label under them. */
+  fakta?: string[];
   popis?: string;
   class?: string;
 }
@@ -46,14 +42,9 @@ const { icon, foto, stitek, nazev, fakta = [], popis, class: className, ...rest 
 
     {
       fakta.length > 0 && (
-        <dl class="mistokarta-fakta">
-          {fakta.map((f) => (
-            <div>
-              <dt>{f.hodnota}</dt>
-              <dd>{f.popis}</dd>
-            </div>
-          ))}
-        </dl>
+        <p class="mistokarta-fakta">
+          {fakta.map((f) => <span>{f}</span>)}
+        </p>
       )
     }
 
@@ -110,11 +101,9 @@ const { icon, foto, stitek, nazev, fakta = [], popis, class: className, ...rest 
   .mistokarta-fakta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem 1.75rem;
-    margin: 0.85rem 0 0;
-  }
-
-  .mistokarta-fakta dt {
+    align-items: baseline;
+    gap: 0.5rem 0.75rem;
+    margin: 0.6rem 0 0;
     font-family: var(--font-display);
     font-weight: var(--font-weight-semibold);
     font-size: var(--text-title-s);
@@ -123,10 +112,11 @@ const { icon, foto, stitek, nazev, fakta = [], popis, class: className, ...rest 
     color: var(--color-mosaz-tmava);
   }
 
-  .mistokarta-fakta dd {
-    margin: 0.3rem 0 0;
-    font-size: var(--text-caption);
-    color: var(--color-kura);
+  /* A middot between figures, not after the last one. */
+  .mistokarta-fakta span:not(:last-child)::after {
+    content: '·';
+    margin-left: 0.75rem;
+    color: var(--color-mosaz);
   }
 
   .mistokarta-popis {

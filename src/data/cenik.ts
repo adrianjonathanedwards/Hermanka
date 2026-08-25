@@ -153,7 +153,7 @@ export const PRAVIDLA: Pravidlo[] = [
   {
     icon: 'calendar-days',
     nazev: 'V lednu, únoru, červenci a srpnu jen celé týdny',
-    popis: `V těchto čtyřech měsících přijímáme objednávky pouze na celé týdny${NBSP}  víkend v${NBSP}nich rezervovat nejde.`,
+    popis: `V těchto čtyřech měsících přijímáme objednávky pouze na celé týdny${NBSP}– víkend v${NBSP}nich rezervovat nejde.`,
   },
 ];
 
@@ -341,6 +341,6 @@ export const PODMINKY: Podminka[] = [
 export const CHYBEJICI_PODMINKY: string[] = [
   'Čas příjezdu a odjezdu',
   'Storno podmínky',
-  'Co je v ceně   povlečení, ručníky, dřevo, pelety',
-  'Domácí mazlíčci   za jakých podmínek',
+  'Co je v ceně: povlečení, ručníky, dřevo, pelety',
+  'Domácí mazlíčci: za jakých podmínek',
 ];

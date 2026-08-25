@@ -50,11 +50,33 @@ Plus the component checklist in [docs/02-design-system.md](docs/02-design-system
 | --- | --- |
 | Build command | `npm run build` |
 | Output directory | `dist` |
-| Node version | 20 or later |
+| Node version | from [`.nvmrc`](.nvmrc)   see below |
 | Production branch | `main` |
 
+### Node version
+
+`.nvmrc` pins it, and it is not optional. Astro 7 requires **Node 22.12 or
+later** and hard-fails below that. Cloudflare Pages does **not** read `engines`
+from `package.json`; left to itself it builds on its own default, which has been
+Node 18 for projects created before it changed   so without the pin the build
+does not merely warn, it fails.
+
+`.nvmrc` pins **22.12.0**: Astro's own declared floor, an LTS, and a version
+every Cloudflare Pages build image offers. Pinning the newest Node instead would
+be the riskier choice here, not the safer one   an older Pages build image may
+not carry it, and that is the same failed build by another route. Local
+development on a newer Node is fine; `engines` is what decides that, and both
+satisfy it.
+
+If you would rather set the version in the dashboard, the variable is
+`NODE_VERSION`   but the file is better, because a dashboard setting is lost the
+day someone recreates the project and nobody remembers it existed.
+
 Every pull request gets a preview URL. **Review on the preview, not locally**   it
-is the only place `public/_redirects` and the real cache headers apply.
+is the only place `_redirects` and the real security and cache headers apply.
+`dist/_headers` is generated at build time by
+[`tools/headers.mjs`](tools/headers.mjs) and is not in `public/`; see the note at
+the top of that file for why.
 
 Two Cloudflare Workers (inquiry form, availability feed) deploy **separately** with
 `wrangler` from [`worker/`](worker/). They are not part of the Pages build and

@@ -7,31 +7,67 @@
  * verified distances from the distance table (§5.2 of docs/01-content.md),
  * the ten in DALSI do not (§9 item 21).
  *
- * Same shape as OkoliLyzovani.astro on purpose: a bordered "here is a
- * verified place" block built from OkoliMistoKarta (one card there, two
- * side by side here   the interface never limited it to one), then a
- * footnote run of the unmeasured names built from OkoliDalsiSeznam.
+ * Same shape as OkoliLyzovani.astro on purpose: a "here is a verified place"
+ * block built from OkoliMistoKarta (one card there, two side by side here
+ * the interface never limited it to one), then a footnote grid of the
+ * unmeasured names built from OkoliDalsiSeznam. No rules between the pieces
+ * in either section   the spacing alone carries the grouping.
  *
- * The two cards get an icon tile, not a photo   no photograph of either place
- * has been sourced for this project (see the note on `Vylet.foto` in
- * src/data/okoli.ts for which places do have one). Because this section's own
- * background IS `--color-kamen`, the tile's default fill, `.koupani-hlavni`
- * overrides that custom property to `--color-omitka` locally so the tile
- * still reads as a tile and not a hole the same colour as the page.
+ * Both cards now carry a real photograph   see the note on `Koupani.foto` in
+ * src/data/okoli.ts for where each one came from. Because this section's own
+ * background IS `--color-kamen`, the tile's default fill (see
+ * OkoliMedia.astro's `.media-frame`), `.koupani-hlavni` overrides that custom
+ * property to `--color-omitka` locally so a tile without a photo   there is
+ * none today, but the fallback stays correct if one is ever removed   still
+ * reads as a tile and not a hole the same colour as the page.
+ *
+ * ---------------------------------------------------------------------------
+ * THE BACKGROUND PHOTOGRAPH
+ *
+ * The same `prehrada-pastviny-letecky.webp` the Přehrada Pastviny card uses
+ * (client-supplied   see the note on `Koupani.foto` in src/data/okoli.ts), full
+ * width behind the whole section instead of cropped to a small tile. Reusing
+ * one photograph rather than sourcing a second is deliberate: the crop and the
+ * scrim below make the two reads different enough that it doesn't look like
+ * repetition, and every photograph on this page being a real, identifiable
+ * place beats padding the section out with a generic "water texture" stock
+ * shot of nowhere in particular.
+ *
+ * It sits behind a `--color-kamen` scrim at ~86% opacity   `.koupani::before`
+ *   so every contrast ratio computed against a flat --color-kamen ground
+ * elsewhere in this file stays true; the photo shows through as texture, not
+ * as a competing background the text has to fight.
+ *
+ * `background-attachment: fixed` only under `(hover: hover) and
+ * (prefers-reduced-motion: no-preference)`: a pointer device with no reduced-
+ * motion preference gets the "photo stays put, the page moves past it" feel
+ * that was asked for; everyone else (touch, or reduced motion) gets the same
+ * photograph scrolling normally with the rest of the section. iOS Safari also
+ * never implements `fixed` attachment reliably, so gating on `hover: hover`
+ * doubles as the fix for that: it degrades to plain `scroll`, not a broken
+ * effect.
+ * ---------------------------------------------------------------------------
  *
  * Band: --kamen. Follows --jinovatka (lyzovani) and precedes --omitka (CtaBand).
  */
+import { getImage } from 'astro:assets';
 import { KOUPANI_BLIZKO, KOUPANI_DALSI } from '../../../data/okoli';
 import OkoliMistoKarta from './OkoliMistoKarta.astro';
 import OkoliDalsiSeznam from './OkoliDalsiSeznam.astro';
+import pozadiZdroj from '@img/prehrada-pastviny-letecky.webp';
 
 /* U+00A0   non-breaking space. */
 const NBSP = ' ';
 
 const STITKY = ['Nejbližší koupání', 'Největší plocha'];
+
+/* `layout: 'none'`   only `.src` is read below, a full responsive ladder for a
+   CSS background-image would be generated and discarded. See the identical
+   note in GalerieTeaser.astro. */
+const pozadi = await getImage({ src: pozadiZdroj, width: 1920, format: 'webp', quality: 65, layout: 'none' });
 ---
 
-<section class="koupani section" aria-labelledby="koupani-nadpis">
+<section class="koupani section" aria-labelledby="koupani-nadpis" style={`--koupani-bg: url(${pozadi.src})`}>
   <div class="wrap">
     <header class="koupani-header" data-reveal>
       <h2 id="koupani-nadpis">Koupání v okolí</h2>
@@ -46,9 +82,11 @@ const STITKY = ['Nejbližší koupání', 'Největší plocha'];
         KOUPANI_BLIZKO.map((k, i) => (
           <OkoliMistoKarta
             icon="waves"
+            foto={k.foto}
             stitek={STITKY[i]}
             nazev={k.nazev}
-            fakta={k.vzdalenost ? [{ hodnota: k.vzdalenost, popis: 'vzdušnou čarou' }] : []}
+            fakta={k.vzdalenost ? [k.vzdalenost] : []}
+            popis={k.popis}
           />
         ))
       }
@@ -71,7 +109,51 @@ const STITKY = ['Nejbližší koupání', 'Největší plocha'];
 
 <style>
   .koupani {
+    position: relative;
+    /* Contains the scrim's negative z-index to THIS section, so it cannot
+       escape and paint behind an ancestor's background instead   plain
+       `position: relative` with no `z-index` set does not by itself create a
+       new stacking context, and without one `z-index: -1` below would resolve
+       against whatever the nearest actual stacking context is instead. */
+    isolation: isolate;
+    /* Fallback ground, and what the scrim below is colour-matched to. */
     background-color: var(--color-kamen);
+    background-image: var(--koupani-bg);
+    background-size: cover;
+    background-position: center 60%;
+    background-repeat: no-repeat;
+  }
+
+  /* "Stuck in one spot, the page moves around it": only where it costs nothing
+     to get wrong   a pointer device, no reduced-motion preference. Everything
+     else (touch, or reduced motion) gets the same photograph scrolling with
+     the section, which is a perfectly normal background image. */
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .koupani {
+      background-attachment: fixed;
+    }
+  }
+
+  /*
+   * The scrim: --color-kamen again, at high opacity, over the photograph. Every
+   * contrast ratio commented elsewhere in this file (mosaz-tmava on kamen =
+   * 5.06:1, kura on kamen = 9.96:1, ...) was measured against a FLAT kamen
+   * ground, and stays true because this reads as close to flat kamen with the
+   * photo underneath as texture   not as a competing photograph the text has to
+   * fight for contrast against.
+   *
+   * Negative z-index, not DOM order: `.koupani`'s `isolation: isolate` above
+   * gives it its own stacking context, so this paints behind the section's own
+   * normal-flow content automatically, without needing `position: relative` on
+   * `.wrap` too.
+   */
+  .koupani::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: rgb(232 230 224 / 0.86);
+    pointer-events: none;
   }
 
   h2 {
@@ -93,12 +175,10 @@ const STITKY = ['Nejbližší koupání', 'Největší plocha'];
   .koupani-hlavni {
     display: grid;
     gap: 2rem;
-    margin-top: 2.5rem;
-    padding-top: 2rem;
-    border-top: 2px solid var(--color-mosaz);
+    margin-top: 3.5rem;
     /* The section band IS --color-kamen, the tile's own default fill (see
-       OkoliMedia.astro's `.media-frame`), so without this override the icon
-       tiles below would sit invisibly on a same-colour ground. */
+       OkoliMedia.astro's `.media-frame`), so without this override a tile
+       with no photo would sit invisibly on a same-colour ground. */
     --color-kamen: var(--color-omitka);
   }
 
@@ -108,12 +188,9 @@ const STITKY = ['Nejbližší koupání', 'Největší plocha'];
     }
   }
 
-  /* A hairline, not the 2px brass rule above: see OkoliLyzovani.astro's
-     equivalent note on why this reads as subordinate. Matches via the cid
+  /* No rule here either   see the header comment. Matches via the cid
      OkoliDalsiSeznam forwards onto its own root   no :global() needed. */
   .koupani-dalsi {
-    margin-top: 3rem;
-    padding-top: 1.75rem;
-    border-top: 1px solid rgb(22 36 28 / 0.14);
+    margin-top: 3.5rem;
   }
 </style>

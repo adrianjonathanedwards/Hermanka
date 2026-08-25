@@ -213,14 +213,12 @@ const FLAKES = Array.from({ length: 16 }, () => ({
 
   /* ---- The two figures --------------------------------------------------
    *
-   * One hairline over both, and the pair set on a two-column grid so the
-   * captions sit under their own figure rather than trailing after it. The rule
-   * is the only chrome   no fill, no border box, nothing that turns two numbers
-   * into two badges.
+   * No rule, no fill, no border box   just the pair on a two-column grid so
+   * the captions sit under their own figure rather than trailing after it.
+   * Nothing here turns two numbers into two badges.
    *
-   * `max-width` keeps the pair narrower than the measure above it, so the second
-   * column lands inside the text block and the rule stops short of the panel's
-   * right edge instead of running out to it like a section divider.
+   * `max-width` keeps the pair narrower than the measure above it, so it reads
+   * as part of the text column rather than a full-width divider.
    */
   .dm-fakta {
     display: grid;
@@ -228,8 +226,6 @@ const FLAKES = Array.from({ length: 16 }, () => ({
     gap: 1.5rem;
     max-width: 22rem;
     margin: 2rem 0 0;
-    padding-top: 1.25rem;
-    border-top: 1px solid rgb(126 89 22 / 0.35);
   }
 
   .dm-fakt-cislo {
