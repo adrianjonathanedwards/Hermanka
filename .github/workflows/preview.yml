@@ -1,0 +1,99 @@
+# Builds the site and publishes it to GitHub Pages, for showing the client
+# before launch.
+#
+# ⚠ THIS IS NOT THE PRODUCTION DEPLOY. Production is Cloudflare Pages, building
+# from this same repository on its own; see README "Deploying". The two do not
+# interact, and nothing here runs in the Cloudflare build.
+#
+# The preview differs from production in ways that matter when reading it:
+#
+#   - it is served from a subdirectory, https://<user>.github.io/Hermanka/,
+#     so the build runs with BASE_PATH set (see tools/gh-pages.mjs)
+#   - `_headers` and `_redirects` are Cloudflare features. GitHub Pages ignores
+#     them, so the preview has no security headers and none of the 301s from
+#     the old WordPress URLs. tools/gh-pages.mjs deletes both rather than ship
+#     files that look live and are not.
+#   - robots.txt is a blanket disallow and the sitemap is dropped, so a copy of
+#     the site on a github.io hostname cannot compete with the real domain in
+#     search.
+#
+# Delete this file and the whole preview mechanism is gone.
+
+name: Preview (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+  # so a preview can be refreshed from the Actions tab without a commit
+  workflow_dispatch:
+
+# Read the repo, mint the Pages token. Nothing else.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One preview at a time. `cancel-in-progress: false` because a half-finished
+# deploy is worse than a slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # .nvmrc is the single source of truth, the same file Cloudflare reads.
+          node-version-file: .nvmrc
+          cache: npm
+
+      # `npm ci` and not `npm install`: the lockfile decides, and a preview that
+      # resolved different versions than production is not a preview.
+      - run: npm ci
+
+      # MUST come before the build: it is what tells us the path and origin the
+      # site will actually be served from, and the build needs both. `origin` is
+      # https://<owner>.github.io and `base_path` is /<repo>, so a repository
+      # rename or a custom domain added later flows through without an edit here.
+      - uses: actions/configure-pages@v5
+        id: pages
+        with:
+          # Switches the repository from "deploy from a branch" (which serves
+          # README.md through Jekyll   what was live before this workflow) to
+          # "GitHub Actions", without anybody visiting the settings page. If the
+          # token is ever not allowed to do this the step fails loudly, and the
+          # same switch is under Settings → Pages → Build and deployment.
+          enablement: true
+
+      - name: Build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+        run: npm run build
+
+      # Cheap insurance against a future component adding an absolute path that
+      # tools/gh-pages.mjs does not know to rewrite: on a subpath that is a 404
+      # for the reader and a green build for us, which is the worst combination
+      # there is. Better to break the build here and be told.
+      - name: Fail if anything still points at the domain root
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: node tools/check-base.mjs
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

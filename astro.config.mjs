@@ -3,10 +3,33 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import headers from './tools/headers.mjs';
+import ghPages from './tools/gh-pages.mjs';
+
+/*
+ * PRODUCTION IS THE DEFAULT AND IS UNCONDITIONAL.
+ *
+ * With neither variable set   which is every local build and every Cloudflare
+ * Pages build   this resolves to the live site at the domain root, exactly as
+ * it did before these two lines existed. The overrides exist for one purpose:
+ * the client-preview deploy to GitHub Pages, which serves the site from a
+ * subdirectory (/Hermanka/) rather than a domain of its own.
+ *
+ * Do NOT set these in the Cloudflare project. See the note in tools/gh-pages.mjs.
+ */
+const SITE = process.env.SITE_URL || 'https://www.chalupahermanka.cz';
+const BASE = process.env.BASE_PATH || '/';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://www.chalupahermanka.cz',
+  site: SITE,
+
+  /*
+   * '/' everywhere except the GitHub Pages preview. Astro prefixes everything it
+   * generates itself   the fingerprinted assets in _a/, every image srcset, the
+   * stylesheet and script tags   with this. It does NOT touch hrefs written by
+   * hand in a component, which is what tools/gh-pages.mjs is for.
+   */
+  base: BASE,
 
   // Static output. There is no server runtime on Cloudflare Pages for this project  
   // the two dynamic things (inquiry form, availability feed) are separate Workers.
@@ -67,6 +90,8 @@ export default defineConfig({
   integrations: [
     sitemap({ filter: (page) => !page.includes('/kontakt/dekujeme') }),
     headers(),
+    /* No-ops entirely unless BASE_PATH is set. Production never runs it. */
+    ghPages(),
   ],
 
   vite: {

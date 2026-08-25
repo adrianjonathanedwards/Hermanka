@@ -78,6 +78,43 @@ is the only place `_redirects` and the real security and cache headers apply.
 [`tools/headers.mjs`](tools/headers.mjs) and is not in `public/`; see the note at
 the top of that file for why.
 
+### The client preview on GitHub Pages
+
+A second, throwaway copy of the site is published to GitHub Pages so the client
+can look at it before the domain is switched over:
+
+**https://adrianjonathanedwards.github.io/Hermanka/**
+
+[`.github/workflows/preview.yml`](.github/workflows/preview.yml) rebuilds it on
+every push to `main`, or on demand from the Actions tab. It is **not** the
+production deploy and differs from it deliberately:
+
+| | Production (Cloudflare) | Preview (GitHub Pages) |
+| --- | --- | --- |
+| Served from | the domain root | the `/Hermanka/` subdirectory |
+| `_headers` (CSP, HSTS…) | applied | **ignored by GitHub Pages**, so deleted from the artifact |
+| `_redirects` (the old WordPress URLs) | applied | **ignored**, so deleted |
+| robots.txt | `Allow: /` | `Disallow: /`, and the sitemap is dropped |
+
+That last row matters: the preview is a copy of the site on a different
+hostname, and left crawlable it would compete with chalupahermanka.cz for the
+client's own search terms.
+
+**One-time setup, in the repository settings:** Settings → Pages → Build and
+deployment → Source → **GitHub Actions**. Until that is set, GitHub serves this
+README through Jekyll instead of the site.
+
+Serving from a subdirectory is the whole difficulty. Astro's `base` prefixes
+everything Astro emits, but not the paths written by hand in components
+(`href="/galerie"`, the font preloads, the favicon). Those are rewritten after
+the build by [`tools/gh-pages.mjs`](tools/gh-pages.mjs), and
+[`tools/check-base.mjs`](tools/check-base.mjs) fails the build if it ever misses
+one   on a subpath a stray `/…` is a 404 for the reader and a green build for
+us. Reproduce it locally with `npm run build:preview`.
+
+Neither file does anything unless `BASE_PATH` is set, and nothing sets it except
+that workflow. **Never set `BASE_PATH` or `SITE_URL` on Cloudflare.**
+
 Two Cloudflare Workers (inquiry form, availability feed) deploy **separately** with
 `wrangler` from [`worker/`](worker/). They are not part of the Pages build and
 neither is written yet. Their secrets   `RESEND_API_KEY`, `INQUIRY_TO`,
