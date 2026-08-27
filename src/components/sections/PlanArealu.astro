@@ -1,216 +1,98 @@
-﻿---
+---
 /**
- * The property plan, made live.
+ * The property plan.
  *
  * ---------------------------------------------------------------------------
- * WHAT THIS FIXES
  * `situace2.webp` is the client's aerial with every label painted into the
  * pixels: `Hot Tube`, `Jezírko`, `Mezonetová ložnice 2+3 os.` and a dozen more.
  * docs/01-content.md §9 flags that as launch-blocking, and §4 of the design
- * system asks for the fix in as many words   "Rebuild them as photograph +
+ * system asks for the fix in as many words — "Rebuild them as photograph +
  * inline SVG … the map as a whole gets a <title> and a text alternative listing
  * what it shows."
  *
  * The proper rebuild needs a CLEAN AERIAL with no baked type, which the client
- * has not supplied. TODO(client): ask for one. Until it exists, this does the
- * half that does not need it: every place on the plan becomes a real hotspot
- * with a real name and a real description in the DOM, and the photographs from
- * the gallery are wired to the spot on the ground they were taken at. When the
- * clean plate arrives, the painted labels come off and nothing here changes.
- *
- * ---------------------------------------------------------------------------
- * WHY THERE IS NO JAVASCRIPT IN IT
- * A radio group. One hidden `<input>` per place, `<label for>` markers over the
- * photograph, and the panel switching on `:checked`. That buys, for nothing:
- *
- *   - it works with scripting off, like the rest of the site;
- *   - arrow keys walk the group, so the whole map is keyboard-navigable and the
- *     panel follows the focus   genuinely the nicest way to read it;
- *   - a screen reader announces it as what it is, a group of places to choose
- *     between, and the <legend> names the group.
- *
- * The `<fieldset>` is what gives the group its accessible name. It has to be
- * reset hard   browsers give it a border, padding and a `min-width: min-content`
- * that breaks grid children.
- *
- * ⚠ THE RADIOS MUST COME FIRST IN THE MARKUP. Everything that reacts to a
- * selection does it through `~`, the general sibling combinator, which only
- * looks FORWARD. Move the inputs below the map and every rule in `LINKS` below
- * silently stops matching.
+ * has not supplied. TODO(client): ask for one. Until it exists, the section is
+ * the photograph itself plus `SPOTS` below, which puts every place on the plan
+ * into the DOM as real text for a screen reader or a search engine. That list
+ * is the reason the painted labels are not the only place this information
+ * exists, so it stays even though nothing on screen renders it.
  * ---------------------------------------------------------------------------
  */
 import { Image } from 'astro:assets';
 
 import plan from '@img/situace2.webp';
-import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
-import jidelna from '@img/DSC_5123-scaled-1-1.jpg';
-import virivka from '@img/DSC_4684-scaled-1.jpg';
-import houpacky from '@img/DSC_5166-scaled-1-1.jpg';
-import sauna from '@img/DSC_5204.webp';
-import terasa from '@img/DSC_5192.webp';
 
 const NBSP = ' ';
 
 interface Spot {
-  id: string;
   nazev: string;
   popis: string;
-  /** Position of the marker over the photograph, as a percentage of its box. */
-  x: number;
-  y: number;
-  /** Optional   six of the fourteen places have a photograph of their own. */
-  foto?: ImageMetadata;
-  alt?: string;
-  /** Shown as a small brass figure on the card. Capacities, counts, distances. */
+  /** Shown in the text alternative. Capacities, counts, distances. */
   detail?: string;
 }
 
-/*
- * Coordinates are read off the client's own aerial and land on the markers
- * already painted on it, so the live dots sit where the map says the places
- * are rather than somewhere approximately near them. If the photograph is ever
- * recropped, every one of these moves.
- */
 const SPOTS: Spot[] = [
   {
-    id: 'potucek',
     nazev: 'Potůček',
     popis: 'Teče podél horní hranice pozemku, po celý rok.',
-    x: 46.5,
-    y: 8.5,
   },
   {
-    id: 'jezirko',
     nazev: 'Jezírko',
     popis: 'Na ochlazení po sauně, hned pod chalupou.',
-    x: 41.7,
-    y: 41,
   },
   {
-    id: 'hot-tube',
     nazev: 'Vířivka',
     popis: 'Dřevěný HotTube s vyhřívanými schody, pod širým nebem.',
-    x: 38.4,
-    y: 55.1,
-    foto: virivka,
-    alt: 'Dřevěná vířivka s vyhřívanými schody na terase, kolem dokola vzrostlý les',
   },
   {
-    id: 'sauna',
     nazev: 'Venkovní sauna',
     popis: 'Finská sauna s dřevěnými lavicemi a výhledem do lesa.',
-    x: 47.1,
-    y: 52.7,
-    foto: sauna,
-    alt: 'Otevřené dveře do venkovní finské sauny s dřevěnými lavicemi',
   },
   {
-    id: 'terasa',
     nazev: 'Krytá terasa',
     popis: 'Venkovní zděný krb a posezení pro celou skupinu, výhled na pastviny.',
-    x: 69.1,
-    y: 40.8,
-    foto: terasa,
-    alt: 'Krytá terasa s venkovním zděným krbem, skleněným stolem a proutěnými křesly, v pozadí les',
   },
   {
-    id: 'balkon',
     nazev: 'Balkon',
     popis: 'Otevřená terasa s výhledem do zalesněného údolí.',
-    x: 80.2,
-    y: 50.3,
   },
   {
-    id: 'posezeni',
     nazev: 'Posezení',
     popis: 'Stůl s lavicemi na zahradě, mezi chalupou a jezírkem.',
-    x: 51.4,
-    y: 69,
   },
   {
-    id: 'houpacky',
     nazev: 'Houpačky',
     popis: 'Dřevěná houpačka se dvěma sedátky a skluzavkou.',
-    x: 30,
-    y: 75.7,
-    foto: houpacky,
-    alt: 'Dřevěná houpačka se dvěma sedátky a zelenou skluzavkou na zatravněné zahradě',
   },
   {
-    id: 'ohniste',
     nazev: 'Ohniště',
     popis: 'Na zahradě pod chalupou, stranou od stromů.',
-    x: 54.9,
-    y: 84,
   },
   {
-    id: 'parkoviste',
     nazev: 'Parkoviště',
     popis: 'Vlastní příjezdová cesta, parkování přímo u objektu.',
-    x: 90.3,
-    y: 36.4,
     detail: `4${NBSP}auta`,
   },
   {
-    id: 'obyvak',
     nazev: 'Obývák a kuchyň',
     popis: 'Krb, dlouhý jídelní stůl pod trámovým stropem a okna do zahrady.',
-    x: 56.5,
-    y: 65.5,
-    foto: obyvak,
-    alt: 'Obývací pokoj s krbem a dlouhým jídelním stolem pod dřevěným trámovým stropem',
   },
   {
-    id: 'loznice-prizemi',
     nazev: 'Ložnice v přízemí',
     popis: 'V přízemí, spolu s koupelnou a WC.',
-    x: 67.9,
-    y: 55.4,
     detail: `2${NBSP}osoby`,
   },
   {
-    id: 'mezonet-a',
     nazev: 'Mezonetová ložnice',
     popis: 'V patře, nad terasou.',
-    x: 71,
-    y: 48.2,
     detail: `2${NBSP}+${NBSP}3 osoby`,
   },
   {
-    id: 'mezonet-b',
     nazev: 'Mezonetová ložnice',
     popis: 'V patře, nad obývacím pokojem. Největší z trojice.',
-    x: 63.5,
-    y: 61.5,
-    foto: jidelna,
-    alt: 'Jídelní stůl se sušenou kyticí, v pozadí zelená kožená sedačka a okna do zahrady',
     detail: `6${NBSP}+${NBSP}2 osoby`,
   },
 ];
-
-/*
- * The rules that tie each radio to its marker and its card.
- *
- * These are GENERATED and emitted `is:inline`, which means unscoped   Astro's
- * scoped `<style>` blocks are static text and cannot be looped over, and there
- * is no way to correlate the nth input with the nth card in plain CSS. Every
- * selector below is anchored on an id, and ids are unique per document, so
- * losing the scope hash costs nothing.
- *
- * `:checked` is the selection. `:focus-visible` is separate on purpose: arrowing
- * through a radio group moves the checked state with the focus, but a user
- * TABBING into the group lands on the checked radio without changing it, and the
- * marker still has to show where the focus went.
- */
-const LINKS = SPOTS.map(
-  (s) => `
-#plan-${s.id}:checked ~ .plan-map [for="plan-${s.id}"] { z-index: 3; }
-#plan-${s.id}:checked ~ .plan-map [for="plan-${s.id}"] .plan-dot { transform: scale(1.35); background-color: var(--color-mosaz); box-shadow: 0 0 0 3px var(--color-omitka), 0 0 0 9px rgb(140 99 24 / 0.32); }
-#plan-${s.id}:checked ~ .plan-map [for="plan-${s.id}"] .plan-tip { opacity: 1; transform: translate(-50%, 0); }
-#plan-${s.id}:focus-visible ~ .plan-map [for="plan-${s.id}"] .plan-dot { outline: 2px solid var(--color-mosaz); outline-offset: 5px; }
-#plan-${s.id}:checked ~ .plan-panel #card-${s.id} { opacity: 1; visibility: visible; }
-`,
-).join('');
 ---
 
 <section class="plan section" aria-labelledby="plan-nadpis">
@@ -219,95 +101,69 @@ const LINKS = SPOTS.map(
       <p class="eyebrow">Areál</p>
       <h2 id="plan-nadpis">Co kde na pozemku najdete</h2>
       <p class="lead">
-        Projděte si areál z ptačí perspektivy. Klepněte na kterékoli místo v plánu
-        nebo se mezi nimi posouvejte šipkami. Ukážeme vám, co na něm je.
+        Takhle vypadá pozemek shora. Chalupa, vířivka, sauna, jezírko i ohniště.
+        Všechno pohromadě, stranou od silnice.
       </p>
     </div>
 
-    <fieldset class="plan-grid" data-reveal="up" data-reveal-delay="90">
-      <legend class="sr-only">Místa na pozemku chalupy Heřmanka</legend>
+    <figure class="plan-map" data-reveal="up" data-reveal-delay="90">
+      {/*
+        ---- WHY IT PANS ON A PHONE ----
+        The same problem OkoliMapa.astro solves, and the same fix, because it is
+        the same kind of object: an aerial with every label painted into the
+        pixels. At 390px edge to edge, `Mezonetová ložnice 2+3 os.` renders at
+        about 5px and the section is a green rectangle with a house in it   the
+        one graphic that answers "what is actually on the property" told a phone
+        reader nothing.
 
-      {/* ⚠ First in the markup. Everything downstream reacts through `~`. */}
-      {
-        SPOTS.map((s, i) => (
-          <input
-            type="radio"
-            name="plan-spot"
-            id={`plan-${s.id}`}
-            class="plan-radio sr-only"
-            checked={i === 0}
-          />
-        ))
-      }
+        Below 48rem the figure is a horizontal scroller holding a 40rem minimum,
+        so the plate is panned at a size the baked type can be read at. From
+        48rem the container is wider than that minimum, there is nothing left to
+        scroll, and this is an ordinary block.
 
-      <figure class="plan-map">
-        {/*
-          `quality` below is 62, not 72. situace2.webp is already a compressed
-          WebP, so this is a re-encode   and measured against the source pixels,
-          q=72 scored WORSE than q=62 (36.50 dB against 37.13) while costing
-          10 kB more, because the extra bits go into faithfully reproducing the
-          source's own compression artefacts. 62 is the peak of the curve for
-          this file, not a saving taken out of it.
-        */}
-        <Image
-          src={plan}
-          alt="Letecký snímek chalupy Heřmanka a jejího pozemku"
-          widths={[720, 1000, 1400]}
-          sizes="(min-width: 64rem) 60vw, 100vw"
-          width={1205}
-          height={902}
-          format="webp"
-          quality={62}
-          loading="lazy"
-          class="plan-photo"
-        />
-
-        {
-          SPOTS.map((s) => (
-            <label class="plan-pin" for={`plan-${s.id}`} style={`--x:${s.x}%;--y:${s.y}%`}>
-              {/*
-                The label's text is the radio's accessible name, so it carries
-                the place name even though the marker shows only a dot. The
-                visible tip is aria-hidden   it would otherwise say it twice.
-              */}
-              <span class="sr-only">{s.nazev}</span>
-              <span class="plan-dot" aria-hidden="true" />
-              <span class="plan-tip" aria-hidden="true">
-                {s.nazev}
-              </span>
-            </label>
-          ))
-        }
-      </figure>
-
-      <div class="plan-panel">
-        {
-          SPOTS.map((s) => (
-            <article class="plan-card" id={`card-${s.id}`}>
-              {s.foto && (
-                <Image
-                  src={s.foto}
-                  alt={s.alt ?? ''}
-                  widths={[320, 480, 640]}
-                  sizes="(min-width: 64rem) 22vw, 100vw"
-                  width={640}
-                  height={480}
-                  format="webp"
-                  quality={62}
-                  loading="lazy"
-                  class="plan-card-foto"
-                />
-              )}
-              <div class="plan-card-body">
-                <h3>{s.nazev}</h3>
-                {s.detail && <p class="plan-card-detail">{s.detail}</p>}
-                <p class="plan-card-popis">{s.popis}</p>
-              </div>
-            </article>
-          ))
-        }
+        `tabindex="0"` is required rather than decorative: a scroll container
+        that cannot take focus cannot be scrolled from a keyboard (WCAG 2.1.1).
+        `role="group"` and the label stop a screen reader announcing an unnamed
+        scroll region   and the reader already has `SPOTS` below, in text.
+      */}
+      <div
+        class="plan-pan"
+        tabindex="0"
+        role="group"
+        aria-label="Plán pozemku. Na malé obrazovce jej lze posouvat do stran"
+      >
+        <div class="plan-plate">
+      {/*
+        `quality` below is 62, not 72. situace2.webp is already a compressed
+        WebP, so this is a re-encode — and measured against the source pixels,
+        q=72 scored WORSE than q=62 (36.50 dB against 37.13) while costing
+        10 kB more, because the extra bits go into faithfully reproducing the
+        source's own compression artefacts. 62 is the peak of the curve for
+        this file, not a saving taken out of it.
+      */}
+      <Image
+        src={plan}
+        alt="Letecký snímek chalupy Heřmanka a jejího pozemku"
+        widths={[720, 1000, 1400]}
+        sizes="(min-width: 64rem) 64rem, (min-width: 48rem) 100vw, 40rem"
+        width={1205}
+        height={902}
+        format="webp"
+        quality={62}
+        loading="lazy"
+        class="plan-photo"
+      />
+        </div>
       </div>
-    </fieldset>
+
+      {/*
+        An instruction, not a description   the heading and lead above already
+        say what this is. `aria-hidden` because the affordance is in the scroll
+        region's own label, and it is hidden outright from 48rem where there is
+        nothing left to pan.
+      */}
+      <figcaption class="plan-hint" aria-hidden="true">Plán posuňte prstem do stran.</figcaption>
+    </figure>
 
     {/*
       The text alternative for the map, per docs/02-design-system.md §4. It is
@@ -334,8 +190,6 @@ const LINKS = SPOTS.map(
   </div>
 </section>
 
-<style is:inline set:html={LINKS}></style>
-
 <style>
   .plan {
     background-color: var(--color-kamen);
@@ -343,7 +197,9 @@ const LINKS = SPOTS.map(
 
   .plan-head {
     max-width: var(--container-prose);
+    margin-inline: auto;
     margin-bottom: 2.5rem;
+    text-align: center;
   }
 
   h2 {
@@ -356,36 +212,39 @@ const LINKS = SPOTS.map(
     color: var(--color-kura);
   }
 
-  /*
-   * Hard reset. A <fieldset> ships with a border, 0.35em/0.75em of padding and  
-   * the one that actually breaks things   `min-inline-size: min-content`, which
-   * stops it shrinking and blows the grid out on a phone.
-   */
-  .plan-grid {
-    display: grid;
-    gap: 1.5rem;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    min-inline-size: 0;
-  }
-
-  @media (width >= 64rem) {
-    .plan-grid {
-      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-      gap: 2rem;
-      align-items: start;
-    }
-  }
-
   /* ---- The map ---------------------------------------------------------- */
 
   .plan-map {
-    position: relative;
-    margin: 0;
+    max-width: 64rem;
+    margin: 0 auto;
+    line-height: 0;
+  }
+
+  /*
+   * ⚠ Nothing carrying `data-drift` may ever go inside this. `overflow-x: auto`
+   * makes it a scroll container, and `view()` resolves against the nearest
+   * ancestor scroll container   a drifting layer in here would take its timeline
+   * from a box that scrolls sideways and would sit frozen. Same warning as
+   * `.mapa-pan` in OkoliMapa.astro, same reason.
+   */
+  .plan-pan {
+    /* See the identical note on `.okoli-mapa`: a 40rem plate inside a box that
+       is allowed to grow to its content takes the whole page sideways with it. */
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
     /* Photographs are square-cornered (see the radius note in global.css). */
     background-color: var(--color-les);
-    line-height: 0;
+  }
+
+  .plan-plate {
+    min-width: 40rem;
+  }
+
+  @media (width >= 48rem) {
+    .plan-plate {
+      min-width: 0;
+    }
   }
 
   .plan-photo {
@@ -393,202 +252,28 @@ const LINKS = SPOTS.map(
     height: auto;
   }
 
-  /* ---- Markers ---------------------------------------------------------- */
-
-  .plan-pin {
-    position: absolute;
-    left: var(--x);
-    top: var(--y);
-    /*
-     * The box is 44px so the touch target clears the minimum, while the dot
-     * inside it stays small enough not to bury the photograph. Translating by
-     * half puts the DOT on the coordinate, not the corner of its target.
-     */
-    width: 44px;
-    height: 44px;
-    margin: -22px 0 0 -22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 2;
-  }
-
-  .plan-dot {
-    display: block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background-color: var(--color-mosaz-svetla);
-    /*
-     * The white collar is not decoration. This dot has to be findable over a
-     * sunlit meadow and over black spruce in the same photograph, and brass
-     * alone disappears against one or the other.
-     */
-    box-shadow: 0 0 0 3px var(--color-omitka), 0 0 0 4px rgb(22 36 28 / 0.35);
-    transition:
-      transform 260ms var(--ease-spring),
-      background-color 200ms var(--ease-out),
-      box-shadow 260ms var(--ease-out);
-  }
-
-  @media (hover: hover) {
-    .plan-pin:hover {
-      z-index: 3;
-    }
-
-    .plan-pin:hover .plan-dot {
-      transform: scale(1.35);
-      background-color: var(--color-mosaz);
-    }
-  }
-
-  /* ---- The name that follows the marker ---------------------------------- */
-
-  .plan-tip {
-    position: absolute;
-    bottom: calc(100% - 4px);
-    left: 50%;
-    padding: 0.3rem 0.6rem;
-    border-radius: var(--radius-sm);
-    background-color: var(--color-les);
-    color: var(--color-omitka);
+  .plan-hint {
+    margin-top: 0.625rem;
     font-size: var(--text-caption);
-    font-weight: var(--font-weight-semibold);
-    line-height: 1.3;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, 4px);
-    transition:
-      opacity 200ms var(--ease-out),
-      transform 260ms var(--ease-spring);
-  }
-
-  @media (hover: hover) {
-    .plan-pin:hover .plan-tip {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-  }
-
-  /*
-   * The tips on the two markers nearest each edge would otherwise run off the
-   * photograph. Anchor those to the marker's inner side instead of its centre.
-   */
-  .plan-pin[for='plan-parkoviste'] .plan-tip,
-  .plan-pin[for='plan-balkon'] .plan-tip {
-    left: auto;
-    right: 50%;
-    transform: translate(0, 4px);
-  }
-
-  @media (hover: hover) {
-    .plan-pin[for='plan-parkoviste']:hover .plan-tip,
-    .plan-pin[for='plan-balkon']:hover .plan-tip {
-      transform: translate(0, 0);
-    }
-  }
-
-  .plan-pin[for='plan-houpacky'] .plan-tip {
-    left: 50%;
-    right: auto;
-  }
-
-  /* ---- The panel --------------------------------------------------------
-   *
-   * Every card is stacked in the same grid cell and only the selected one is
-   * visible, so the panel is always as tall as its tallest card and choosing a
-   * place never moves the page under the cursor.
-   */
-  .plan-panel {
-    display: grid;
-    background-color: var(--color-omitka);
-    border: 1px solid rgb(62 50 38 / 0.14);
-  }
-
-  .plan-card {
-    grid-area: 1 / 1;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 260ms var(--ease-out);
-  }
-
-  .plan-card-foto {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-  }
-
-  .plan-card-body {
-    padding: 1.25rem 1.25rem 1.5rem;
-  }
-
-  .plan-panel h3 {
-    font-size: var(--text-title-s);
-    color: var(--color-les);
-  }
-
-  .plan-card-detail {
-    margin-top: 0.4rem;
-    font-size: var(--text-caption);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-mosaz-tmava);
-  }
-
-  .plan-card-popis {
-    margin-top: 0.6rem;
+    line-height: 1.6;
+    /* --kura on --kamen = 9.96:1 */
     color: var(--color-kura);
   }
 
-  /*
-   * Eight of the fourteen places have no photograph of their own, and their
-   * cards are a third the height of the ones that do. The grid stack already
-   * stops the panel resizing   it is always as tall as the tallest card, so
-   * choosing a place never moves the page under the cursor   but it leaves the
-   * short cards sitting at the top of a tall empty box.
-   *
-   * Centring them vertically makes that space read as deliberate rather than as
-   * something failing to load.
-   */
-  .plan-card:not(:has(.plan-card-foto)) {
-    display: grid;
-    align-content: center;
+  @media (width >= 48rem) {
+    .plan-hint {
+      display: none;
+    }
   }
 
-  /* ---- Phones -----------------------------------------------------------
-   *
-   * Two problems at 390 px, and they compound. The map is a quarter of the size
-   * it is on a laptop, and four of the markers are interior rooms clustered on
-   * one roof   at that scale their 44 px targets overlap each other and half the
-   * outdoor markers as well.
-   *
-   * So: let the photograph go edge to edge for the extra width, and drop the
-   * four interior markers. Nothing is lost   the rooms are still in the text
-   * alternative, still reachable with the arrow keys, and their capacities are
-   * set out properly in the bed table one section up. They are also the least
-   * spatial things on the plan: knowing the 6+2 room is *over there* on a roof
-   * is worth much less than knowing where the fire pit is.
-   */
+  /* On a phone it goes edge to edge, so the panned plate gets the full width. */
   @media (width < 48rem) {
     .plan-map {
       margin-inline: -1.5rem;
     }
 
-    .plan-pin[for='plan-obyvak'],
-    .plan-pin[for='plan-loznice-prizemi'],
-    .plan-pin[for='plan-mezonet-a'],
-    .plan-pin[for='plan-mezonet-b'] {
-      display: none;
-    }
-
-    .plan-dot {
-      width: 12px;
-      height: 12px;
+    .plan-hint {
+      padding-inline: 1.5rem;
     }
   }
 </style>

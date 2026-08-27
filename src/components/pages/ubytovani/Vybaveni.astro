@@ -16,6 +16,15 @@
  * took a bedroom photo instead, which freed this one up for the room its own
  * copy actually opens on.
  *
+ * ⚠ BAND: --omitka, by request, not --kamen. This is the one deviation from
+ * docs/02-design-system.md §3's "no two adjacent bands share a ground"   the
+ * section directly above (Loznice) is also --omitka. The two still read as
+ * separate sections because the split mirrors sides (media-right, then
+ * media-left) and each has its own photograph; nothing here relies on the
+ * ground colour to mark the boundary. If that ever stops being enough, the fix
+ * is a divider between them (RoofDivider, the device Vybaveni's own
+ * `Přehled vybavení` half already uses), not reverting to --kamen.
+ *
  * ---------------------------------------------------------------------------
  * THE OVERVIEW WAS FIVE COLUMNS OF PLAIN TEXT AND IT STILL IS.
  *
@@ -129,12 +138,12 @@ import { VYBAVENI } from '../../../data/vybaveni';
 
 <style>
   .vybaveni {
-    background-color: var(--color-kamen);
+    background-color: var(--color-omitka);
   }
 
   h2 {
-    /* --mosaz-tmava on --kamen = 5.06:1. Plain --mosaz would be 4.30:1   the
-       failure §1.2 warns about, and this is a stone band. */
+    /* --mosaz-tmava on --omitka = 6.05:1. Plain --mosaz would be 4.30:1   the
+       failure §1.2 warns about. */
     color: var(--color-mosaz-tmava);
   }
 
@@ -234,13 +243,17 @@ import { VYBAVENI } from '../../../data/vybaveni';
     }
   }
 
+  /*
+   * --color-kamen fill, not --color-omitka: the section itself is --omitka now
+   * (see the file header), so a white card on a white ground would have shown
+   * only a hairline for an edge. Stone-on-white reads as a card without one.
+   */
   .skupina {
     break-inside: avoid;
     margin-bottom: 2rem;
     padding: 1.25rem 1.25rem 1.25rem;
-    background-color: var(--color-omitka);
+    background-color: var(--color-kamen);
     border-radius: var(--radius-sm);
-    border: 1px solid rgb(62 50 38 / 0.1);
   }
 
   .skupina-nadpis {

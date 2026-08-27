@@ -1,47 +1,71 @@
-﻿---
+---
 /**
- * Ceník   one table, seasons as rows, week and weekend as columns.
+ * Ceník   one plain list, seasons as rows, a real photograph per season.
  *
- * docs/01-content.md §6.2: "REWRITE the presentation into one table with
- * seasons as rows. Six near-identical cards to express four distinct prices
- * is five cards too many."
- *
- * Every figure is drawn from src/data/cenik.ts through formatKc(). The word
- * "every" is absolute: no price, no per-person figure and no currency amount
- * may be typed into this file (docs/01-content.md §2   the four-year-old
+ * REDONE: was a `<table>` with a boxed, left-bordered note above it. Both are
+ * gone. Every figure still comes from src/data/cenik.ts through formatKc()
+ * the word "every" is absolute: no price, no per-person figure and no currency
+ * amount may be typed into this file (docs/01-content.md §2, the four-year-old
  * hardcoded 311 Kč that stopped matching the price list is why this module
  * exists at all).
  *
- * ⚠ PRESNE_HRANICE_CHYBI is true. "půlka března" is prose, not a date. The
- * season boundary decides the price   15. 3. and 31. 3. are 4 000 Kč apart
- * for the same week. An exact boundary is launch-blocking: docs/01-content.md
- * §9 item 5. Until the client answers, the table shows the prose periods the
- * old site had, with a visible note that they are approximate.
+ * ---------------------------------------------------------------------------
+ * WHY A LIST OF ROWS, NOT A TABLE, AND NOT A CARD EACH
  *
- * ⚠ The table must not force the page to scroll sideways (hard rule #13).
- * `overflow-x: auto` on .tabulka-scroll means the PAGE body never scrolls;
- * the table may scroll inside its own wrapper on very narrow viewports.
+ * Three seasons, four figures. A `<table>` was the right call over six cards
+ * (docs/01-content.md §6.2), but a table has a second failure mode on a phone:
+ * it either scrolls sideways or its columns collapse until the price and the
+ * season that owns it are two thumb-widths apart. Three rows in a plain list,
+ * each one a season name, its months, and its two prices, reflows on its own
+ * terms instead   the price pair drops under the name on a narrow phone and
+ * sits at the row's right edge everywhere wider, so the "prices must line up
+ * and be COMPARABLE" property the table existed for survives without the
+ * scroll wrapper.
  *
- * Section band: --kamen. KalendarSlot above it is --omitka.
+ * No card box around a row, either. `--color-omitka` fill and a hairline
+ * border on three near-identical boxes said "these are three unrelated
+ * offers"; three rows under one rule say what is actually true, that they are
+ * one price list with three entries.
  *
- * TODO(client)   docs/01-content.md §9 item 5: exact season boundaries.
- * "půlka března" and "půlka září" must become real dates. Once supplied,
- * SEZONY gains od/do month-day pairs and sezonaProDatum() can be added;
- * this component changes nothing.
+ * ---------------------------------------------------------------------------
+ * THE PHOTOGRAPHS
  *
- * TODO(client)   docs/01-content.md §9 item 6: definition of "víkend".
- * How many nights, which days, bank holidays? The table caption notes it
- * as undefined until the answer arrives.
+ * One per season, all the client's own, all already used elsewhere on the
+ * site: `dolnimorava.webp` (the ski slopes   Zimní sezona), `DSC_5189.webp`
+ * (the garden table under full summer leaf   Letní sezona), `DSC_5228.webp`
+ * (the cottage's own three-quarter exterior, in no particular season   Mimo
+ * sezonu, which has no season of its own to photograph). They replace the note
+ * box and the empty space a bare table left beside three rows of numbers   the
+ * "use images" instruction was answered with real photographs of real seasons
+ * here, not a stock photo of a calendar.
  */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import IconLucide from '../../IconLucide.astro';
-import { SEZONY, KAPACITA, formatKc, PRESNE_HRANICE_CHYBI } from '../../../data/cenik';
+import type { LucideName } from '../../IconLucide.astro';
+import { SEZONY, KAPACITA, formatKc, PRESNE_HRANICE_CHYBI, type Sezona } from '../../../data/cenik';
+import zimniFoto from '@img/dolnimorava.webp';
+import letniFoto from '@img/DSC_5189.webp';
+import mimoFoto from '@img/DSC_5228.webp';
+
+const SEZONA_FOTO: Record<Sezona['klic'], ImageMetadata> = {
+  zimni: zimniFoto,
+  letni: letniFoto,
+  mimo: mimoFoto,
+};
+
+const SEZONA_IKONA: Record<Sezona['klic'], LucideName> = {
+  zimni: 'snowflake',
+  letni: 'sun',
+  mimo: 'trees',
+};
 
 /*
  * U+00A0   hard space. Written as a constant so it cannot be mistaken for
  * an ordinary space in review or in edits. docs/02-design-system.md §2.6:
  * required between a numeral and its unit and after single-letter prepositions.
  */
-const NBSP = ' ';
+const NBSP = ' ';
 ---
 
 <section class="section cenik" aria-labelledby="cenik-nadpis">
@@ -57,89 +81,80 @@ const NBSP = ' ';
       </p>
       <h2 id="cenik-nadpis">Ceník</h2>
       <p class="lead">
-        Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění  
+        Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění
         chalupa je k dispozici jako celek.
       </p>
     </div>
 
-    <div class="tabulka-obal" data-reveal data-reveal-delay="80">
+    <ul class="cenik-list" data-reveal data-reveal-delay="80" role="list" aria-describedby="cenik-pozn">
+      {
+        SEZONY.map((s) => (
+          <li class="cenik-radek">
+            <div class="cenik-media media-frame">
+              <Image
+                src={SEZONA_FOTO[s.klic]}
+                alt=""
+                widths={[96, 176, 288]}
+                sizes="5rem"
+                width={288}
+                height={288}
+                format="webp"
+                quality={62}
+                loading="lazy"
+                class="cenik-foto"
+              />
+            </div>
 
-      {/*
-        This note is conditional on the build-time flag. When the client
-        supplies exact dates (item 5 above), PRESNE_HRANICE_CHYBI flips to
-        false and the note disappears without touching this template.
-      */}
-      {PRESNE_HRANICE_CHYBI && (
-        <div class="hranice-pozn" role="note">
-          <IconLucide name="info" size={16} class="hranice-ikona" />
-          <p>
-            {/*
-              ⚠ Guest-facing copy. This sentence used to read "ještě čekají na
-              potvrzení od klienta"   the agency's view of the job, printed on
-              the price page for people who have no idea who "the client" is and
-              no reason to be told a supplier is late. Say what it means for the
-              reader instead: the dates below are approximate and we will confirm
-              theirs. Keep any future wording here in the second person.
-              TODO(client)   docs/01-content.md §9 item 5
-            */}
-            Přesné hranice sezón ještě dolaďujeme, zatím platí přibližné
-            vymezení z původního ceníku. Váš termín vám rádi potvrdíme předem,
-            stačí napsat.
-          </p>
-        </div>
-      )}
+            <div class="cenik-info">
+              <h3 class="cenik-nazev">
+                <IconLucide name={SEZONA_IKONA[s.klic]} size={16} class="cenik-ikona" />
+                <span>{s.nazev}</span>
+              </h3>
+              <p class="cenik-obdobi">{s.obdobi}</p>
+            </div>
 
-      {/*
-        The table sits inside a scroll-safe wrapper. The page body never
-        scrolls sideways; the table may scroll inside this div on very narrow
-        viewports. min-width is set explicitly so the price columns do not
-        collapse to an unreadable width before the scroll kicks in.
-      */}
-      <div class="tabulka-scroll">
-        <table class="ceny" aria-describedby="cenik-pozn">
-          <caption>
-            Cena za celou chalupu
-            {/*
-              "Víkend" is still undefined   docs/01-content.md §9 item 6.
-              TODO(client): how many nights, Fri–Sun or Sat–Mon, bank holidays?
-              The note below the table surfaces this. Caption keeps it short.
-            */}
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col" class="col-sezona">Sezóna</th>
-              <th scope="col" class="col-cena">Týden</th>
-              <th scope="col" class="col-cena">Víkend</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SEZONY.map((s) => (
-              <tr class:list={[`sez-${s.klic}`]}>
-                <th scope="row">
-                  <span class="sezona-nazev">{s.nazev}</span>
-                  <span class="sezona-obdobi">{s.obdobi}</span>
-                </th>
-                <td>{formatKc(s.tyden)}</td>
-                <td>{formatKc(s.vikend)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            <div class="cenik-ceny">
+              <div class="cenik-cena">
+                <span class="cenik-cena-hodnota">{formatKc(s.tyden)}</span>
+                <span class="cenik-cena-label">týden</span>
+              </div>
+              <div class="cenik-cena">
+                <span class="cenik-cena-hodnota">{formatKc(s.vikend)}</span>
+                <span class="cenik-cena-label">víkend</span>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
 
-      <p class="cenik-pozn" id="cenik-pozn">
-        K ceně se připočítává elektřina dle spotřeby, voda a rekreační poplatek
-        obci.{NBSP}Podrobnosti v{NBSP}přehledu poplatků níže.
-      </p>
+    {/*
+      Replaces the old boxed, left-bordered note. A plain line under the list,
+      the same weight as the note under it   an honest caveat, not an alert.
+      Conditional on the build-time flag: once the client supplies exact
+      dates (docs/01-content.md §9 item 5), PRESNE_HRANICE_CHYBI flips to
+      false and this disappears without touching the template.
+    */}
+    {
+      PRESNE_HRANICE_CHYBI && (
+        <p class="cenik-note">
+          <IconLucide name="info" size={15} class="cenik-note-ikona" />
+          {/*
+            ⚠ Guest-facing copy, second person throughout   see the file's
+            previous version for why "čeká na potvrzení od klienta" is wrong.
+          */}
+          Přesné hranice sezón ještě dolaďujeme, zatím platí přibližné
+          vymezení z původního ceníku. Váš termín vám rádi potvrdíme předem,
+          stačí napsat.
+        </p>
+      )
+    }
 
-      {/*
-        The whole-weeks rule for Jan/Feb and Jul/Aug is already shown prominently
-        above by KalendarSlot   repeating it in full here would be redundant.
-        The "Víkend" column itself implies the rule: if your month is one of the
-        four, the weekend price simply does not apply.
-      */}
+    <p class="cenik-pozn" id="cenik-pozn">
+      K ceně se připočítává elektřina dle spotřeby, voda a rekreační poplatek
+      obci.{NBSP}Podrobnosti v{NBSP}přehledu poplatků níže.
+    </p>
 
-    </div>
   </div>
 </section>
 
@@ -181,189 +196,177 @@ const NBSP = ' ';
     color: var(--color-kura);
   }
 
-  /* ---- Table wrapper --------------------------------------------------- */
-
-  .tabulka-obal {
-    margin-top: 2.5rem;
+  /* ---- The list ---------------------------------------------------------
+   *
+   * Grid, not flex: `grid-template-areas` is what lets the price pair drop
+   * onto its own row under the name on a narrow phone and rejoin the row at
+   * its right edge from 40rem, with the photograph spanning both either way,
+   * without a second breakpoint-specific markup structure.
+   */
+  .cenik-list {
+    margin: 2.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    max-width: 44rem;
   }
 
-  /*
-   * Horizontal scroll container. The page body never scrolls sideways   only
-   * this div does, and only when the table is too wide for the viewport.
-   * Hard rule #13 in the build instructions.
-   */
-  .tabulka-scroll {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--radius-sm);
-    /*
-     * ⚠ CAPPED, AND NOT AT THE CONTAINER WIDTH.
-     *
-     * The table has three rows and four short cells per row. Left to fill the
-     * full 1280px container it put `Zimní sezona` at one edge of the screen and
-     * `30 000 Kč` at the other, with roughly 900px of nothing between them   so
-     * reading a row meant tracking a price back across half a metre of stone to
-     * the season it belongs to. That is the failure mode a wide table with few
-     * columns always has, and it is worse here because the whole point of
-     * choosing one table over the old six cards was that the prices line up and
-     * can be COMPARED.
-     *
-     * 52rem is about the width at which the four cells sit as a group rather
-     * than as four things at the corners. It is a ceiling, not a size: below it
-     * the table is fluid, and `overflow-x` still owns the phone case so the page
-     * body never scrolls sideways.
-     */
-    max-width: 52rem;
+  .cenik-radek {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'media info' 'media ceny';
+    column-gap: 1rem;
+    row-gap: 0.6rem;
+    align-items: center;
+    padding-block: 1.5rem;
   }
 
-  /* ---- Season-boundary note -------------------------------------------- */
+  .cenik-radek + .cenik-radek {
+    /* Hairline between rows   the only rule this list has. */
+    border-top: 1px solid rgb(62 50 38 / 0.14);
+  }
 
-  /*
-   * Visible when PRESNE_HRANICE_CHYBI is true. Not an error badge   it is an
-   * honest statement of what the site does not yet know. Disappears the moment
-   * the client supplies exact dates and the flag flips.
-   */
-  .hranice-pozn {
+  @media (width >= 40rem) {
+    .cenik-radek {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'media info ceny';
+      column-gap: 1.5rem;
+    }
+  }
+
+  .cenik-media {
+    grid-area: media;
+    width: 4rem;
+    aspect-ratio: 1;
+  }
+
+  @media (width >= 40rem) {
+    .cenik-media {
+      width: 5rem;
+    }
+  }
+
+  /* `.media-frame` from global.css: square corners, --color-kamen fill while
+     the photo loads. This section's own ground IS --color-kamen, so unlike
+     OkoliKoupani.astro no override is needed   every row here has a real
+     photo, and the fill is never seen once it loads. */
+  .cenik-foto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cenik-info {
+    grid-area: info;
+    min-width: 0;
+  }
+
+  .cenik-nazev {
     display: flex;
-    align-items: flex-start;
-    gap: 0.625rem;
-    padding: 0.875rem 1rem;
-    margin-bottom: 1.25rem;
-    background-color: var(--color-omitka);
-    border-left: 3px solid var(--color-mosaz);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-les);
   }
 
-  .hranice-ikona {
+  .cenik-ikona {
     flex: none;
-    margin-top: 0.1rem;
-    /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
+    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
     color: var(--color-mosaz-tmava);
   }
 
-  .hranice-pozn p {
-    margin: 0;
+  .cenik-obdobi {
+    margin: 0.25rem 0 0;
     font-size: var(--text-caption);
     color: var(--color-kura);
     max-width: none;
   }
 
-  /* ---- Price table ----------------------------------------------------- */
+  .cenik-ceny {
+    grid-area: ceny;
+    display: flex;
+    gap: 1rem;
+  }
+
+  @media (width >= 40rem) {
+    .cenik-ceny {
+      justify-self: end;
+      text-align: right;
+      gap: 2rem;
+    }
+  }
+
+  .cenik-cena {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  @media (width >= 40rem) {
+    .cenik-cena {
+      align-items: flex-end;
+    }
+  }
 
   /*
-   * global.css already applies `font-variant-numeric: tabular-nums` to all
-   * `table` elements, so every price in this table lines up in columns
-   * automatically. No per-cell rule needed.
-   *
-   * min-width prevents the price columns from collapsing below their content
-   * width before the scroll wrapper takes over. 20rem (320px) is narrower than
-   * the ~340px the table needs at body size with 1rem cell padding, so the
-   * wrapper scrolls before the columns collapse.
+   * ⚠ Smaller on a phone, on purpose. Two price figures share the row with a
+   * photo, a name and a period there, and `--text-title-s` (the size used for
+   * a single standalone figure elsewhere on the site) was 1px away from
+   * forcing the page to scroll sideways at 375px   hard rule #13. Escalates
+   * to the standalone size once the row has a third grid column to grow into.
    */
-  .ceny {
-    width: 100%;
-    min-width: 20rem;
-    border-collapse: collapse;
-    background-color: var(--color-omitka);
-    text-align: left;
-  }
-
-  caption {
-    caption-side: top;
-    text-align: left;
-    font-size: var(--text-caption);
+  .cenik-cena-hodnota {
+    font-family: var(--font-display);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    /* --kura on --kamen = 9.96:1 ✓ (caption sits above the table, on kamen) */
-    color: var(--color-kura);
-    padding-bottom: 0.75rem;
-  }
-
-  thead th {
-    font-family: var(--font-body);
-    font-size: var(--text-caption);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-kura);
-    padding: 0.75rem 1rem;
-    /* Brass rule under the header row   the same device Ubytovani.astro uses. */
-    border-bottom: 2px solid var(--color-mosaz);
-    white-space: nowrap;
-  }
-
-  .col-sezona {
-    text-align: left;
-    width: 55%;
-  }
-
-  .col-cena {
-    text-align: right;
-    width: 22.5%;
-  }
-
-  tbody th {
-    font-family: var(--font-body);
     font-size: var(--text-body);
-    font-weight: var(--font-weight-normal);
-    vertical-align: top;
-    padding: 1rem;
-    text-align: left;
-  }
-
-  tbody td {
-    text-align: right;
-    padding: 1.1rem 1rem 1rem 0;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    vertical-align: top;
-    font-size: var(--text-body);
+    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
+    color: var(--color-mosaz-tmava);
   }
 
-  /* Hairline border between rows   1px is the only raw px permitted. */
-  tbody tr + tr th,
-  tbody tr + tr td {
-    border-top: 1px solid var(--color-kamen);
-  }
-
-  /* Row hover   colour shift, nothing moves. */
-  @media (hover: hover) {
-    tbody tr {
-      transition: background-color 150ms var(--ease-out);
-    }
-
-    tbody tr:hover {
-      background-color: var(--color-kamen);
+  @media (width >= 40rem) {
+    .cenik-cena-hodnota {
+      font-size: var(--text-title-s);
     }
   }
 
-  .sezona-nazev {
-    display: block;
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .sezona-obdobi {
-    display: block;
+  .cenik-cena-label {
     margin-top: 0.2rem;
     font-size: var(--text-caption);
     color: var(--color-kura);
   }
 
-  /*
-   * Winter season row: a faint frost tint to mark the cold months visually.
-   * --jinovatka as a winter accent on a table row is one of the explicitly
-   * permitted uses in docs/02-design-system.md §1 ("winter accent only").
-   * It is applied as a BACKGROUND fill at low opacity, never as text.
-   * Text on this row remains --les; --les on jinovatka = 12.17:1 ✓.
+  /* ---- Season-boundary note ---------------------------------------------
    *
-   * color-mix() references the token directly so no raw hex is needed.
+   * A plain line, not a box: see the header comment for why the old
+   * left-bordered panel is gone. `info` in the same brass the rest of the
+   * page's icons use, not a warning colour   this is an honest caveat, not
+   * an error.
    */
-  .sez-zimni {
-    background-color: color-mix(in srgb, var(--color-jinovatka) 22%, transparent);
+  .cenik-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    max-width: 44rem;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
   }
 
-  /* ---- Note below the table -------------------------------------------- */
+  .cenik-note-ikona {
+    flex: none;
+    margin-top: 0.15rem;
+    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* ---- Note below the list ----------------------------------------------- */
 
   .cenik-pozn {
-    margin-top: 1rem;
+    margin-top: 0.75rem;
     font-size: var(--text-caption);
     color: var(--color-kura);
     max-width: 56ch;

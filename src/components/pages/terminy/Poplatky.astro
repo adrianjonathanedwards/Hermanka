@@ -4,8 +4,15 @@
  *
  * docs/01-content.md §6.4 (REWRITE): the old site buried all of this in a
  * 120-word run of prose   the guest found out about the electricity meter after
- * they had already decided. A table of line items makes each charge visible and
- * comparable at a glance.
+ * they had already decided. A visible list of line items makes each charge
+ * visible and comparable at a glance.
+ *
+ * REDONE: was five bordered `.card` tiles in a grid. Five near-identical boxes
+ * for five short line items was the same mistake the old ceník's six cards
+ * were (see Cenik.astro's header comment)   a plain icon list says "these are
+ * one list of charges" instead of "these are five separate offers." No card,
+ * no border, anywhere in this file now; a two-column grid at wider viewports
+ * groups the five items without boxing any of them.
  *
  * The POPLATKY array in cenik.ts is the single source of truth for this section.
  * Nothing about money is typed into this file (docs/01-content.md §2).
@@ -52,36 +59,34 @@ import { POPLATKY } from '../../../data/cenik';
       </p>
     </div>
 
-    <ul class="poplatky-list" data-reveal data-reveal-delay="80">
+    <ul class="poplatky-list" data-reveal data-reveal-delay="80" role="list">
       {POPLATKY.map((p) => (
-        <li class="poplatek card">
+        <li class="poplatek">
+          <IconLucide name={p.icon} size={22} class="poplatek-ikona" />
 
-          <div class="poplatek-hlava">
-            <IconLucide name={p.icon} size={22} class="poplatek-ikona" />
-            <h3 class="poplatek-nazev">{p.nazev}</h3>
+          <div class="poplatek-text">
+            <div class="poplatek-radek">
+              <h3 class="poplatek-nazev">{p.nazev}</h3>
+              <span class="poplatek-castka">{p.castka}</span>
+              {p.nepotvrzeno && (
+                /*
+                 * Unconfirmed rate. Shown as "orientačně" (approx.) rather than
+                 * silently presented as a confirmed price. See the TODO(client) in
+                 * the file header   both items must be confirmed before launch.
+                 *
+                 * docs/01-content.md §6.4: `momentálně 7 Kč/kWh` is "not a price".
+                 * That is the reason this badge exists. A guest who gets a surprise
+                 * electricity bill also loses trust in the calendar, the price list
+                 * and everything else on the page.
+                 */
+                <span class="badge-nepotvrzeno" aria-label="Orientační cena, čeká na potvrzení">
+                  orientačně
+                </span>
+              )}
+            </div>
+
+            <p class="poplatek-popis">{p.popis}</p>
           </div>
-
-          <div class="poplatek-castka-radek">
-            <span class="poplatek-castka">{p.castka}</span>
-            {p.nepotvrzeno && (
-              /*
-               * Unconfirmed rate. Shown as "orientačně" (approx.) rather than
-               * silently presented as a confirmed price. See the TODO(client) in
-               * the file header   both items must be confirmed before launch.
-               *
-               * docs/01-content.md §6.4: `momentálně 7 Kč/kWh` is "not a price".
-               * That is the reason this badge exists. A guest who gets a surprise
-               * electricity bill also loses trust in the calendar, the price list
-               * and everything else on the page.
-               */
-              <span class="badge-nepotvrzeno" aria-label="Orientační cena, čeká na potvrzení">
-                orientačně
-              </span>
-            )}
-          </div>
-
-          <p class="poplatek-popis">{p.popis}</p>
-
         </li>
       ))}
     </ul>
@@ -124,53 +129,54 @@ import { POPLATKY } from '../../../data/cenik';
     color: var(--color-kura);
   }
 
-  /* ---- Fee list -------------------------------------------------------- */
-
+  /* ---- Fee list --------------------------------------------------------
+   *
+   * A plain two-column list, not a card grid   see the header comment. Items
+   * are separated by generous gap alone, no rules and no boxes; five items in
+   * two columns naturally sit as 3+2, which does not need a rule to look
+   * intentional the way a card grid with a short last row can.
+   */
   .poplatky-list {
     display: grid;
-    gap: 1rem;
+    gap: 1.75rem 2.5rem;
     margin: 2.5rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 40rem) {
     .poplatky-list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.25rem;
     }
   }
 
-  @media (width >= 64rem) {
-    .poplatky-list {
-      /* Three across at laptop: the five items sit as 3+2, cleaner than 2+2+1. */
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
+  /* ---- Individual fee row ------------------------------------------------ */
 
-  /* ---- Individual fee card --------------------------------------------- */
-
-  /*
-   * Uses the global .card class: --omitka background, hairline border, stays
-   * still on hover (no lift, no glow   the card vocabulary here is a printed
-   * invoice, not a landing-page tile).
-   */
   .poplatek {
-    gap: 0.75rem;
-  }
-
-  /* ---- Card head ------------------------------------------------------- */
-
-  .poplatek-hlava {
     display: flex;
-    align-items: center;
-    gap: 0.625rem;
+    gap: 0.875rem;
+    align-items: flex-start;
   }
 
   .poplatek-ikona {
     flex: none;
+    margin-top: 0.15rem;
     /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
     color: var(--color-mosaz-tmava);
+  }
+
+  .poplatek-text {
+    min-width: 0;
+  }
+
+  /* ---- Name + amount row ------------------------------------------------- */
+
+  .poplatek-radek {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.75rem;
+    row-gap: 0.35rem;
   }
 
   /*
@@ -186,15 +192,6 @@ import { POPLATKY } from '../../../data/cenik';
     color: var(--color-les);
   }
 
-  /* ---- Amount row ------------------------------------------------------ */
-
-  .poplatek-castka-radek {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
   /*
    * The amount is a string from cenik.ts that already contains tabular-spaced
    * numerals and hard spaces (e.g. "7 Kč/kWh"). global.css sets tabular-nums
@@ -202,12 +199,11 @@ import { POPLATKY } from '../../../data/cenik';
    * added, or we set it explicitly here.
    */
   .poplatek-castka {
-    font-size: var(--text-title-s);
+    font-size: var(--text-caption);
     font-variant-numeric: tabular-nums;
     font-weight: var(--font-weight-semibold);
-    /* --les on --omitka = 15.45:1 ✓ */
-    color: var(--color-les);
-    line-height: 1.3;
+    /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
+    color: var(--color-mosaz-tmava);
   }
 
   /* ---- Unconfirmed badge ----------------------------------------------- */
@@ -240,7 +236,7 @@ import { POPLATKY } from '../../../data/cenik';
   .poplatek-popis {
     font-size: var(--text-caption);
     color: var(--color-kura);
-    margin: 0;
+    margin: 0.35rem 0 0;
     max-width: none;
     line-height: 1.5;
   }

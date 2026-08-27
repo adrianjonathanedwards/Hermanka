@@ -516,13 +516,7 @@ export const FOTKY: Fotka[] = [
  * The holes, named. One tile each, and each one is a photograph the client owes
  * the site. Order inside a group follows this array.
  */
-export const PLACEHOLDERY: Placeholder[] = [
-  {
-    skupina: 'interier',
-    popisek: 'Kuchyň',
-    poznamka: 'Fotografii kuchyně připravujeme',
-  },
-];
+export const PLACEHOLDERY: Placeholder[] = [];
 
 /** The photographs of one group, in file order. */
 export function fotkySkupiny(skupina: GalerieSkupina): Fotka[] {
