@@ -60,19 +60,41 @@ const odDveri: { vzdalenost: string; co: string }[] = [
   <div class="wrap">
     <div class="okoli-grid">
       <figure class="okoli-mapa" data-reveal>
-        <div class="media-frame photo-frame">
-          <Image
-            src={mapa}
-            alt="Letecký snímek okolí Heřmanic u Králík s vyznačenou polohou chalupy Heřmanka a okolními cíli: Polsko, Klepáč, Králický Sněžník, Dolní Morava, Klášter Hedeč a Králíky"
-            widths={[640, 960, 1280]}
-            sizes="(min-width: 64rem) 55vw, 100vw"
-            width={1280}
-            height={958}
-            format="webp"
-            quality={68}
-            loading="lazy"
-          />
+        {/*
+          Panned on a phone, for the reason OkoliMapa.astro on /okoli sets out
+          at length: every label on this drawing is baked into the raster, and
+          at 342px inside a one-column grid none of them can be read. The
+          section then shows a map that cannot be used as one.
+
+          Same shape as the /okoli version and the plan on this page   a scroll
+          container holding a 40rem minimum below 48rem, an ordinary block above
+          it. `tabindex="0"` so a keyboard can scroll it (WCAG 2.1.1);
+          `role="group"` plus the label so a screen reader does not meet an
+          unnamed scroll region.
+        */}
+        <div
+          class="okoli-pan"
+          tabindex="0"
+          role="group"
+          aria-label="Mapa okolí. Na malé obrazovce ji lze posouvat do stran"
+        >
+          <div class="media-frame photo-frame okoli-plate">
+            <Image
+              src={mapa}
+              alt="Letecký snímek okolí Heřmanic u Králík s vyznačenou polohou chalupy Heřmanka a okolními cíli: Polsko, Klepáč, Králický Sněžník, Dolní Morava, Klášter Hedeč a Králíky"
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 64rem) 55vw, (min-width: 48rem) 100vw, 40rem"
+              width={1280}
+              height={958}
+              format="webp"
+              quality={68}
+              loading="lazy"
+            />
+          </div>
         </div>
+
+        {/* Instruction, not description   see the identical caption on /okoli. */}
+        <figcaption class="okoli-hint" aria-hidden="true">Mapu posuňte prstem do stran.</figcaption>
       </figure>
 
       <div class="okoli-text" data-reveal>
@@ -130,11 +152,56 @@ const odDveri: { vzdalenost: string; co: string }[] = [
 
   .okoli-mapa {
     margin: 0;
+    /*
+     * ⚠ LOAD-BEARING. This figure is a grid item, and a grid item's default
+     * `min-width: auto` refuses to shrink below its content's min-content
+     * width. `.okoli-plate` below sets a 40rem minimum, so without this the
+     * COLUMN becomes 40rem on a 390px screen and takes the whole page with it
+     *   the document picks up 640px of horizontal scroll and the fixed header
+     * stretches with it. The pan container is the only thing here allowed to
+     * scroll sideways. Same fix, same reason, as `.mapa-figure` on /okoli.
+     */
+    min-width: 0;
+  }
+
+  /*
+   * ⚠ Nothing carrying `data-drift` may ever go inside this   `overflow-x: auto`
+   * makes it a scroll container and `view()` would resolve against it. Same
+   * warning as `.mapa-pan` in OkoliMapa.astro and `.plan-pan` in PlanArealu.
+   */
+  .okoli-pan {
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .okoli-plate {
+    min-width: 40rem;
+  }
+
+  @media (width >= 48rem) {
+    .okoli-plate {
+      min-width: 0;
+    }
   }
 
   .okoli-mapa :global(img) {
     width: 100%;
     height: auto;
+  }
+
+  .okoli-hint {
+    margin-top: 0.625rem;
+    font-size: var(--text-caption);
+    line-height: 1.6;
+    /* --kura on --kamen = 9.96:1 */
+    color: var(--color-kura);
+  }
+
+  @media (width >= 48rem) {
+    .okoli-hint {
+      display: none;
+    }
   }
 
   h2 {

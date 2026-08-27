@@ -156,6 +156,25 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /*
+   * Set on <html> by setUpMobileNav in src/scripts/motion.ts while the phone
+   * menu is open, and removed on close.
+   *
+   * `overflow: hidden` alone, deliberately   NOT the `position: fixed` body
+   * trick. That one needs the scroll offset saved and restored by hand, and it
+   * loses the reader's place if anything goes wrong. This menu opens under a
+   * fixed header and closes on Escape, on an outside click and on following a
+   * link, so the window it is applied in is short and every exit restores it.
+   *
+   * `scrollbar-gutter` keeps the desktop layout from jumping sideways as the
+   * bar disappears. Only ever relevant if the menu is opened at a width where
+   * a scrollbar is showing, which is a narrow window, but the jump is ugly.
+   */
+  html.nav-open {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
+
   body {
     background-color: var(--color-omitka);
     color: var(--color-les);
@@ -664,6 +683,45 @@
 
   .link-more.link-on-dark {
     color: var(--color-mosaz-svetla);
+  }
+
+  /* ---- Touch targets ----------------------------------------------------
+   *
+   * A link that is one line of 16px text is about 19px tall. That is the
+   * whole hit area on a phone, and WCAG 2.5.8 asks for 24px minimum with 44px
+   * the comfortable figure this site uses everywhere it controls the box (the
+   * hero dots, the lightbox arrows, the phone menu rows).
+   *
+   * Grown with a pseudo-element rather than with padding ON PURPOSE. These
+   * links sit inside running prose and inside flex rows; padding them changes
+   * line boxes and gaps, and the layout would have to be re-tuned around a
+   * change nobody can see. An absolutely positioned box centred on the text
+   * grows the target and moves nothing.
+   *
+   * ⚠ SINGLE-LINE LINKS ONLY. An absolute box cannot follow text that wraps
+   * on a two-line link it covers the middle and misses both ends. Everything
+   * this is applied to is a short label that does not wrap at 320px; check
+   * that before adding a selector here.
+   *
+   * `pointer: coarse` because this is a finger problem. On a mouse the hit
+   * area is already exact, and an invisible 44px box over body copy is one
+   * more thing that can swallow a click near a link it does not belong to.
+   */
+  @media (pointer: coarse) {
+    .link-more,
+    .link {
+      position: relative;
+    }
+
+    .link-more::before,
+    .link::before {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      height: 44px;
+      translate: 0 -50%;
+    }
   }
 }
 

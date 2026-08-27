@@ -189,4 +189,18 @@ import { SITE } from '../../../data/site';
       color: var(--color-mosaz-tmava);
     }
   }
+
+  /*
+   * The phone number is the primary action on this page from a phone   the one
+   * link where a tap means a call is placed. 32px is not a target for that.
+   * It is the last line of its column so the extra height falls into the gap
+   * below it rather than pushing anything.
+   */
+  @media (pointer: coarse) {
+    .karta-tel {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
 </style>

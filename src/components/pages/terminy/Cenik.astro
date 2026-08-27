@@ -1,52 +1,94 @@
 ---
 /**
- * Ceník   one plain list, seasons as rows, a real photograph per season.
+ * Ceník   season cards, plus Silvestr and Vánoce as two wide cards under them.
  *
- * REDONE: was a `<table>` with a boxed, left-bordered note above it. Both are
- * gone. Every figure still comes from src/data/cenik.ts through formatKc()
- * the word "every" is absolute: no price, no per-person figure and no currency
+ * Every figure still comes from src/data/cenik.ts through formatKc()   the
+ * word "every" is absolute: no price, no per-person figure and no currency
  * amount may be typed into this file (docs/01-content.md §2, the four-year-old
  * hardcoded 311 Kč that stopped matching the price list is why this module
  * exists at all).
  *
  * ---------------------------------------------------------------------------
- * WHY A LIST OF ROWS, NOT A TABLE, AND NOT A CARD EACH
+ * THE CARD: A PHOTOGRAPH DISSOLVING INTO A DARK PANEL, NOT --color-omitka
  *
- * Three seasons, four figures. A `<table>` was the right call over six cards
- * (docs/01-content.md §6.2), but a table has a second failure mode on a phone:
- * it either scrolls sideways or its columns collapse until the price and the
- * season that owns it are two thumb-widths apart. Three rows in a plain list,
- * each one a season name, its months, and its two prices, reflows on its own
- * terms instead   the price pair drops under the name on a narrow phone and
- * sits at the row's right edge everywhere wider, so the "prices must line up
- * and be COMPARABLE" property the table existed for survives without the
- * scroll wrapper.
+ * A photograph fills the top of each card and DISSOLVES into a solid panel
+ *   a CSS gradient over the photograph's own bottom edge, fading transparent
+ * to the panel colour, with the panel below it in the exact same colour so
+ * the seam is invisible   and the card's own text sits in that panel. The
+ * three season cards use --color-les, this site's near-black dark token; the
+ * Silvestr and Vánoce pair overrides that same custom property to true
+ * `#000000` on itself (`.cenik-karta--siroka`, by request   see its own
+ * comment further down), so the fireworks and the string-lit tree fade to
+ * actual black instead. Neither is --color-omitka, which the first version of
+ * this card used: every text and icon colour inside the panel was re-picked
+ * for a dark ground rather than reused, each with its own contrast comment
+ * below, and that work covers both shades of dark since black is only ever
+ * darker than --color-les, never lighter   see the override's own comment for
+ * why none of those ratios needed rechecking. No border anywhere on any card;
+ * the colour shift from the section's light --color-kamen ground to the
+ * card's dark panel is what marks its edge instead.
  *
- * No card box around a row, either. `--color-omitka` fill and a hairline
- * border on three near-identical boxes said "these are three unrelated
- * offers"; three rows under one rule say what is actually true, that they are
- * one price list with three entries.
+ * No hairline-plus-accent border either, which was the standing complaint
+ * about this page: a card with a border on every side EXCEPT one, which got
+ * a thicker, different-coloured edge instead. KalendarSlot.astro's
+ * booking-rule cards and Podminky.astro's `.chybi` panel both did this and
+ * were corrected in the same pass that first built this card   see their own
+ * files. "No border, or a border on every side" is the rule on this page now;
+ * this card has no border at all.
+ *
+ * ---------------------------------------------------------------------------
+ * SVÁTKY MOVED IN, FROM ITS OWN SECTION
+ *
+ * Silvestr and Vánoce used to be Svatky.astro, a separate --les section
+ * between this one and Poplatky.astro   two of the site's `.card`s (hairline
+ * border, --kura ground) with a heading and a lead paragraph of their own.
+ * That whole section is gone; Svatky.astro is deleted. The two holidays are
+ * now the fourth and fifth items in this file's own card language, in a
+ * second row under the three seasons rather than announced by a heading of
+ * their own   "Ceník" already says what this part of the page is.
+ *
+ * They render as WIDE cards (`cenik-karta--siroka`, one `<ul>` of its own,
+ * two columns instead of three) because they carry more than a season card
+ * does: the invitation sentence the old section had, and either a confirmed
+ * date range or a "Napsat poptávku" button   `jeAktualni()` from
+ * src/data/cenik.ts still decides which, exactly as it did in Svatky.astro,
+ * and both holidays have null dates at launch (docs/01-content.md §9 items 3
+ * and 4, LAUNCH-BLOCKING), so the button is what both cards show today. The
+ * explanatory sentence that used to sit above the button ("Termín pro tuto
+ * sezonu upřesníme...") was removed by request; the button alone is the CTA
+ * now. A season card's fixed two-price shape had no room for any of this.
  *
  * ---------------------------------------------------------------------------
  * THE PHOTOGRAPHS
  *
- * One per season, all the client's own, all already used elsewhere on the
- * site: `dolnimorava.webp` (the ski slopes   Zimní sezona), `DSC_5189.webp`
- * (the garden table under full summer leaf   Letní sezona), `DSC_5228.webp`
- * (the cottage's own three-quarter exterior, in no particular season   Mimo
- * sezonu, which has no season of its own to photograph). They replace the note
- * box and the empty space a bare table left beside three rows of numbers   the
- * "use images" instruction was answered with real photographs of real seasons
- * here, not a stock photo of a calendar.
+ * Three of the client's own, already used elsewhere on the site:
+ * `dolnimorava.webp` (the ski slopes   Zimní sezona), `DSC_5189.webp` (the
+ * garden table under full summer leaf   Letní sezona), `DSC_5228.webp` (the
+ * cottage's own three-quarter exterior, in no particular season   Mimo
+ * sezonu). Two are new and sourced, not the client's own   mood photographs
+ * for an occasion that has no photograph of THIS cottage to show yet:
+ * `silvestr-ohnostroj.jpg` (fireworks against a black sky   Wikimedia
+ * Commons, public domain) and `vanoce-stromek.jpg` (a snow-laden evergreen
+ * strung with coloured lights   Wikimedia Commons, CC BY-SA 4.0, needs
+ * attribution). Neither claims to depict Heřmanka itself; they set the mood
+ * the way the fade sets the ground, and both already read almost entirely
+ * black at the source, which is why they dissolve into this card's dark
+ * panel with barely any visible seam.
+ * TODO(client): confirm you may use silvestr-ohnostroj.jpg and
+ * vanoce-stromek.jpg commercially before launch (the second one specifically
+ * needs a visible photo credit per its licence), or swap either for a real
+ * photograph of the cottage at that time of year once one exists.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import IconLucide from '../../IconLucide.astro';
 import type { LucideName } from '../../IconLucide.astro';
-import { SEZONY, KAPACITA, formatKc, PRESNE_HRANICE_CHYBI, type Sezona } from '../../../data/cenik';
+import { SEZONY, SVATKY, formatKc, jeAktualni, type Sezona } from '../../../data/cenik';
 import zimniFoto from '@img/dolnimorava.webp';
 import letniFoto from '@img/DSC_5189.webp';
 import mimoFoto from '@img/DSC_5228.webp';
+import silvestrFoto from '@img/silvestr-ohnostroj.jpg';
+import vanoceFoto from '@img/vanoce-stromek.jpg';
 
 const SEZONA_FOTO: Record<Sezona['klic'], ImageMetadata> = {
   zimni: zimniFoto,
@@ -60,10 +102,29 @@ const SEZONA_IKONA: Record<Sezona['klic'], LucideName> = {
   mimo: 'trees',
 };
 
+const SVATEK_FOTO: Record<string, ImageMetadata> = {
+  silvestr: silvestrFoto,
+  vanoce: vanoceFoto,
+};
+
+/* `tree-pine` for Vánoce, in place of the generic `calendar-days` every card
+   used before   Silvestr keeps it, since nothing more specific fits a date
+   with no fixed symbol of its own the way a tree does for Christmas. */
+const SVATEK_IKONA: Record<string, LucideName> = {
+  silvestr: 'calendar-days',
+  vanoce: 'tree-pine',
+};
+
 /*
- * U+00A0   hard space. Written as a constant so it cannot be mistaken for
- * an ordinary space in review or in edits. docs/02-design-system.md §2.6:
- * required between a numeral and its unit and after single-letter prepositions.
+ * Called at BUILD time, same as Svatky.astro did   the site is static, so
+ * "today" is the day of the last deploy. See jeAktualni()'s own comment in
+ * src/data/cenik.ts for why that is accurate enough here.
+ */
+const dnes = new Date();
+
+/*
+ * U+00A0   hard space. docs/02-design-system.md §2.6: required between a
+ * numeral and its unit and after single-letter prepositions.
  */
 const NBSP = ' ';
 ---
@@ -72,13 +133,6 @@ const NBSP = ' ';
   <div class="wrap">
 
     <div class="cenik-head" data-reveal>
-      <p class="kapacita">
-        {/*
-          Hard spaces between every unit pair: "2 až 15 osob", "3 ložnice".
-          docs/02-design-system.md §2.6.
-        */}
-        2{NBSP}až{NBSP}{KAPACITA}{NBSP}osob · 3{NBSP}ložnice
-      </p>
       <h2 id="cenik-nadpis">Ceník</h2>
       <p class="lead">
         Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění
@@ -86,41 +140,41 @@ const NBSP = ' ';
       </p>
     </div>
 
-    <ul class="cenik-list" data-reveal data-reveal-delay="80" role="list" aria-describedby="cenik-pozn">
+    <ul class="cenik-list" data-reveal data-reveal-delay="80" role="list">
       {
         SEZONY.map((s) => (
-          <li class="cenik-radek">
-            <div class="cenik-media media-frame">
+          <li class="cenik-karta">
+            <div class="cenik-karta-media" aria-hidden="true">
               <Image
                 src={SEZONA_FOTO[s.klic]}
                 alt=""
-                widths={[96, 176, 288]}
-                sizes="5rem"
-                width={288}
-                height={288}
+                widths={[320, 480, 640]}
+                sizes="(min-width: 56rem) 24rem, (min-width: 40rem) 50vw, 100vw"
+                width={640}
+                height={512}
                 format="webp"
-                quality={62}
+                quality={68}
                 loading="lazy"
-                class="cenik-foto"
+                class="cenik-karta-foto"
               />
             </div>
 
-            <div class="cenik-info">
+            <div class="cenik-karta-obsah">
               <h3 class="cenik-nazev">
                 <IconLucide name={SEZONA_IKONA[s.klic]} size={16} class="cenik-ikona" />
                 <span>{s.nazev}</span>
               </h3>
               <p class="cenik-obdobi">{s.obdobi}</p>
-            </div>
 
-            <div class="cenik-ceny">
-              <div class="cenik-cena">
-                <span class="cenik-cena-hodnota">{formatKc(s.tyden)}</span>
-                <span class="cenik-cena-label">týden</span>
-              </div>
-              <div class="cenik-cena">
-                <span class="cenik-cena-hodnota">{formatKc(s.vikend)}</span>
-                <span class="cenik-cena-label">víkend</span>
+              <div class="cenik-ceny">
+                <div class="cenik-cena">
+                  <span class="cenik-cena-hodnota">{formatKc(s.tyden)}</span>
+                  <span class="cenik-cena-label">týden</span>
+                </div>
+                <div class="cenik-cena">
+                  <span class="cenik-cena-hodnota">{formatKc(s.vikend)}</span>
+                  <span class="cenik-cena-label">víkend</span>
+                </div>
               </div>
             </div>
           </li>
@@ -129,31 +183,77 @@ const NBSP = ' ';
     </ul>
 
     {/*
-      Replaces the old boxed, left-bordered note. A plain line under the list,
-      the same weight as the note under it   an honest caveat, not an alert.
-      Conditional on the build-time flag: once the client supplies exact
-      dates (docs/01-content.md §9 item 5), PRESNE_HRANICE_CHYBI flips to
-      false and this disappears without touching the template.
+      Silvestr and Vánoce   the same card, widened. Two columns instead of
+      three so the pair fills the row exactly, the way three across fills the
+      row above.
     */}
-    {
-      PRESNE_HRANICE_CHYBI && (
-        <p class="cenik-note">
-          <IconLucide name="info" size={15} class="cenik-note-ikona" />
-          {/*
-            ⚠ Guest-facing copy, second person throughout   see the file's
-            previous version for why "čeká na potvrzení od klienta" is wrong.
-          */}
-          Přesné hranice sezón ještě dolaďujeme, zatím platí přibližné
-          vymezení z původního ceníku. Váš termín vám rádi potvrdíme předem,
-          stačí napsat.
-        </p>
-      )
-    }
+    <ul class="cenik-list cenik-list--svatky" data-reveal data-reveal-delay="140" role="list">
+      {
+        SVATKY.map((s) => {
+          const aktualni = jeAktualni(s, dnes);
+          return (
+            <li class="cenik-karta cenik-karta--siroka">
+              <div class="cenik-karta-media cenik-karta-media--siroka" aria-hidden="true">
+                <Image
+                  src={SVATEK_FOTO[s.klic]}
+                  alt=""
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 40rem) 50vw, 100vw"
+                  width={960}
+                  height={540}
+                  format="webp"
+                  quality={68}
+                  loading="lazy"
+                  class="cenik-karta-foto"
+                />
+              </div>
 
-    <p class="cenik-pozn" id="cenik-pozn">
-      K ceně se připočítává elektřina dle spotřeby, voda a rekreační poplatek
-      obci.{NBSP}Podrobnosti v{NBSP}přehledu poplatků níže.
-    </p>
+              <div class="cenik-karta-obsah">
+                <h3 class="cenik-nazev">
+                  <IconLucide name={SVATEK_IKONA[s.klic]} size={16} class="cenik-ikona" />
+                  <span>{s.nazev}</span>
+                </h3>
+
+                <p class="cenik-svatek-text">{s.text}</p>
+
+                <div class="cenik-svatek-spodek">
+                  {s.cena !== null && (
+                    <div class="cenik-cena">
+                      <span class="cenik-cena-hodnota">{formatKc(s.cena)}</span>
+                      {s.delka !== null && <span class="cenik-cena-label">/{NBSP}{s.delka}</span>}
+                    </div>
+                  )}
+
+                  {aktualni && s.od && s.do ? (
+                    /*
+                     * Dates confirmed and not yet passed. `datetime`,
+                     * lowercase: Astro's <time> is plain HTML, not JSX.
+                     */
+                    <p class="cenik-svatek-termin">
+                      <IconLucide name="calendar-days" size={15} class="cenik-svatek-termin-ikona" />
+                      <time datetime={`${s.od}/${s.do}`}>
+                        {s.od}{NBSP}–{NBSP}{s.do}
+                      </time>
+                    </p>
+                  ) : (
+                    /*
+                     * No dates (null) or past dates   the state both holidays
+                     * are in at launch. Never a stale year; see jeAktualni()
+                     * in src/data/cenik.ts. No "termín upřesníme" copy any
+                     * more (removed by request)   the button alone is the
+                     * call to action.
+                     */
+                    <div class="cenik-svatek-cta">
+                      <a href="#poptavka" class="btn btn-ghost">Napsat poptávku</a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ul>
 
   </div>
 </section>
@@ -171,20 +271,6 @@ const NBSP = ' ';
     max-width: var(--container-prose);
   }
 
-  /*
-   * "2 až 15 osob · 3 ložnice"   styled as an eyebrow label in brass.
-   * --mosaz-tmava on --kamen = 5.06:1 ✓ (docs/02-design-system.md §1.1)
-   */
-  .kapacita {
-    display: block;
-    font-size: var(--text-caption);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-mosaz-tmava);
-    margin-bottom: 0.5rem;
-  }
-
   h2 {
     /* --les on --kamen = 12.91:1 ✓ */
     color: var(--color-les);
@@ -196,68 +282,135 @@ const NBSP = ' ';
     color: var(--color-kura);
   }
 
-  /* ---- The list ---------------------------------------------------------
+  /* ---- The cards ---------------------------------------------------------
    *
-   * Grid, not flex: `grid-template-areas` is what lets the price pair drop
-   * onto its own row under the name on a narrow phone and rejoin the row at
-   * its right edge from 40rem, with the photograph spanning both either way,
-   * without a second breakpoint-specific markup structure.
+   * One column on a phone, three from 56rem. Two was tried at the tablet step
+   * in between and skipped: three items in two columns is a 2+1 grid with a
+   * lone card under a gap of nothing, the exact "short column" failure
+   * Vybaveni.astro's own overview grid was built to avoid. Straight from one
+   * column to three reads as intentional at every width in between.
    */
   .cenik-list {
+    display: grid;
+    gap: 1.75rem;
     margin: 2.5rem 0 0;
     padding: 0;
     list-style: none;
-    max-width: 44rem;
-  }
-
-  .cenik-radek {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas: 'media info' 'media ceny';
-    column-gap: 1rem;
-    row-gap: 0.6rem;
-    align-items: center;
-    padding-block: 1.5rem;
-  }
-
-  .cenik-radek + .cenik-radek {
-    /* Hairline between rows   the only rule this list has. */
-    border-top: 1px solid rgb(62 50 38 / 0.14);
   }
 
   @media (width >= 40rem) {
-    .cenik-radek {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      grid-template-areas: 'media info ceny';
-      column-gap: 1.5rem;
+    .cenik-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .cenik-media {
-    grid-area: media;
-    width: 4rem;
-    aspect-ratio: 1;
-  }
-
-  @media (width >= 40rem) {
-    .cenik-media {
-      width: 5rem;
+  @media (width >= 56rem) {
+    .cenik-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 2rem;
     }
   }
 
-  /* `.media-frame` from global.css: square corners, --color-kamen fill while
-     the photo loads. This section's own ground IS --color-kamen, so unlike
-     OkoliKoupani.astro no override is needed   every row here has a real
-     photo, and the fill is never seen once it loads. */
-  .cenik-foto {
+  /*
+   * The Svátky row stays at two columns from 40rem even once the season row
+   * above has gone to three at 56rem   two wide cards, not three narrow ones,
+   * is the whole point of "fills the width" here.
+   */
+  @media (width >= 56rem) {
+    .cenik-list--svatky {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /*
+   * The card itself. No border, no shadow, no radius   square corners, the
+   * same rule OkoliMedia.astro's photo tiles follow site-wide. `overflow:
+   * hidden` clips the photograph to the card's own top corners; `isolation`
+   * is not needed here the way it was for OkoliKoupani's full-bleed section
+   * background because the fade lives on a child element, not the card's own
+   * background-image.
+   *
+   * --color-les, this site's near-black, not --color-omitka. Every text and
+   * icon colour below it was re-picked for this ground rather than reused:
+   * see each rule's own contrast comment.
+   */
+  .cenik-karta {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-les);
+    overflow: hidden;
+  }
+
+  /*
+   * The Svátky pair fades to true black instead   overriding the custom
+   * property itself, not just background-color, so `.cenik-karta-media::after`
+   * below (which reads the same `var(--color-les)`) picks it up too and the
+   * fade still ends on the exact colour the panel starts on. Every text and
+   * icon colour in the panel reads off --omitka/--kamen/--mosaz-svetla, never
+   * --color-les directly, so none of them needed a second look: black is a
+   * darker ground than the --color-les they were already checked against, so
+   * every ratio only goes up.
+   */
+  .cenik-karta--siroka {
+    --color-les: #000000;
+  }
+
+  /* ---- The photograph, and the fade into the panel ----------------------
+   *
+   * The image sets the card's top; `::after` lays a gradient over its own
+   * BOTTOM portion, transparent to --color-les, ending at 100% so the very
+   * last pixel row of the photograph is already the panel's exact colour.
+   * `.cenik-karta-obsah` below it starts in that same colour, so the seam
+   * between "photograph" and "panel" never actually renders   the eye reads
+   * one continuous card, not an image stacked on a box.
+   */
+  .cenik-karta-media {
+    position: relative;
+    aspect-ratio: 5 / 4;
+  }
+
+  /*
+   * The Svátky cards are wide, not tall: a squarish 5:4 crop on a card twice
+   * the width would be an enormous photograph over a few lines of text. 16:9
+   * keeps the image a band across the top instead.
+   */
+  .cenik-karta-media--siroka {
+    aspect-ratio: 16 / 9;
+  }
+
+  .cenik-karta-foto {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
   }
 
-  .cenik-info {
-    grid-area: info;
-    min-width: 0;
+  .cenik-karta-media::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 65%;
+    background: linear-gradient(to bottom, transparent, var(--color-les) 100%);
+  }
+
+  /* ---- The panel ---------------------------------------------------------
+   *
+   * Pulled up over the fade with a negative margin so the heading sits
+   * where the photograph has already faded to solid colour, not below it
+   * with a second gap   the fade IS the card's only internal spacing above
+   * the text.
+   */
+  .cenik-karta-obsah {
+    position: relative;
+    margin-top: -2.75rem;
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .cenik-karta--siroka .cenik-karta-obsah {
+    padding: 0 1.75rem 1.75rem;
   }
 
   .cenik-nazev {
@@ -267,108 +420,123 @@ const NBSP = ' ';
     font-family: var(--font-body);
     font-size: var(--text-body);
     font-weight: var(--font-weight-semibold);
-    color: var(--color-les);
+    /* --omitka on --les = 15.45:1 ✓ */
+    color: var(--color-omitka);
   }
 
   .cenik-ikona {
     flex: none;
-    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
-    color: var(--color-mosaz-tmava);
+    /* --mosaz-svetla on --les = 6.19:1 ✓   the light brass, for dark grounds */
+    color: var(--color-mosaz-svetla);
   }
 
   .cenik-obdobi {
-    margin: 0.25rem 0 0;
+    margin: 0.3rem 0 0;
     font-size: var(--text-caption);
-    color: var(--color-kura);
+    /* --kamen on --les = 12.91:1 ✓ */
+    color: var(--color-kamen);
     max-width: none;
   }
 
+  /*
+   * `margin-top: auto` pins the price pair to the card's bottom edge, so
+   * three cards of slightly different name/period length still line their
+   * prices up on one row   the one alignment property the old table had that
+   * was worth keeping, achieved here per-card instead of down a shared column.
+   */
   .cenik-ceny {
-    grid-area: ceny;
     display: flex;
-    gap: 1rem;
-  }
-
-  @media (width >= 40rem) {
-    .cenik-ceny {
-      justify-self: end;
-      text-align: right;
-      gap: 2rem;
-    }
+    gap: 1.5rem;
+    margin-top: auto;
+    padding-top: 1.25rem;
   }
 
   .cenik-cena {
     display: flex;
     flex-direction: column;
-    min-width: 0;
   }
 
-  @media (width >= 40rem) {
-    .cenik-cena {
-      align-items: flex-end;
-    }
-  }
-
-  /*
-   * ⚠ Smaller on a phone, on purpose. Two price figures share the row with a
-   * photo, a name and a period there, and `--text-title-s` (the size used for
-   * a single standalone figure elsewhere on the site) was 1px away from
-   * forcing the page to scroll sideways at 375px   hard rule #13. Escalates
-   * to the standalone size once the row has a third grid column to grow into.
-   */
   .cenik-cena-hodnota {
     font-family: var(--font-display);
     font-weight: var(--font-weight-semibold);
-    font-size: var(--text-body);
-    line-height: 1.15;
+    font-size: var(--text-title-s);
+    line-height: 1.1;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
-    color: var(--color-mosaz-tmava);
-  }
-
-  @media (width >= 40rem) {
-    .cenik-cena-hodnota {
-      font-size: var(--text-title-s);
-    }
+    /* --mosaz-svetla on --les = 6.19:1 ✓ */
+    color: var(--color-mosaz-svetla);
   }
 
   .cenik-cena-label {
     margin-top: 0.2rem;
     font-size: var(--text-caption);
-    color: var(--color-kura);
+    color: var(--color-kamen);
   }
 
-  /* ---- Season-boundary note ---------------------------------------------
+  /* ---- Svátky: the invitation text ---------------------------------------
    *
-   * A plain line, not a box: see the header comment for why the old
-   * left-bordered panel is gone. `info` in the same brass the rest of the
-   * page's icons use, not a warning colour   this is an honest caveat, not
-   * an error.
+   * Fraunces at lead size, not the caption-size body text everywhere else in
+   * this file   the one place in the card that is a sentence to be read
+   * rather than a figure to be scanned, so it gets the display face the rest
+   * of the site reserves for exactly that (docs/02-design-system.md §2.6).
    */
-  .cenik-note {
+  .cenik-svatek-text {
+    margin-top: 0.85rem;
+    font-family: var(--font-display);
+    font-size: var(--text-lead);
+    line-height: 1.4;
+    /* --kamen on --les = 12.91:1 ✓ */
+    color: var(--color-kamen);
+    max-width: none;
+  }
+
+  .cenik-svatek-spodek {
+    margin-top: auto;
+    padding-top: 1.5rem;
     display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    max-width: 44rem;
-    font-size: var(--text-caption);
-    color: var(--color-kura);
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
   }
 
-  .cenik-note-ikona {
+  /* ---- Confirmed date --------------------------------------------------- */
+
+  .cenik-svatek-termin {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--text-body);
+    font-variant-numeric: tabular-nums;
+    /* --mosaz-svetla on --les = 6.19:1 ✓ */
+    color: var(--color-mosaz-svetla);
+    margin: 0;
+    max-width: none;
+  }
+
+  .cenik-svatek-termin-ikona {
     flex: none;
-    margin-top: 0.15rem;
-    /* --mosaz-tmava on --kamen = 5.06:1 ✓ */
-    color: var(--color-mosaz-tmava);
+    color: var(--color-mosaz-svetla);
   }
 
-  /* ---- Note below the list ----------------------------------------------- */
+  /*
+   * ---- "Termín upřesníme" state -------------------------------------------
+   * The state both holidays are in at launch. Just the button now (the
+   * "Termín pro tuto sezonu upřesníme" line was removed by request)   see the
+   * comment beside it in the markup.
+   */
+  .cenik-svatek-cta {
+    display: flex;
+    /* Below --text-lead width even alone, so it never fights the price for
+       the row's width on a phone. */
+    flex: 1 1 14rem;
+  }
 
-  .cenik-pozn {
-    margin-top: 0.75rem;
-    font-size: var(--text-caption);
-    color: var(--color-kura);
-    max-width: 56ch;
+  /*
+   * .btn-ghost is the button meant for photography or a dark ground
+   * (global.css's own comment on it) so it needs no override here.
+   */
+  .cenik-svatek-cta .btn {
+    align-self: flex-start;
   }
 </style>

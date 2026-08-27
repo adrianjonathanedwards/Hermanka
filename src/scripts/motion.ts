@@ -54,6 +54,65 @@ const EASE = [0.2, 0, 0, 1] as const;
 const DURATION = 0.62;
 
 /* ==========================================================================
+   Swipe
+
+   Two things on this site are a sequence of photographs that a phone user will
+   try to swipe: the hero carousel and the lightbox. Neither is a scroll
+   container, so neither gets the gesture for free the way the /galerie strips
+   do   those are native scrollers and are deliberately left alone.
+
+   Deliberately NOT a drag: nothing follows the finger, the slide simply changes
+   on release. Following the finger would mean owning the gesture from the first
+   pixel of movement, and getting that wrong on a full-bleed hero costs the user
+   the ability to scroll the page.
+
+   The rules that keep vertical scrolling intact:
+     - touch and pen only. A mouse drag across a photograph is a text selection.
+     - `preventDefault` is never called, and no `touch-action` is set, so the
+       browser keeps first refusal on the gesture throughout.
+     - the move has to be horizontally dominant (1.5x) and past a threshold the
+       browser's own scroll slop cannot produce by accident.
+     - a slow gesture is a hesitation, not a flick, so it is ignored.
+   ========================================================================== */
+
+const SWIPE_MIN_PX = 44;
+const SWIPE_MAX_MS = 800;
+
+function onSwipe(el: HTMLElement, handler: (direction: 1 | -1) => void): void {
+  let startX = 0;
+  let startY = 0;
+  let startT = 0;
+  let tracking = false;
+
+  el.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (e.pointerType === 'mouse') return;
+      tracking = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      startT = e.timeStamp;
+    },
+    { passive: true },
+  );
+
+  const end = (e: PointerEvent): void => {
+    if (!tracking) return;
+    tracking = false;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if (e.timeStamp - startT > SWIPE_MAX_MS) return;
+    if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    handler(dx < 0 ? 1 : -1);
+  };
+
+  el.addEventListener('pointerup', end, { passive: true });
+  el.addEventListener('pointercancel', () => {
+    tracking = false;
+  });
+}
+
+/* ==========================================================================
    Reveals
    ========================================================================== */
 
@@ -217,6 +276,21 @@ function setUpMobileNav(): void {
     });
   }
 
+  /*
+   * The page behind the panel must not scroll. Without this the panel stays
+   * pinned under the header while the hero slides away underneath it, which on a
+   * phone reads as the menu having come loose from the page.
+   *
+   * A class on <html> rather than an inline style, so global.css owns the rule
+   * and there is one place to look. Behaviour, not decoration, so it is outside
+   * the reduced-motion gate above and it is restored on every close   including
+   * the Escape and outside-click paths below, which both go through `details.open`
+   * and therefore back through this listener.
+   */
+  details.addEventListener('toggle', () => {
+    root.classList.toggle('nav-open', details.open);
+  });
+
   /* Escape closes it, the same as any other menu. Behaviour, so never gated. */
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && details.open) {
@@ -285,6 +359,17 @@ function setUpLightbox(): void {
     if (e.key === 'ArrowLeft') show(index - 1);
     if (e.key === 'ArrowRight') show(index + 1);
   });
+
+  /*
+   * Swipe, the touch twin of the two arrow keys above. /galerie has forty
+   * photographs and the only way through them on a phone was forty presses of a
+   * 44px arrow sitting on top of the picture.
+   *
+   * Bound to the dialog rather than the <img> so the gesture is caught in the
+   * dead space either side of a portrait photograph too   which on a phone is
+   * most of the screen.
+   */
+  onSwipe(dialog, (direction) => show(index + direction));
 
   /* A click on the dialog box itself, i.e. outside the figure, is the backdrop. */
   dialog.addEventListener('click', (e) => {
@@ -480,12 +565,22 @@ function setUpHeroCarousel(): void {
    * keyboard user reading the headline touches neither of these   and with the
    * pause button removed it is all that is on offer to anyone not running
    * reduced motion.
+   *
+   * ⚠ `pointerType` MUST be checked. On a phone a tap fires `pointerenter` on
+   * the hero exactly as a mouse does, but the matching `pointerleave` is not
+   * guaranteed   a tap that turns into a scroll, or that ends in a `pointercancel`,
+   * never delivers one. `held` then stays true for the rest of the visit and the
+   * carousel is dead after the first touch anywhere in the hero, including on
+   * the two buttons. That is what happened. Hover-hold is a mouse affordance;
+   * on touch the dots and the swipe below are the controls.
    */
-  hero.addEventListener('pointerenter', () => {
+  hero.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'touch') return;
     held = true;
     stopTimer();
   });
-  hero.addEventListener('pointerleave', () => {
+  hero.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'touch') return;
     held = false;
     schedule();
   });
@@ -503,6 +598,17 @@ function setUpHeroCarousel(): void {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopTimer();
     else schedule();
+  });
+
+  /*
+   * Swipe. The dots are 44px targets and stay the accessible control; this is
+   * the gesture anyone handed a full-bleed photo carousel on a phone will try
+   * first. A swipe restarts the clock for the same reason a dot press does
+   * a deliberate choice earns a full slide before the next one.
+   */
+  onSwipe(hero, (direction) => {
+    show(index + direction);
+    schedule();
   });
 
   /* Left and right move between photographs while the controls have focus. */

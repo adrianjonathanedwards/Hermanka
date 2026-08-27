@@ -303,6 +303,14 @@ const odkud = Astro.url.pathname;
     gap: 0.75rem;
     font-weight: var(--font-weight-normal);
     cursor: pointer;
+    /*
+     * The row is the target, per the note beside the markup   but the row is
+     * only as tall as one line of text, about 26px. This is the only checkbox
+     * on the site and it sits between a textarea and the submit button, so a
+     * 44px row is both reachable and clear of its neighbours.
+     */
+    min-height: 44px;
+    touch-action: manipulation;
   }
 
   .check input {

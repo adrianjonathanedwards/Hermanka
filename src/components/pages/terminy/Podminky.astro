@@ -213,15 +213,17 @@ const NBSP = ' ';
 
   /*
    * A distinct panel, visually separated from the steps above.
-   * Uses a left-border accent   the same device KalendarSlot uses for the
-   * booking rules, because both are "information you must have before you act".
+   * No border   a single-side brass accent used to mark it, the same device
+   * KalendarSlot's booking-rule cards used; both are gone now (a card with a
+   * different-coloured border on only one side reads as an error, not an
+   * accent). The colour shift alone   --omitka panel on this section's
+   * --kamen ground   is what marks the boundary here instead.
    */
   .chybi {
     margin-top: 3rem;
     padding: 1.5rem;
     background-color: var(--color-omitka);
-    border-left: 3px solid var(--color-mosaz);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    border-radius: var(--radius-sm);
   }
 
   @media (width >= 48rem) {

@@ -1,6 +1,12 @@
 ﻿---
 /**
- * `Ložnice a pokoje` + `Sociální zařízení`   the first section of /ubytovani.
+ * `Ložnice a pokoje`   the first section of /ubytovani.
+ *
+ * UPDATE: `Sociální zařízení` used to sit under this split and now lives in
+ * Vybaveni.astro, by request   the page reads `Ložnice a pokoje` → `Vybavení
+ * chalupy` → `Sociální zařízení` → `Přehled vybavení`, so the two prose+photo
+ * splits run back to back and the two card blocks follow them. The bathrooms
+ * are equipment, so they sit under the equipment heading without straining.
  *
  * COPY IS THE OLD SITE'S, VERBATIM. This rebuild changes the design, not the
  * words. The two paragraphs below are the 2019 `/ubytovani/` page's own, with
@@ -46,9 +52,6 @@
  */
 import { Image } from 'astro:assets';
 import loznice from '@img/DSC_4614.webp';
-import RoofDivider from '../../decor/RoofDivider.astro';
-import IconLucide from '../../IconLucide.astro';
-import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
 ---
 
 <section id="loznice" class="loznice" aria-labelledby="loznice-nadpis">
@@ -89,43 +92,6 @@ import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
       </div>
     </div>
   </div>
-
-  {/*
-    The bathrooms sit under the split rather than inside it. They are a
-    comparison   the same three things on two floors   and a comparison wants
-    two columns side by side, not a sentence that makes the reader hold one
-    floor in their head while they read the other.
-  */}
-  <div class="wrap zarizeni">
-    <RoofDivider class="zarizeni-divider" />
-
-    <h3 id="zarizeni-nadpis" data-reveal="up">Sociální zařízení</h3>
-
-    {/*
-      The shower/bath icon is the one real difference between the floors
-      the copy says a shower on 1. NP and a tub on 2. NP   so it is what tells
-      the two cards apart at a glance, rather than a repeated generic mark.
-    */}
-    <ul class="zarizeni-grid" role="list" data-reveal="up" data-reveal-delay="80">
-      {
-        SOCIALNI_ZARIZENI.map((z, i) => (
-          <li class="card zarizeni-karta">
-            <p class="zarizeni-patro">
-              <IconLucide
-                name={i === 0 ? 'shower-head' : 'bath'}
-                size={18}
-                class="zarizeni-ikona"
-              />
-              <span>{i === 0 ? '1. NP' : '2. NP'}</span>
-            </p>
-            <ul role="list">
-              {z.polozky.map((p) => <li>{p}</li>)}
-            </ul>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
 </section>
 
 <style>
@@ -146,94 +112,5 @@ import { SOCIALNI_ZARIZENI } from '../../../data/vybaveni';
    */
   .split-body p {
     margin-top: 1.25rem;
-  }
-
-  /* ---- Bathrooms ------------------------------------------------------- */
-
-  /*
-   * The top padding is load-bearing. The split above runs its photograph to the
-   * full height of its row and the picture's bottom edge is the section's own
-   * edge, so without this the `Sociální zařízení` heading starts hard against
-   * it and reads as a caption on the photograph rather than as a new heading.
-   */
-  .zarizeni {
-    padding-block: 3rem 4rem;
-  }
-
-  @media (width >= 48rem) {
-    .zarizeni {
-      padding-block: 4.5rem 6rem;
-    }
-  }
-
-  /* The divider does the separating now, so the heading sits closer under it
-     than it did under bare padding. */
-  .zarizeni-divider {
-    margin-bottom: 2.5rem;
-  }
-
-  h3 {
-    font-size: var(--text-title-m);
-    color: var(--color-les);
-  }
-
-  .zarizeni-grid {
-    display: grid;
-    gap: 1rem;
-    margin: 1.5rem 0 0;
-    padding: 0;
-    list-style: none;
-    /* Two cards of short lines do not need the full 1280   at full width the
-       pair reads as two distant columns. */
-    max-width: 48rem;
-  }
-
-  @media (width >= 40rem) {
-    .zarizeni-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.5rem;
-    }
-  }
-
-  .zarizeni-patro {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: var(--text-caption);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-mosaz-tmava);
-  }
-
-  .zarizeni-ikona {
-    flex: none;
-    /* An icon is a fill, so plain brass is correct here (§1.2). */
-    color: var(--color-mosaz);
-  }
-
-  .zarizeni-karta ul {
-    margin: 0.75rem 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .zarizeni-karta li + li {
-    margin-top: 0.4rem;
-  }
-
-  /* An en dash, not a disc: the same marker the old site used for its lists. */
-  .zarizeni-karta li {
-    position: relative;
-    padding-left: 1rem;
-    color: var(--color-kura);
-  }
-
-  .zarizeni-karta li::before {
-    content: '–';
-    position: absolute;
-    left: 0;
-    /* Brass AS TEXT, so the darker step (§1.2). */
-    color: var(--color-mosaz-tmava);
   }
 </style>

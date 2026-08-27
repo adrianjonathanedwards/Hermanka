@@ -206,6 +206,32 @@ const rok = new Date().getFullYear();
     align-items: center;
   }
 
+  /*
+   * Finger-sized rows on a phone. The footer is the last thing on every page
+   * and on a phone it is a stack of 26px-tall links   the sitemap, the phone
+   * number and the GPS link. Here there IS room to give them real height, so
+   * they get it rather than an invisible pseudo-element: the list is already a
+   * column of its own and growing the rows costs nothing but the gap, which
+   * comes back off `li`.
+   */
+  @media (pointer: coarse) {
+    .footer-nav a,
+    .footer-row a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .footer-nav li {
+      margin-bottom: 0;
+    }
+
+    .footer-row {
+      /* The icon is centred against a 44px row now, not against a 26px one. */
+      align-items: center;
+    }
+  }
+
   /* --mosaz-svetla on --les = 6.19:1. Plain --mosaz would be 3.00:1 and fail. */
   a {
     color: var(--color-mosaz-svetla);

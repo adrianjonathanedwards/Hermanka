@@ -1,6 +1,20 @@
 ﻿---
 /**
- * `Vybavení chalupy` + `Přehled vybavení`   the second section of /ubytovani.
+ * `Vybavení chalupy` + `Sociální zařízení` + `Přehled vybavení`   the second
+ * section of /ubytovani.
+ *
+ * UPDATE: `Sociální zařízení` moved here from Loznice.astro, by request, so
+ * that `Vybavení chalupy` sits ABOVE it. The page now reads
+ *
+ *   Ložnice a pokoje   (split, media-right)
+ *   Vybavení chalupy   (split, media-left)
+ *   Sociální zařízení  (two cards)
+ *   Přehled vybavení   (five lists)
+ *
+ * i.e. the two prose+photograph splits run back to back and the two card
+ * blocks follow. Nothing about the bathroom copy or its markup changed in the
+ * move   only its parent section. It reads correctly under this heading: a
+ * bathroom's fittings ARE cottage equipment, and the block keeps its own h3.
  *
  * COPY IS THE OLD SITE'S, VERBATIM: three paragraphs of prose, then the five
  * lists. Nothing is reworded and nothing is dropped. See the header of
@@ -44,7 +58,7 @@ import { Image } from 'astro:assets';
 import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import IconLucide from '../../IconLucide.astro';
 import RoofDivider from '../../decor/RoofDivider.astro';
-import { VYBAVENI } from '../../../data/vybaveni';
+import { SOCIALNI_ZARIZENI, VYBAVENI } from '../../../data/vybaveni';
 ---
 
 <section id="vybaveni" class="vybaveni" aria-labelledby="vybaveni-nadpis">
@@ -90,6 +104,43 @@ import { VYBAVENI } from '../../../data/vybaveni';
         </p>
       </div>
     </div>
+  </div>
+
+  {/*
+    The bathrooms sit under the split rather than inside it. They are a
+    comparison   the same three things on two floors   and a comparison wants
+    two columns side by side, not a sentence that makes the reader hold one
+    floor in their head while they read the other.
+  */}
+  <div class="wrap zarizeni">
+    <RoofDivider class="zarizeni-divider" />
+
+    <h3 id="zarizeni-nadpis" data-reveal="up">Sociální zařízení</h3>
+
+    {/*
+      The shower/bath icon is the one real difference between the floors
+      the copy says a shower on 1. NP and a tub on 2. NP   so it is what tells
+      the two cards apart at a glance, rather than a repeated generic mark.
+    */}
+    <ul class="zarizeni-grid" role="list" data-reveal="up" data-reveal-delay="80">
+      {
+        SOCIALNI_ZARIZENI.map((z, i) => (
+          <li class="card zarizeni-karta">
+            <p class="zarizeni-patro">
+              <IconLucide
+                name={i === 0 ? 'shower-head' : 'bath'}
+                size={18}
+                class="zarizeni-ikona"
+              />
+              <span>{i === 0 ? '1. NP' : '2. NP'}</span>
+            </p>
+            <ul role="list">
+              {z.polozky.map((p) => <li>{p}</li>)}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
   </div>
 
   <div class="wrap prehled">
@@ -156,9 +207,22 @@ import { VYBAVENI } from '../../../data/vybaveni';
    * ---- Photo bleed, media-left only -------------------------------------
    *
    * The photograph runs taller than the text beside it and overflows the
-   * row itself, top and bottom   so it reads as the bigger of the two halves
+   * row at the BOTTOM   so it reads as the bigger of the two halves
    * instead of matching the text column's height like every other split on
-   * the page. Desktop only, same threshold as the rest of the split
+   * the page.
+   *
+   * ⚠ IT USED TO OVERFLOW THE TOP AS WELL (`inset-block: -3rem`) AND MUST NOT
+   * AGAIN. The section above is now the `Ložnice a pokoje` split, whose own
+   * photograph is media-RIGHT and runs to the section boundary. A top bleed
+   * pushed this picture 3rem up past that boundary, so the two photographs met
+   * as a staircase with this one's top edge slicing into the bottom of the
+   * bedroom copy. Squared off at the boundary they meet corner to corner
+   * instead   text, photo / photo, text   which is the point of alternating
+   * the sides in the first place. (Before `Sociální zařízení` moved out of
+   * Loznice.astro the section above ended in cards, and the top bleed had
+   * nothing to collide with. It does now.)
+   *
+   * Desktop only, same threshold as the rest of the split
    * (docs/02-design-system.md's two-column split activates at 64rem); below
    * that the two stack and there is no row height to break out of.
    *
@@ -177,7 +241,7 @@ import { VYBAVENI } from '../../../data/vybaveni';
 
     .split-media {
       position: absolute;
-      inset-block: -3rem;
+      inset-block: 0 -3rem;
       inset-inline-start: 0;
       width: 50%;
     }
@@ -187,19 +251,61 @@ import { VYBAVENI } from '../../../data/vybaveni';
     }
   }
 
-  /* ---- Přehled vybavení ------------------------------------------------ */
+  /* ---- The two card blocks --------------------------------------------- */
 
-  /* Top padding clears the photograph's bottom edge   see Loznice.astro. */
+  /*
+   * The top padding is load-bearing. The split above runs its photograph past
+   * the bottom of its own row (the bleed, three rules up), so without this the
+   * `Sociální zařízení` heading starts hard against the picture and reads as a
+   * caption on it rather than as a new heading.
+   *
+   * The two blocks take the SAME top padding, so each divider carries the same
+   * air above it. `.zarizeni` has no bottom padding: it and `.prehled` are in
+   * one section now, so the gap between the bathroom cards and the `Přehled
+   * vybavení` divider is `.prehled`'s top padding alone, not the two sections'
+   * padding stacked as it was when they lived in separate files.
+   */
+  .zarizeni,
   .prehled {
-    padding-block: 3rem 4rem;
+    padding-top: 3rem;
+  }
+
+  .zarizeni {
+    padding-bottom: 0;
+  }
+
+  .prehled {
+    padding-bottom: 4rem;
   }
 
   @media (width >= 48rem) {
+    .zarizeni,
     .prehled {
-      padding-block: 4.5rem 6rem;
+      padding-top: 4.5rem;
+    }
+
+    .prehled {
+      padding-bottom: 6rem;
     }
   }
 
+  /*
+   * Equal padding is not equal SPACE above 64rem, because that is where the
+   * photograph starts bleeding 3rem past the bottom of its row and eats the
+   * first block's padding from the top. Add the 3rem back so both dividers
+   * measure the same distance from whatever sits above them   without this the
+   * first sits 104px below the photo and the second 152px below the cards, and
+   * the pair reads as two different rhythms rather than one.
+   */
+  @media (width >= 64rem) {
+    .zarizeni {
+      padding-top: 7.5rem;
+    }
+  }
+
+  /* The divider does the separating now, so the heading sits closer under it
+     than it did under bare padding. */
+  .zarizeni-divider,
   .prehled-divider {
     margin-bottom: 2.5rem;
   }
@@ -208,6 +314,70 @@ import { VYBAVENI } from '../../../data/vybaveni';
     font-size: var(--text-title-m);
     color: var(--color-les);
   }
+
+  /* ---- Sociální zařízení ------------------------------------------------ */
+
+  .zarizeni-grid {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    /* Two cards of short lines do not need the full 1280   at full width the
+       pair reads as two distant columns. */
+    max-width: 48rem;
+  }
+
+  @media (width >= 40rem) {
+    .zarizeni-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  .zarizeni-patro {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-mosaz-tmava);
+  }
+
+  .zarizeni-ikona {
+    flex: none;
+    /* An icon is a fill, so plain brass is correct here (§1.2). */
+    color: var(--color-mosaz);
+  }
+
+  .zarizeni-karta ul {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .zarizeni-karta li + li {
+    margin-top: 0.4rem;
+  }
+
+  /* An en dash, not a disc: the same marker the old site used for its lists. */
+  .zarizeni-karta li {
+    position: relative;
+    padding-left: 1rem;
+    color: var(--color-kura);
+  }
+
+  .zarizeni-karta li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    /* Brass AS TEXT, so the darker step (§1.2). */
+    color: var(--color-mosaz-tmava);
+  }
+
+  /* ---- Přehled vybavení ------------------------------------------------ */
 
   /*
    * ⚠ TWO COLUMNS, NOT THREE, AND THE REASON IS ARITHMETIC.

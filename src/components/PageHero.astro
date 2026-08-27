@@ -62,10 +62,11 @@ const {
   </div>
 
   {/*
-    Two gradients, not a flat wash. The band across the top is what keeps the
-    fixed header's --omitka labels readable where they sit over a pale roof; the
-    floor is what holds the title above 4.5:1. Measured against this photograph
-    at its lightest: --omitka over --les at 0.72 gives 11.1:1.
+    Two gradients, not a flat wash, and neutral black rather than --les   the
+    green tint is what made this band read as a colour field instead of a
+    photograph. The top one keeps the fixed header's --omitka labels readable
+    where they sit over a pale roof; the floor plus the title's own text-shadow
+    is what holds the title above 4.5:1.
   */}
   <div class="page-hero-scrim" aria-hidden="true"></div>
 
@@ -115,10 +116,35 @@ const {
     object-fit: cover;
   }
 
+  /*
+   * NEUTRAL, NOT GREEN. This was painted in `--les` at up to 82 %, which put an
+   * olive cast over the whole band on every subpage   the photograph read as a
+   * tinted rectangle rather than as the cottage. Plain black, thinner, so the
+   * picture keeps its own colour; the `text-shadow` on the title and lead below
+   * took over the separation the tint was providing. The two go together.
+   */
   .page-hero-scrim {
     background-image:
-      linear-gradient(to bottom, rgb(22 36 28 / 0.72) 0%, rgb(22 36 28 / 0.1) 32%),
-      linear-gradient(to top, rgb(22 36 28 / 0.82) 0%, rgb(22 36 28 / 0.25) 55%, transparent 100%);
+      /* Top: holds across the fixed header rather than decaying immediately. */
+      linear-gradient(
+        to bottom,
+        rgb(0 0 0 / 0.52) 0%,
+        rgb(0 0 0 / 0.44) 16%,
+        rgb(0 0 0 / 0.06) 34%
+      ),
+      /*
+       * Floor: the lead is --kamen, which is a very light stone, and on the
+       * default exterior it lands on a white gable and lit grass. 55 %/14 % put
+       * it at 4.61:1   over the floor but with nothing to spare, and this
+       * photograph is one the client may still replace.
+       */
+      linear-gradient(
+        to top,
+        rgb(0 0 0 / 0.68) 0%,
+        rgb(0 0 0 / 0.52) 35%,
+        rgb(0 0 0 / 0.22) 62%,
+        transparent 88%
+      );
   }
 
   .page-hero-inner {
@@ -130,7 +156,9 @@ const {
     /* --omitka over the scrimmed photograph. Never brass: --mosaz on --les is
        3.00:1 and fails (docs/02-design-system.md §1.2). */
     color: var(--color-omitka);
-    text-shadow: 0 1px 24px rgb(22 36 28 / 0.5);
+    text-shadow:
+      0 1px 3px rgb(0 0 0 / 0.55),
+      0 2px 28px rgb(0 0 0 / 0.45);
   }
 
   .page-hero-lead {
@@ -139,7 +167,9 @@ const {
     font-size: var(--text-lead);
     /* Stone, not frost: --jinovatka is a winter accent only (§1). */
     color: var(--color-kamen);
-    text-shadow: 0 1px 20px rgb(22 36 28 / 0.55);
+    text-shadow:
+      0 1px 3px rgb(0 0 0 / 0.6),
+      0 2px 22px rgb(0 0 0 / 0.45);
   }
 
   /*

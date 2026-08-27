@@ -344,16 +344,30 @@ const { solid = false } = Astro.props;
     }
   }
 
+  /*
+   * 44px minimum, and it is the only control in the header on a phone   the
+   * thing every navigation on the site goes through. It was 38px tall, which is
+   * under both the 44px this site uses and the 24px WCAG 2.5.8 floor for the
+   * label plus icon as one row.
+   *
+   * The vertical padding grows the box without moving the label, because the
+   * header row is `align-items: center` and taller than this either way; the
+   * negative right margin still pulls the icon out to the container edge so the
+   * target reaches the corner of the screen rather than stopping short of it.
+   */
   .nav-mobile summary {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-height: 44px;
     padding: 0.5rem;
     margin-right: -0.5rem;
     color: var(--color-omitka);
     font-size: var(--text-caption);
     cursor: pointer;
     list-style: none;
+    /* A double-tap near the menu should never zoom the page. */
+    touch-action: manipulation;
   }
 
   .nav-mobile summary::-webkit-details-marker {

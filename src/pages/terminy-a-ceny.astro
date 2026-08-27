@@ -9,17 +9,17 @@
  *
  * SECTION ORDER (docs/04-pages.md §/terminy-a-ceny):
  *   1. KalendarSlot     booking rules + legend + "ask us today"
- *   2. Ceník            one price table, seasons as rows
- *   3. Svátky           Silvestr and Vánoce with self-expiring dates
- *   4. Poplatky         fee schedule (electricity, water, sauna, deposit)
- *   5. Podmínky         known terms as steps + missing terms as "ask us"
- *   6. Poptavka         the inquiry form
+ *   2. Ceník            season cards, Silvestr and Vánoce as two wide cards
+ *                       under them (Svatky.astro's own section is gone   see
+ *                       Cenik.astro's header comment)
+ *   3. Poplatky         fee schedule (electricity, water, sauna, deposit)
+ *   4. Podmínky         known terms as steps + missing terms as "ask us"
+ *   5. Poptavka         the inquiry form
  *
  * BAND ALTERNATION (from KalendarSlot's --omitka):
  *   KalendarSlot  --omitka   (the component sets this)
- *   Ceník         --kamen    (alternates ✓)
- *   Svátky        --les      (dark; different from kamen ✓)
- *   Poplatky      --omitka   (different from les ✓)
+ *   Ceník         --kamen    (alternates ✓, now carries Silvestr and Vánoce too)
+ *   Poplatky      --omitka   (different from kamen ✓)
  *   Podmínky      --kamen    (different from omitka ✓)
  *   Poptavka      --omitka   (band="omitka"; last section, light ✓)
  *
@@ -54,7 +54,6 @@ import Poptavka from '../components/sections/Poptavka.astro';
 import RoofDivider from '../components/decor/RoofDivider.astro';
 
 import Cenik from '../components/pages/terminy/Cenik.astro';
-import Svatky from '../components/pages/terminy/Svatky.astro';
 import Poplatky from '../components/pages/terminy/Poplatky.astro';
 import Podminky from '../components/pages/terminy/Podminky.astro';
 
@@ -95,21 +94,16 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <KalendarSlot id="kalendar" />
 
   {/*
-    2. Ceník   one table, seasons as rows, week and weekend as columns.
-    Not six cards. Section band: --kamen.
+    2. Ceník   season cards, then Silvestr and Vánoce as two wide cards under
+    them. Both holidays have null dates at launch (launch-blocking §9 items 3
+    and 4); jeAktualni() renders the "termín upřesníme" path   never a stale
+    year   exactly as it did in the Svátky section this replaced. Section
+    band: --kamen.
   */}
   <Cenik />
 
   {/*
-    3. Svátky   Silvestr and Vánoce.
-    Both have null dates at launch (launch-blocking §9 items 3 and 4).
-    jeAktualni() renders the "termín upřesníme" path   never a stale year.
-    Section band: --les.
-  */}
-  <Svatky />
-
-  {/*
-    4. Poplatky   what is added to the rate.
+    3. Poplatky   what is added to the rate.
     Two entries are marked nepotvrzeno: true (electricity and municipal fee);
     they render with an "orientačně" badge (§9 item 7).
     Section band: --omitka.
@@ -125,7 +119,7 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <RoofDivider />
 
   {/*
-    5. Podmínky   known terms as steps, missing terms as "ask us".
+    4. Podmínky   known terms as steps, missing terms as "ask us".
     CHYBEJICI_PODMINKY is never dropped   it is the honest answer to "what
     does this site not yet tell you?" and bed linen is the single most-asked
     question for a Czech chalupa let. Section band: --kamen.
@@ -133,7 +127,7 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <Podminky />
 
   {/*
-    6. Poptavka   the inquiry form.
+    5. Poptavka   the inquiry form.
     band="omitka" because Podmínky above is --kamen (stone). The last section
     must be on a light band ✓. The lead references the price list the reader
     has just read.
