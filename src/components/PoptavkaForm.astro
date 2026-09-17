@@ -20,11 +20,17 @@
  * are built from the design tokens directly and ship zero bytes of JavaScript.
  *
  * The date field is deliberately free text, not a picker. Someone typing
- * `20.-27.9.` must not be rejected   the Worker parses leniently and passes the
- * raw string through to the email.
+ * `20.-27.9.` must not be rejected   Web3Forms passes the raw string straight
+ * through to the email with no parsing at all.
+ *
+ * Submits to Web3Forms (POPTAVKA_ENDPOINT in src/data/site.ts), not the
+ * Cloudflare Worker docs/03-tech.md §2 describes   see the comment on
+ * POPTAVKA_ENDPOINT for why. Web3Forms performs the no-JS redirect itself via
+ * the hidden `redirect` field below, so the "must work with JS disabled"
+ * requirement still holds.
  */
 import Icon from './Icon.astro';
-import { POPTAVKA_ENDPOINT, SITE } from '../data/site';
+import { POPTAVKA_ENDPOINT, SITE, WEB3FORMS_ACCESS_KEY } from '../data/site';
 
 interface Props {
   /** Extra classes on the <form>   a page wanting a different card width. */
@@ -40,22 +46,26 @@ const { class: className } = Astro.props;
  * Hidden rather than a field: it is metadata, not something to ask a guest.
  */
 const odkud = Astro.url.pathname;
+
+/* Absolute URL   Web3Forms redirects the browser here itself on success. */
+const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
 ---
 
-{/*
-  TODO(worker): POPTAVKA_ENDPOINT is a placeholder   the Cloudflare Worker is
-  not written yet (worker/README.md). It must respond 303 to
-  /kontakt/dekujeme on success and 303 back here with an error parameter on
-  failure, so a no-JS browser follows both.
-*/}
 <form class:list={['form', className]} method="POST" action={POPTAVKA_ENDPOINT}>
+  <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+  <input type="hidden" name="subject" value="Nová poptávka   Chalupa Heřmanka" />
+  <input type="hidden" name="from_name" value="Formulář na webu Chalupa Heřmanka" />
+  <input type="hidden" name="redirect" value={dekujeme} />
+
   {/*
-    Honeypot. Hidden from sight, from the tab order and from screen readers;
-    a submission that fills it in is a bot. docs/03-tech.md §2.
+    Honeypot, Web3Forms' own convention: a hidden checkbox named "botcheck".
+    Left unchecked by a human; Web3Forms silently drops any submission where
+    it comes back checked. Hidden from sight, from the tab order and from
+    screen readers. docs/03-tech.md §2.
   */}
   <div class="hp" aria-hidden="true">
-    <label for="web">Nevyplňujte toto pole</label>
-    <input type="text" id="web" name="web" tabindex="-1" autocomplete="off" />
+    <label for="botcheck">Nevyplňujte toto pole</label>
+    <input type="checkbox" id="botcheck" name="botcheck" tabindex="-1" autocomplete="off" />
   </div>
 
   <input type="hidden" name="odkud" value={odkud} />

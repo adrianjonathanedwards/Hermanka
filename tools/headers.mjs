@@ -77,10 +77,10 @@ function policy(scriptHashes) {
     /* No fetch/XHR/WebSocket anywhere in src/scripts/motion.ts. */
     "connect-src 'self'",
 
-    /* ⚠ The inquiry form POSTs to POPTAVKA_ENDPOINT (src/data/site.ts), today
-       the same-origin /api/poptavka. If that is ever repointed at a Worker on
-       its own hostname, add that origin here or submissions are blocked. */
-    "form-action 'self'",
+    /* The inquiry form POSTs to POPTAVKA_ENDPOINT (src/data/site.ts), which is
+       Web3Forms   https://api.web3forms.com/submit. If that is ever repointed
+       at a same-origin Worker instead, this can drop back to just 'self'. */
+    "form-action 'self' https://api.web3forms.com",
 
     /* Nothing is framed, and this site frames nothing. */
     "frame-src 'none'",

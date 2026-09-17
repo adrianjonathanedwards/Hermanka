@@ -41,12 +41,24 @@ export const SITE = {
 export const mapyUrl = `https://mapy.com/zakladni?q=${SITE.gps.lat}%2C${SITE.gps.lon}`;
 
 /**
- * TODO(worker): the inquiry form posts here. The Worker is not written yet  
- * see worker/README.md and docs/03-tech.md §2. Until it exists the form will
- * fail to submit; the markup, labels and no-JS behaviour are what this pass
- * delivers.
+ * The inquiry form posts straight to Web3Forms   https://web3forms.com   rather
+ * than the Cloudflare Worker described in worker/README.md and docs/03-tech.md
+ * §2. Web3Forms accepts a plain `<form method="POST">` submission and performs
+ * the redirect itself, so the no-JS requirement in docs/03-tech.md §2 still
+ * holds without us writing or hosting anything.
+ *
+ * If the Worker + Resend path is ever built, repoint this at it and remove the
+ * `form-action` entry for api.web3forms.com in tools/headers.mjs.
  */
-export const POPTAVKA_ENDPOINT = '/api/poptavka';
+export const POPTAVKA_ENDPOINT = 'https://api.web3forms.com/submit';
+
+/**
+ * Web3Forms access key   identifies which Web3Forms account/inbox receives the
+ * submission. Not a bearer secret: it is designed to sit in public HTML (it
+ * only authorises a form to submit, not to read anything back), so it is safe
+ * here alongside the other public site constants.
+ */
+export const WEB3FORMS_ACCESS_KEY = 'a9d14851-597f-4e30-82fa-57f01dff3801';
 
 /** Primary navigation. Used by both the header and the footer. */
 export const NAV = [

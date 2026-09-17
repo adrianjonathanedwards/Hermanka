@@ -1,17 +1,11 @@
 ﻿---
 /**
- * /kontakt/dekujeme   The form's 303 success target.
+ * /kontakt/dekujeme   The form's success target.
  *
- * The inquiry form in <PoptavkaForm> posts to the Cloudflare Worker
- * (POPTAVKA_ENDPOINT in src/data/site.ts). On a successful submission the
- * Worker responds with:
- *   HTTP/1.1 303 See Other
- *   Location: /kontakt/dekujeme
- *
- * TODO(worker): the Worker does not exist yet   worker/README.md and
- * src/data/site.ts POPTAVKA_ENDPOINT. Until it is deployed, this page is
- * reachable only by manually typing its URL; no form submission can land here.
- * The markup and content are what this pass delivers.
+ * The inquiry form in <PoptavkaForm> posts to Web3Forms (POPTAVKA_ENDPOINT in
+ * src/data/site.ts), with this page's absolute URL in a hidden `redirect`
+ * field. Web3Forms redirects the browser here itself on a successful,
+ * no-JS submission.
  *
  * ---------------------------------------------------------------------------
  * WHY THIS PAGE IS SHORT AND WHY --treeline-h IS OVERRIDDEN
