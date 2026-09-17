@@ -114,6 +114,10 @@ const schema = {
   '@id': new URL('/ubytovani', Astro.site).href,
   name: SITE.name,
   url: new URL('/ubytovani', Astro.site).href,
+  /* Recommended (not required) fields for a LodgingBusiness rich result   both
+     point at assets that already exist elsewhere on the site, not new ones. */
+  image: new URL('/og-default.jpg', Astro.site).href,
+  logo: new URL('/apple-touch-icon.png', Astro.site).href,
   telephone: SITE.telefon,
   address: {
     '@type': 'PostalAddress',

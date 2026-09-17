@@ -292,9 +292,9 @@ const NBSP = ' ';
        */
       linear-gradient(
         to bottom,
-        rgb(0 0 0 / 0.62) 0%,
-        rgb(0 0 0 / 0.56) 10%,
-        rgb(0 0 0 / 0.12) 19%,
+        rgb(0 0 0 / 0.38) 0%,
+        rgb(0 0 0 / 0.34) 10%,
+        rgb(0 0 0 / 0.07) 19%,
         rgb(0 0 0 / 0) 28%
       ),
       /*
@@ -307,16 +307,22 @@ const NBSP = ' ';
        * exterior. So it stays substantial through the copy block (0 %  ‑ 58 %) and
        * only falls away above it. Neutral black, not --les: that is the part
        * that changed, and the part that has to stay changed.
+       *
+       * ⚠ LIGHTENED ~45% TOTAL BY REQUEST (initial 20% on 2026-09-17, further
+       * reduced ~25% more) so the photograph reads through more distinctly
+       * re-measure against slide three (brightest, sunlit interior) before
+       * lightening further; the text-shadow on .hero-title/.hero-sub is
+       * carrying more of the contrast burden now than it was.
        */
       linear-gradient(
         to top,
-        rgb(0 0 0 / 0.74) 0%,
-        rgb(0 0 0 / 0.72) 25%,
-        rgb(0 0 0 / 0.68) 45%,
-        rgb(0 0 0 / 0.62) 58%,
-        rgb(0 0 0 / 0.44) 68%,
-        rgb(0 0 0 / 0.24) 78%,
-        rgb(0 0 0 / 0.09) 88%,
+        rgb(0 0 0 / 0.44) 0%,
+        rgb(0 0 0 / 0.44) 25%,
+        rgb(0 0 0 / 0.40) 45%,
+        rgb(0 0 0 / 0.37) 58%,
+        rgb(0 0 0 / 0.26) 68%,
+        rgb(0 0 0 / 0.14) 78%,
+        rgb(0 0 0 / 0.05) 88%,
         rgb(0 0 0 / 0) 96%
       );
   }
@@ -331,16 +337,16 @@ const NBSP = ' ';
       background:
         linear-gradient(
           to bottom,
-          rgb(0 0 0 / 0.62) 0%,
-          rgb(0 0 0 / 0.56) 10%,
-          rgb(0 0 0 / 0.12) 19%,
+          rgb(0 0 0 / 0.38) 0%,
+          rgb(0 0 0 / 0.34) 10%,
+          rgb(0 0 0 / 0.07) 19%,
           rgb(0 0 0 / 0) 28%
         ),
         linear-gradient(
           to right,
-          rgb(0 0 0 / 0.5) 0%,
-          rgb(0 0 0 / 0.4) 30%,
-          rgb(0 0 0 / 0.17) 60%,
+          rgb(0 0 0 / 0.30) 0%,
+          rgb(0 0 0 / 0.24) 30%,
+          rgb(0 0 0 / 0.10) 60%,
           rgb(0 0 0 / 0) 86%
         ),
         /*
@@ -353,16 +359,20 @@ const NBSP = ' ';
          * a 1440 screen measures fine there and fails here: thinned to match the
          * wide layout it put the headline at 2.02:1 over the covered terrace at
          * 1024, against 10.08:1 before. Check this breakpoint first.
+         *
+         * ⚠ LIGHTENED ~45% TOTAL (initial 20% on 2026-09-17, further reduced
+         * ~25% more), same as the portrait floor above   re-measure against
+         * slide three before lightening further.
          */
         linear-gradient(
           to top,
-          rgb(0 0 0 / 0.74) 0%,
-          rgb(0 0 0 / 0.7) 25%,
-          rgb(0 0 0 / 0.64) 45%,
-          rgb(0 0 0 / 0.54) 58%,
-          rgb(0 0 0 / 0.36) 70%,
-          rgb(0 0 0 / 0.18) 80%,
-          rgb(0 0 0 / 0.06) 90%,
+          rgb(0 0 0 / 0.44) 0%,
+          rgb(0 0 0 / 0.42) 25%,
+          rgb(0 0 0 / 0.38) 45%,
+          rgb(0 0 0 / 0.32) 58%,
+          rgb(0 0 0 / 0.22) 70%,
+          rgb(0 0 0 / 0.10) 80%,
+          rgb(0 0 0 / 0.04) 90%,
           rgb(0 0 0 / 0) 98%
         );
     }

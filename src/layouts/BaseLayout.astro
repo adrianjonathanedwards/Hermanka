@@ -71,6 +71,24 @@ const fullTitle = title ? `${title} | ${siteName}` : siteName;
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 const pathWithoutLocale = stripLocale(Astro.url.pathname);
+
+/*
+ * Sitewide WebSite entity, on every page   otherwise the only structured data
+ * on the whole site lives on one page (ubytovani.astro's LodgingBusiness) and
+ * nothing ties the two together into one graph. `publisher` references that
+ * LodgingBusiness by its existing `@id` (its canonical URL) rather than
+ * redeclaring it here, so there is exactly one definition of the business to
+ * keep in sync.
+ */
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': new URL('/#website', Astro.site).href,
+  url: new URL('/', Astro.site).href,
+  name: siteName,
+  inLanguage: HTML_LANG[locale],
+  publisher: { '@id': new URL('/ubytovani', Astro.site).href },
+};
 ---
 
 <!doctype html>
@@ -147,7 +165,21 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={t('site.name')} />
+    {/* `ogImage` is always the generated /og-default.jpg   see the prop comment
+        above for why it is JPEG on purpose. */}
+    <meta property="og:image:type" content="image/jpeg" />
+
+    {/*
+      Explicit twitter:* rather than relying on X's og: fallback. Not every
+      crawler that reads Twitter Cards implements that fallback   several
+      answer-engine and chat-app bots read twitter:* directly and show nothing
+      if it is absent.
+    */}
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
+    <meta name="twitter:image:alt" content={t('site.name')} />
 
     {/*
       The client's own favicon, copied from img/cropped-favicon-1-32x32.png.
@@ -170,6 +202,8 @@ const pathWithoutLocale = stripLocale(Astro.url.pathname);
     <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#16241C" />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(websiteSchema)} />
 
     {/*
       Motion gate + failsafe. `is:inline` and in <head> on purpose: it has to run
