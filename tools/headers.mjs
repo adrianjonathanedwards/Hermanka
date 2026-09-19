@@ -53,6 +53,15 @@ function inlineScriptHashes(dist) {
   return [...hashes].sort();
 }
 
+function connectSrc() {
+  try {
+    const url = process.env.PUBLIC_AVAILABILITY_URL;
+    return url ? `connect-src 'self' ${new URL(url).origin}` : "connect-src 'self'";
+  } catch {
+    return "connect-src 'self'";
+  }
+}
+
 function policy(scriptHashes) {
   return [
     /* Nothing loads from anywhere but this origin. There is no third-party
@@ -75,9 +84,9 @@ function policy(scriptHashes) {
     "font-src 'self'",
 
     /* The only fetch on the site is the availability calendar's GET /api/availability
-       (src/scripts/availability-calendar.ts), and that route is on this hostname.
-       If the Worker is ever served from another origin, that origin goes here. */
-    "connect-src 'self'",
+       (src/scripts/availability-calendar.ts), on this hostname unless the build sets
+       PUBLIC_AVAILABILITY_URL, in which case that Worker's origin is allowed too. */
+    connectSrc(),
 
     /* The inquiry form POSTs to POPTAVKA_ENDPOINT (src/data/site.ts), which is
        Web3Forms   https://api.web3forms.com/submit. If that is ever repointed

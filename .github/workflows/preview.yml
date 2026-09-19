@@ -87,6 +87,11 @@ jobs:
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           SITE_URL: ${{ steps.pages.outputs.origin }}
+          # The preview is on github.io, where there is no /api route, so the
+          # calendar calls the availability Worker (worker/availability/) at its own
+          # address. Public, not a secret: the Worker only returns booked dates.
+          # Override with a repository variable AVAILABILITY_URL to move it.
+          PUBLIC_AVAILABILITY_URL: ${{ vars.AVAILABILITY_URL || 'https://hermanka-availability.squareshare.workers.dev/api/availability' }}
         run: npm run build
 
       # Cheap insurance against a future component adding an absolute path that

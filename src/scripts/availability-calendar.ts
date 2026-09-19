@@ -23,7 +23,14 @@ import {
   type Conflict,
 } from './availability-core';
 
-const ENDPOINT = '/api/availability';
+/**
+ * Same-origin by default: production puts the Worker on a route of the site's own
+ * hostname. The GitHub Pages preview has no such route, so its build sets
+ * PUBLIC_AVAILABILITY_URL to the Worker's own address (CORS on the Worker allows it).
+ * If you set it for a production build, add its origin to `connect-src`; tools/headers.mjs
+ * does that from the same variable.
+ */
+const ENDPOINT: string = import.meta.env.PUBLIC_AVAILABILITY_URL || '/api/availability';
 const FETCH_TIMEOUT_MS = 10_000;
 const MONTHS_SHOWN = 2;
 const MONTHS_AHEAD = 12;

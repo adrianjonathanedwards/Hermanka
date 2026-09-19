@@ -52,6 +52,18 @@ npm run dev                        # http://127.0.0.1:8787/api/availability
 Then `npm run dev` in the repo root: Astro's dev server proxies `/api` to port 8787
 (override with `AVAILABILITY_DEV_ORIGIN`). `wrangler dev` simulates KV locally.
 
+### Where it is deployed now
+
+`https://hermanka-availability.squareshare.workers.dev/api/availability`, on the
+Cloudflare account that `CLOUDFLARE_API_TOKEN` points at on the developer machine
+(the Squareshare account, KV namespace `hermanka-availability-availability-kv`).
+That is a stopgap so the GitHub Pages preview has a live calendar: the production
+domain is not on Cloudflare yet, and the site's own Cloudflare project is not in
+that account. The preview build reaches it through `PUBLIC_AVAILABILITY_URL` in
+`.github/workflows/preview.yml`. To move it to the client's account: log in there,
+`wrangler deploy`, `wrangler secret put E_CHALUPY_ICAL_URL`, set the repository
+variable `AVAILABILITY_URL`, then delete the old Worker and namespace here.
+
 ### Deploy
 
 ```sh
@@ -62,13 +74,13 @@ npx wrangler deploy
 
 - The KV namespace has no `id` in `wrangler.jsonc`; Wrangler creates it on the first
   deploy (automatic provisioning).
-- `wrangler.jsonc` binds the route `www.chalupahermanka.cz/api/availability`, so the
-  browser calls it same-origin and the site's CSP (`connect-src 'self'`) needs no
-  change. **Check after the first deploy** that the route wins over the site's own
-  static-assets Worker for that path: `curl -i https://www.chalupahermanka.cz/api/availability`
-  should be JSON, not the 404 page. If the Worker is served from another origin
-  (workers.dev), change `ENDPOINT` in `src/scripts/availability-calendar.ts` and add
-  that origin to `connect-src` in `tools/headers.mjs`.
+- For production, once `chalupahermanka.cz` is on Cloudflare, add the route from the
+  comment in `wrangler.jsonc` so the browser calls the site's own hostname (the CSP's
+  `connect-src 'self'` then needs no change). **Check after deploying** that the route
+  wins over the site's static-assets Worker for that path:
+  `curl -i https://www.chalupahermanka.cz/api/availability` should be JSON, not the
+  404 page. Building with `PUBLIC_AVAILABILITY_URL` set instead points the calendar at
+  another origin, and `tools/headers.mjs` adds that origin to `connect-src` itself.
 - Rotating the feed URL: `wrangler secret put` again. The 15-minute cache means the
   old data is served for up to that long.
 

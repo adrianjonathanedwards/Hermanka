@@ -4,9 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-17",
 
-  // Same origin as the site, so the page's `connect-src 'self'` covers it and no
-  // CSP change is needed. Check the zone before the first deploy.
-  "routes": [{ "pattern": "www.chalupahermanka.cz/api/availability", "zone_name": "chalupahermanka.cz" }],
+  // Served from its own workers.dev address, which is what the GitHub Pages preview
+  // calls (PUBLIC_AVAILABILITY_URL). Once chalupahermanka.cz is on Cloudflare, add
+  // this so the browser calls the site's own hostname and the CSP needs no change:
+  //   "routes": [{ "pattern": "www.chalupahermanka.cz/api/availability", "zone_name": "chalupahermanka.cz" }],
 
   // No `id`: Wrangler creates the namespace on the first `wrangler deploy` and
   // simulates it locally under `wrangler dev`.
