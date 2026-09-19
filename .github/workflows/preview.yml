@@ -27,11 +27,13 @@ on:
   # so a preview can be refreshed from the Actions tab without a commit
   workflow_dispatch:
 
-# Read the repo, mint the Pages token. Nothing else.
+# Read the repo, mint the Pages token, and (actions) look at GitHub's own Pages run
+# so the deploy job can wait for it. Nothing else.
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 # One preview at a time. `cancel-in-progress: false` because a half-finished
 # deploy is worse than a slightly stale one.
@@ -74,8 +76,10 @@ jobs:
       # renders README.md, and it is the slower of the two, so it usually wins.
       # Setting the source to "GitHub Actions" stops that run from existing.
       # The same switch is under Settings → Pages → Build and deployment → Source.
-      # If the token is not allowed to do it this only warns, so the build and
-      # deploy below still run.
+      # This step is belt and braces: it has not been observed to stop that run
+      # (it still appeared on the next push), so the deploy job below does not
+      # depend on it and waits for that run instead. If the token is not allowed to
+      # switch the source this only warns.
       - name: Deploy from GitHub Actions, not from the branch
         env:
           GH_TOKEN: ${{ github.token }}
@@ -114,5 +118,22 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # ORDER, NOT LUCK. If GitHub is also running its own Jekyll build for this
+      # commit (see the warning above) both deployments succeed and whichever lands
+      # second is live. Ours has to be second, so wait for that run to finish. With
+      # the source on "GitHub Actions" there is no such run and this returns at once.
+      # Gives up after ~6 minutes and deploys anyway rather than blocking the preview.
+      - name: Let GitHub's built-in Pages run finish first
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 36); do
+            state=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${GITHUB_SHA}"               --jq '[.workflow_runs[] | select(.name == "pages build and deployment") | .status]
+                    | if length == 0 then "none" elif all(. == "completed") then "done" else "running" end')
+            echo "built-in pages run: $state"
+            [ "$state" != "running" ] && break
+            sleep 10
+          done
+
       - id: deployment
         uses: actions/deploy-pages@v4
