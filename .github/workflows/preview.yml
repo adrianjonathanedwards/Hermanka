@@ -62,12 +62,26 @@ jobs:
       - uses: actions/configure-pages@v5
         id: pages
         with:
-          # Switches the repository from "deploy from a branch" (which serves
-          # README.md through Jekyll   what was live before this workflow) to
-          # "GitHub Actions", without anybody visiting the settings page. If the
-          # token is ever not allowed to do this the step fails loudly, and the
-          # same switch is under Settings → Pages → Build and deployment.
+          # Turns Pages ON if it is off. It does NOT change the source of a site
+          # that is already on: a repository left on "Deploy from a branch" stays
+          # there. That is what the next step is for.
           enablement: true
+
+      # ⚠ WHY THE PREVIEW SOMETIMES SHOWS ONLY THE README.
+      # On "Deploy from a branch" GitHub runs its own Jekyll build on every push
+      # (the run called "pages build and deployment") IN PARALLEL with this
+      # workflow, and whichever deployment finishes last is what is live. Jekyll
+      # renders README.md, and it is the slower of the two, so it usually wins.
+      # Setting the source to "GitHub Actions" stops that run from existing.
+      # The same switch is under Settings → Pages → Build and deployment → Source.
+      # If the token is not allowed to do it this only warns, so the build and
+      # deploy below still run.
+      - name: Deploy from GitHub Actions, not from the branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow \
+            || echo "::warning::Could not switch the Pages source. Set Settings > Pages > Build and deployment > Source to GitHub Actions, or Jekyll will keep overwriting this preview with the README."
 
       - name: Build
         env:
