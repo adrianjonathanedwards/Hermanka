@@ -139,3 +139,16 @@ test('an empty or reversed range from upstream blocks nothing and does not hang'
   );
   assert.equal(av.canCheckIn(d('2026-10-10')), true);
 });
+
+test('adjust(): a chosen stay grows later, grows earlier, or shrinks, but never into a booking', () => {
+  const av = new Availability(MERGED, { today: TODAY });
+  const a = (ci: string, co: string, day: string) => av.adjust(d(ci), d(co), d(day))?.map(toIso) ?? null;
+  assert.deepEqual(a('2026-10-01', '2026-10-03', '2026-10-06'), ['2026-10-01', '2026-10-06']); // later
+  assert.deepEqual(a('2026-10-03', '2026-10-05', '2026-10-01'), ['2026-10-01', '2026-10-05']); // earlier
+  assert.deepEqual(a('2026-10-01', '2026-10-08', '2026-10-04'), ['2026-10-01', '2026-10-04']); // shorter
+  assert.deepEqual(a('2026-10-01', '2026-10-03', '2026-10-10'), ['2026-10-01', '2026-10-10']); // up to the arrival day
+  assert.equal(a('2026-10-01', '2026-10-03', '2026-10-12'), null); // past a booking
+  assert.equal(a('2026-10-16', '2026-10-18', '2026-10-12'), null); // earlier, into a booking
+  assert.equal(a('2026-10-01', '2026-10-03', '2026-10-01'), null); // an end itself
+  assert.equal(a('2026-10-01', '2026-10-03', '2026-10-03'), null);
+});

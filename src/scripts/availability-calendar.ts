@@ -7,8 +7,9 @@
  * number, the form). This replaces it only once the data has arrived, so a guest
  * is never shown a calendar that has not heard from the Worker: a grid of free days
  * that are not really free would be believed. If the fetch fails the fallback
- * stays. The form's date field remains free text either way (docs/03-tech.md §2);
- * picking a range only fills it in and adds `prijezd` / `odjezd` (ISO dates).
+ * stays. The form's two date inputs (#prijezd, #odjezd) are real `type="date"` fields
+ * and work without any of this; the calendar fills them in, follows them when they
+ * are edited, and both are checked against the booked ranges (validateDates).
  *
  * The rules (what may be an arrival, what may be a departure) live in
  * availability-core.ts and are unit-tested there.
@@ -122,6 +123,36 @@ const CHEVRON = (path: string) =>
 
 let uid = 0;
 
+/**
+ * Check the form's two date inputs against the booked ranges and set their validity, so the
+ * browser itself refuses to submit a stay that overlaps a booking. Also keeps `min` honest.
+ */
+function validateDates(form: HTMLFormElement, av: Availability, today: number): Conflict | null {
+  const dateIn = form.querySelector<HTMLInputElement>('#prijezd');
+  const dateOut = form.querySelector<HTMLInputElement>('#odjezd');
+  if (!dateIn || !dateOut) return null;
+  dateIn.min = toIso(today);
+  dateOut.min = toIso((dateIn.value ? toDay(dateIn.value) : today) + 1);
+  dateIn.setCustomValidity('');
+  dateOut.setCustomValidity('');
+  if (!dateIn.value) return null;
+  const conflict = av.conflict(dateIn.value, dateOut.value || toIso(toDay(dateIn.value) + 1));
+  if (conflict) (conflict === 'checkin' || conflict === 'past' ? dateIn : dateOut).setCustomValidity(CONFLICT_TEXT[conflict]);
+  return conflict;
+}
+
+/** Validation only, no calendar: for a form whose date inputs are used without opening the picker. */
+export async function guardForm(form: HTMLFormElement): Promise<void> {
+  try {
+    const av = new Availability(await load(), { today: todayDay() });
+    const check = () => validateDates(form, av, todayDay());
+    form.addEventListener('input', (e) => (e.target as Element).matches('#prijezd, #odjezd') && check());
+    check();
+  } catch {
+    /* Worker down: the inputs still work, unchecked. */
+  }
+}
+
 export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | null): Promise<void> {
   root.setAttribute('aria-busy', 'true');
 
@@ -147,8 +178,8 @@ export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | n
   const minDay = firstOf(nowMonth);
   const maxDay = firstOf(nowMonth + MONTHS_AHEAD) - 1;
 
-  const termin = form?.querySelector<HTMLInputElement>('#termin') ?? null;
-  let prefilled = '';
+  const dateIn = form?.querySelector<HTMLInputElement>('#prijezd') ?? null;
+  const dateOut = form?.querySelector<HTMLInputElement>('#odjezd') ?? null;
 
   const state = {
     view: nowMonth,
@@ -182,10 +213,12 @@ export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | n
   const reset = root.querySelector<HTMLElement>('[data-cal-reset]')!;
   root.removeAttribute('aria-busy');
 
-  const selectable = (day: number): boolean =>
-    state.checkIn === null || state.checkOut !== null
-      ? av.canCheckIn(day)
-      : av.canCheckOut(state.checkIn, day) || av.canCheckIn(day);
+  const selectable = (day: number): boolean => {
+    const { checkIn, checkOut } = state;
+    if (checkIn === null) return av.canCheckIn(day);
+    if (checkOut === null) return av.canCheckOut(checkIn, day) || av.canCheckIn(day);
+    return day === checkIn || day === checkOut || av.canCheckIn(day) || av.adjust(checkIn, checkOut, day) !== null;
+  };
 
   const selectionOf = (day: number): 'in' | 'out' | 'mid' | '' => {
     if (day === state.checkIn) return 'in';
@@ -249,7 +282,7 @@ export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | n
     const { checkIn, checkOut } = state;
     if (checkIn === null) return 'Vyberte den příjezdu.';
     if (checkOut === null) return `Příjezd ${short(checkIn)}. Nyní vyberte den odjezdu.`;
-    return `Vybráno: ${short(checkIn)} – ${short(checkOut)} (${nights(checkOut - checkIn)}). Termín je volný.`;
+    return `Vybráno: ${short(checkIn)} – ${short(checkOut)} (${nights(checkOut - checkIn)}). Termín je volný. Klepnutím na jiný den pobyt upravíte.`;
   }
 
   function render(refocus?: string): void {
@@ -262,39 +295,12 @@ export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | n
     if (refocus) months.querySelector<HTMLElement>(refocus)?.focus();
   }
 
-  function hidden(name: string): HTMLInputElement | null {
-    return form?.querySelector<HTMLInputElement>(`input[type="hidden"][name="${name}"]`) ?? null;
-  }
-
-  function setHidden(name: string, value: string | null): void {
-    if (!form) return;
-    let el = hidden(name);
-    if (value === null) return el?.remove();
-    if (!el) {
-      el = document.createElement('input');
-      el.type = 'hidden';
-      el.name = name;
-      form.append(el);
-    }
-    el.value = value;
-  }
-
-  /** Write the selection into the form: the free-text field, plus exact ISO dates. */
+  /** Write the selection into the two date inputs and re-check them. */
   function syncForm(): void {
-    if (!termin) return;
-    termin.setCustomValidity('');
-    const { checkIn, checkOut } = state;
-    if (checkIn !== null && checkOut !== null) {
-      prefilled = `${short(checkIn)} – ${short(checkOut)} (${nights(checkOut - checkIn)})`;
-      termin.value = prefilled;
-      setHidden('prijezd', toIso(checkIn));
-      setHidden('odjezd', toIso(checkOut));
-    } else {
-      if (termin.value === prefilled) termin.value = '';
-      prefilled = '';
-      setHidden('prijezd', null);
-      setHidden('odjezd', null);
-    }
+    if (!form || !dateIn || !dateOut) return;
+    dateIn.value = state.checkIn === null ? '' : toIso(state.checkIn);
+    dateOut.value = state.checkOut === null ? '' : toIso(state.checkOut);
+    validateDates(form, av, today);
   }
 
   function clear(): void {
@@ -307,7 +313,19 @@ export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | n
     warning = '';
     const { checkIn, checkOut } = state;
 
-    if (checkIn !== null && checkOut === null) {
+    if (checkIn !== null && checkOut !== null) {
+      // A finished stay is edited, not thrown away: later, earlier or shorter.
+      if (day === checkIn) return clear();
+      if (day === checkOut) {
+        state.checkOut = null;
+        return syncForm();
+      }
+      const next = av.adjust(checkIn, checkOut, day);
+      if (next) {
+        [state.checkIn, state.checkOut] = next;
+        return syncForm();
+      }
+    } else if (checkIn !== null) {
       if (day === checkIn) return clear();
       if (day > checkIn) {
         if (av.canCheckOut(checkIn, day)) {
@@ -385,33 +403,33 @@ export async function mountCalendar(root: HTMLElement, form: HTMLFormElement | n
     render(`[data-d="${state.focus}"]`);
   });
 
-  if (form && termin) {
-    // Typing over a prefilled range means the guest is no longer choosing from the calendar.
-    termin.addEventListener('input', () => {
-      if (termin.value === prefilled) return;
-      state.checkIn = state.checkOut = null;
-      warning = '';
-      prefilled = '';
-      termin.setCustomValidity('');
-      setHidden('prijezd', null);
-      setHidden('odjezd', null);
-      render();
-    });
+  /** Take the stay from the two date inputs, and bring its month into view. */
+  function fromInputs(): void {
+    if (!dateIn || !dateOut) return;
+    const a = dateIn.value ? toDay(dateIn.value) : null;
+    const b = dateOut.value ? toDay(dateOut.value) : null;
+    state.checkIn = a;
+    state.checkOut = a !== null && b !== null && b > a ? b : null;
+    if (a !== null) {
+      const m = monthOf(a);
+      if (m < state.view || m >= state.view + MONTHS_SHOWN) {
+        state.view = Math.min(Math.max(m, nowMonth), maxView);
+      }
+      state.focus = Math.min(Math.max(a, minDay), maxDay);
+    }
+  }
 
-    // What is checked is what is about to be sent, not what the widget believes.
-    form.addEventListener('submit', (e) => {
-      const checkIn = hidden('prijezd')?.value;
-      const checkOut = hidden('odjezd')?.value;
-      if (!checkIn || !checkOut) return;
-      const conflict = av.conflict(checkIn, checkOut);
-      if (!conflict) return;
-      e.preventDefault();
-      termin.setCustomValidity(CONFLICT_TEXT[conflict]);
-      termin.reportValidity();
-      // The bubble fades after a few seconds; the reason should not.
-      warning = CONFLICT_TEXT[conflict];
+  if (form && dateIn && dateOut) {
+    // Dates chosen with the browser's own picker or typed: follow them, and say what is wrong.
+    form.addEventListener('input', (e) => {
+      if (!(e.target as Element).matches('#prijezd, #odjezd')) return;
+      fromInputs();
+      const conflict = validateDates(form, av, today);
+      warning = conflict ? CONFLICT_TEXT[conflict] : '';
       render();
     });
+    fromInputs();
+    validateDates(form, av, today);
   }
 
   render();

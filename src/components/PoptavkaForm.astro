@@ -19,18 +19,14 @@
  * out React/Vue/Svelte, so the card, the icon-prefixed controls and the checkbox
  * are built from the design tokens directly and ship zero bytes of JavaScript.
  *
- * The date field is deliberately free text, not a picker. Someone typing
- * `20.-27.9.` must not be rejected   Web3Forms passes the raw string straight
- * through to the email with no parsing at all.
- *
- * A calendar picker sits on top of that, never instead of it. On /terminy-a-ceny
- * the embedded calendar (KalendarSlot.astro) fills this form in; on the other two
- * pages the <details> below opens the same widget in place. Choosing a range writes
- * a readable string into `termin` and adds hidden `prijezd` / `odjezd` ISO dates,
- * and only those structured dates are checked against the booked ranges on submit.
- * Whatever a guest types by hand is passed through unvalidated, as before. The
- * <details> is `hidden` until the script runs, so without JavaScript the form is
- * exactly what it was, and the calendar code is not fetched until it is opened.
+ * The dates are two native `type="date"` inputs (`prijezd`, `odjezd`), so every browser
+ * gives the guest its own date picker, with or without JavaScript. They are optional: a
+ * guest with flexible dates says so in the message. The calendar in KalendarSlot.astro
+ * (or the <details> below, on the pages without one) fills them in and follows them
+ * when they change, and both are checked against the booked ranges: an overlap sets a
+ * validity message on the field, so the browser itself refuses to submit. That code is
+ * not fetched until a date field is focused or the picker is opened. The <details> is
+ * `hidden` until the script runs.
  *
  * Submits to Web3Forms (POPTAVKA_ENDPOINT in src/data/site.ts), not the
  * Cloudflare Worker docs/03-tech.md §2 describes   see the comment on
@@ -79,7 +75,7 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
 
   <input type="hidden" name="odkud" value={odkud} />
 
-  <div class="field">
+  <div class="field field--wide">
     <label for="email">
       Váš e-mail <span class="req" aria-hidden="true">*</span>
     </label>
@@ -115,22 +111,22 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
   </div>
 
   <div class="field">
-    <label for="termin">Požadovaný termín</label>
+    <label for="prijezd">Příjezd</label>
     <div class="control">
       <Icon name="kalendar" class="control-icon" />
-      <input
-        type="text"
-        id="termin"
-        name="termin"
-        placeholder="např. 20.–27. 9. 2026"
-        autocomplete="off"
-        aria-describedby="termin-hint"
-      />
+      <input type="date" id="prijezd" name="prijezd" autocomplete="off" />
     </div>
-    <p class="hint" id="termin-hint">
-      Stačí přibližně. Termín nám nejvíc pomůže s rychlou odpovědí.
-    </p>
   </div>
+
+  <div class="field">
+    <label for="odjezd">Odjezd</label>
+    <div class="control">
+      <Icon name="kalendar" class="control-icon" />
+      <input type="date" id="odjezd" name="odjezd" autocomplete="off" />
+    </div>
+  </div>
+
+  <p class="hint field--wide">Termín nemusí být přesný, upřesnit ho můžete ve zprávě.</p>
 
   {/* Removed by the script when the page already has an embedded calendar. */}
   <details class="picker field--wide" data-picker hidden>
@@ -194,18 +190,23 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
 </form>
 
 <script>
+  const form = document.querySelector<HTMLFormElement>('form[data-poptavka]');
   const picker = document.querySelector<HTMLDetailsElement>('details[data-picker]');
-  if (picker) {
-    if (document.querySelector('[data-avail-cal="embedded"]')) {
-      picker.remove();
-    } else {
+  // The embedded calendar on /terminy-a-ceny mounts itself and checks the dates. Elsewhere
+  // nothing is loaded until the guest touches a date field or opens the picker.
+  if (form && document.querySelector('[data-avail-cal="embedded"]')) {
+    picker?.remove();
+  } else if (form) {
+    const lib = () => import('../scripts/availability-calendar');
+    form.querySelectorAll('#prijezd, #odjezd').forEach((input) =>
+      input.addEventListener('focus', () => void lib().then((m) => m.guardForm(form)), { once: true }),
+    );
+    if (picker) {
       picker.hidden = false;
       picker.addEventListener('toggle', () => {
         if (!picker.open || picker.dataset.mounted) return;
         picker.dataset.mounted = '1';
-        void import('../scripts/availability-calendar').then(({ mountCalendar }) =>
-          mountCalendar(picker.querySelector<HTMLElement>('[data-avail-cal]')!, picker.closest('form')),
-        );
+        void lib().then((m) => m.mountCalendar(picker.querySelector<HTMLElement>('[data-avail-cal]')!, form));
       });
     }
   }

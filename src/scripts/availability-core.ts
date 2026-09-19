@@ -103,6 +103,18 @@ export class Availability {
     return day > checkIn && day <= this.lastCheckOut(checkIn);
   }
 
+  /**
+   * A chosen stay changed to include `day`: a later check-out, an earlier check-in,
+   * or a shorter stay. Null if that would run into a booking (or `day` is one of
+   * the two ends, which the caller treats as "deselect").
+   */
+  adjust(checkIn: number, checkOut: number, day: number): [number, number] | null {
+    if (day > checkOut) return this.canCheckOut(checkIn, day) ? [checkIn, day] : null;
+    if (day > checkIn && day < checkOut) return [checkIn, day];
+    if (day < checkIn) return this.canCheckIn(day) && this.canCheckOut(day, checkOut) ? [day, checkOut] : null;
+    return null;
+  }
+
   /** Why a stay is not possible, or null if it is. Takes ISO strings: what the form holds. */
   conflict(checkIn: string, checkOut: string): Conflict | null {
     const a = toDay(checkIn);

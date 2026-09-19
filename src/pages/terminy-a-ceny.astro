@@ -35,7 +35,7 @@
  * CLIENT JAVASCRIPT, on purpose and only for the calendar: KalendarSlot loads
  * src/scripts/availability-calendar.ts, which reads GET /api/availability (the Worker
  * in worker/availability/) and draws the grid. Choosing a range fills the inquiry
- * form's date field and adds hidden `prijezd` / `odjezd` dates, and the form refuses
+ * form's Příjezd / Odjezd date inputs, and the browser refuses
  * to send a range that overlaps a booking. Without JavaScript, or with the Worker
  * down, the page shows the fallback in KalendarSlot and the form works as before.
  * docs/03-tech.md §3.

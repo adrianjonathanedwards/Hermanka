@@ -49,14 +49,12 @@ have.
   `type="email"` are hints to the browser, not a security boundary.
 
 ### Fields
-
-Defined in [01-content.md](01-content.md) §8.2. The date field is a **free-text
-input**, not a date-range picker:
-
-> The site's single job is an inquiry with dates attached. A picker that rejects
-> `20.-27.9.` because it wanted `20. 9. 2026 – 27. 9. 2026` costs us the inquiry.
-> Accept anything, parse leniently on the Worker, and pass the raw string through to
-> the email so the owner can read what the guest actually typed.
+Defined in [01-content.md](01-content.md) §8.2. The dates are two native
+`<input type="date">` fields, **Příjezd** and **Odjezd** (`prijezd`, `odjezd`, sent as
+ISO dates). They are optional and are checked in the browser only: a guest with
+flexible dates writes that in the message. The browser gives every device its own
+date picker with or without JavaScript, and `src/scripts/availability-calendar.ts`
+adds the booked-range check (§3).
 
 ### Spam
 
@@ -125,13 +123,11 @@ iCal source ──▶ Worker (fetch, parse VEVENTs) ──▶ KV (cached) ──
 - Four states, carried over from the widget being replaced:
   `Volno` · `Obsazeno` · `Den příjezdu` · `Den odjezdu`. **State must never be
   conveyed by colour alone**   pattern or glyph as well (§7).
-- Choosing a free range prefills the inquiry form's date field. This is the
-  single highest-value interaction on the site: it is the difference between an
-  inquiry with dates and an inquiry without. The field stays free text (§2); the
-  picker only fills it and adds hidden `prijezd` / `odjezd` ISO dates. On submit
-  only those structured dates are checked against the booked ranges, and a
-  conflict blocks the send. Whatever a guest types by hand is passed through
-  unvalidated, on purpose.
+- Choosing a free range fills the form's two date inputs, and editing the inputs moves
+  the calendar. Clicking another day on a finished stay extends, shortens or moves it
+  rather than starting over. An overlap sets a validity message on the field, so the
+  browser refuses to submit. On the pages without the calendar the check code loads
+  only when a date field is focused or the picker is opened.
 
 ### The feed
 
