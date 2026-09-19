@@ -24,11 +24,7 @@ export const SITE = {
   telefon: '+420 603 285 524',
   telHref: '+420603285524',
 
-  /**
-   * TODO(client): there is NO published email address anywhere on the current
-   * site   only a third-party form. Launch-blocking, docs/01-content.md §9 item 13.
-   */
-  email: null as string | null,
+  email: 'nemeh@seznam.cz' as string | null,
 
   gps: {
     label: '50.13088N, 16.75827E',

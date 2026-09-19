@@ -116,9 +116,13 @@ Neither file does anything unless `BASE_PATH` is set, and nothing sets it except
 that workflow. **Never set `BASE_PATH` or `SITE_URL` on Cloudflare.**
 
 Two Cloudflare Workers (inquiry form, availability feed) deploy **separately** with
-`wrangler` from [`worker/`](worker/). They are not part of the Pages build and
-neither is written yet. Their secrets   `RESEND_API_KEY`, `INQUIRY_TO`,
-`INQUIRY_FROM`   are set with `wrangler secret put` and never committed.
+`wrangler` from [`worker/`](worker/). They are not part of the Pages build. The
+availability Worker is written ([`worker/availability/`](worker/availability/)); the
+inquiry Worker is not, because the form posts to Web3Forms for now. Secrets
+(`E_CHALUPY_ICAL_URL`; and `RESEND_API_KEY`, `INQUIRY_TO`, `INQUIRY_FROM` if the inquiry
+Worker is ever built) are set with `wrangler secret put` and never committed.
+
+`npm test` runs the unit tests for the availability rules and the Worker.
 
 ---
 
@@ -228,10 +232,9 @@ roof mark, the form icons   was made for it and is generated or hand-authored in
    client has to answer. Fifteen of them block launch, including the room-by-room
    capacity (the old site's prose totals up to 19 people against a stated maximum of
    15) and an unverified `bezbariérové ubytování` accessibility claim.
-2. **[docs/03-tech.md](docs/03-tech.md) §3**   **there is no iCal feed yet.**
-   Availability on the current site is a third-party HTML iframe from `e-chalupy.cz`
-   with no `.ics` export. The calendar cannot be built until a source is agreed;
-   the recommendation is a private Google Calendar owned by the client.
+2. **[docs/03-tech.md](docs/03-tech.md) §3**   the availability calendar. The feed is
+   e-chalupy's iCal export, and it contains guest names, e-mails and phone numbers,
+   so read that section before touching the parser.
 
 ---
 

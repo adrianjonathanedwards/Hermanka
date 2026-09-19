@@ -108,41 +108,53 @@ iCal source ──▶ Worker (fetch, parse VEVENTs) ──▶ KV (cached) ──
 - The Worker returns a **compact JSON array of booked date ranges**   never raw
   iCal to the browser. Parsing iCal client-side would mean shipping a parser to a
   phone to render a table of coloured squares.
-- The calendar renders **server-side at build time** from the last known good data,
-  then refreshes from the Worker on load. So the page is useful before any
-  JavaScript runs, and correct shortly after. If the Worker is down, the guest sees
-  build-time availability and the form still works.
+- The calendar is drawn **in the browser** from the Worker's JSON, on load. Until the
+  Worker has answered the page shows a fallback (the two booking rules, the legend,
+  a phone number and the form link) and **never a grid of days it has not been told
+  are free**: a calendar that looks authoritative and is not would be believed. If
+  the Worker is down, or JavaScript is off, the fallback stays and the form works.
+  (An earlier plan was to render the last known good data at build time. It needs
+  the secret feed URL in the Pages build and a rebuild to stay fresh, for a page a
+  guest reaches seconds before the Worker answers anyway.)
+- **Which days may be chosen.** A range is `[start, end)`: `start` is the arrival
+  day, `end` the departure day, and the nights taken are `start .. end-1`. A guest
+  may arrive on another guest's departure day and leave on another's arrival day.
+  That is what the half-day legend states mean. The rules live in
+  `src/scripts/availability-core.ts` and are unit-tested; `sameDayTurnover: false`
+  closes both days if the owner ever wants a clear day between guests.
 - Four states, carried over from the widget being replaced:
   `Volno` · `Obsazeno` · `Den příjezdu` · `Den odjezdu`. **State must never be
   conveyed by colour alone**   pattern or glyph as well (§7).
-- Clicking a free range should prefill the inquiry form's date field. This is the
+- Choosing a free range prefills the inquiry form's date field. This is the
   single highest-value interaction on the site: it is the difference between an
-  inquiry with dates and an inquiry without.
+  inquiry with dates and an inquiry without. The field stays free text (§2); the
+  picker only fills it and adds hidden `prijezd` / `odjezd` ISO dates. On submit
+  only those structured dates are checked against the booked ranges, and a
+  conflict blocks the send. Whatever a guest types by hand is passed through
+  unvalidated, on purpose.
 
-> ### ⚠️ There is no iCal feed yet   this is the project's largest unknown.
->
-> The current site does not use iCal. Availability is an iframe from
-> `obsazenost.e-chalupy.cz/kalendar.php?id=2096`, an HTML table with no `.ics`
-> export exposed anywhere in the widget. So the architecture above has no source to
-> read from today.
->
-> Three options, in order of preference:
->
-> 1. **Google Calendar as the source of truth.** The owner maintains a private
->    calendar; we read its secret `.ics` address. Matches "owner-managed
->    availability" exactly, gives the owner a phone app they already know how to
->    use, and gives us a stable, documented format. **This is the recommendation.**
-> 2. **An iCal export from e-chalupy.** Many Czech listing portals expose one from
->    the owner's admin area even when it is not in the public widget. Worth one
->    email before building anything.
-> 3. **Scraping the e-chalupy HTML widget from the Worker.** Works today, breaks
->    without warning on any markup change, and leaves the site dependent on a
->    competitor's listing portal to display its own availability. Fallback only.
->
-> Whichever is chosen, the site must keep working when the feed is unreachable:
-> build-time data, a clear "ověřte prosím dostupnost" note, and a form that submits
-> regardless. **Do not start building the calendar until this is answered**
-> ([01-content.md](01-content.md) §9, item 15).
+### The feed
+
+e-chalupy exposes an iCal export for property `2096`: a `.ics` URL with a token in
+its path, which the Worker reads as the secret `E_CHALUPY_ICAL_URL`. (This doc used to
+say no such export existed; one was supplied for this project.)
+
+- **The feed contains guest personal data**: name in `SUMMARY`, phone and e-mail in
+  `DESCRIPTION`. The Worker reads DTSTART, DTEND, STATUS and TRANSP and discards every
+  other line, so nothing else can reach KV or the browser. Never add SUMMARY or
+  DESCRIPTION to the parser, and never log the feed or its URL.
+- **Times are floating local times**: arrival `14:00`, departure `10:00`. Only the date
+  part is used.
+- **An event that ends the day it starts blocks that night.** The feed has one such
+  entry (`14:00` → `10:00` the same day). Reading it as "nothing" would show a day the
+  owner marked as taken as free. Failing closed costs a guest one day they have to
+  ask about.
+- Cancelled and `TRANSPARENT` events are ignored; back-to-back and overlapping ranges
+  are merged, which loses nothing because the rules are about nights.
+- **Not supported: `RRULE`.** The current feed has no recurring events. If one ever
+  appears it would silently under-block, so add expansion before relying on it.
+
+The Worker is in `worker/availability/`; its README covers running and deploying it.
 
 ---
 

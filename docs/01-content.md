@@ -505,10 +505,9 @@ the site does not answer it anywhere.
 Currently an iframe: `obsazenost.e-chalupy.cz/kalendar.php?id=2096`   12 months, a
 legend of `Volno` / `Obsazeno` / `Den příjezdu` / `Den odjezdu`.
 
-**KEEP** the concept and the four legend states. **REWRITE** as our own component  
-see [03-tech.md](03-tech.md) §Availability, and note the open question there about
-where the feed actually comes from, which is currently the largest unknown in the
-project.
+**KEEP** the concept and the four legend states. **REWRITTEN** as our own component  
+see [03-tech.md](03-tech.md) §3. The feed question is answered: e-chalupy's own iCal
+export, read by a Worker.
 
 ### 6.6 Data, not copy
 
@@ -655,7 +654,9 @@ Collected from the sections above. Nothing here is optional.
 12. Pets   allowed, charged, limited? Amenity list and terms disagree (§5.9, §6.4)
 13. Public email address (§8.1)
 14. GDPR line and privacy link for the form (§8.2)
-15. Where availability data will come from (see [03-tech.md](03-tech.md))
+15. ~~Where availability data will come from~~   **resolved**: the e-chalupy iCal export
+    ([03-tech.md](03-tech.md) §3). Still to do: put the real feed URL in the Worker as a
+    secret and deploy it (`worker/availability/README.md`).
 
 **Blocks content quality, not launch**
 

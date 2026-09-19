@@ -64,7 +64,7 @@ find it.
 
 | # | Section | Notes |
 | --- | --- | --- |
-| 1 | **Kalendář obsazenosti** | 12 months. Four states: `Volno` · `Obsazeno` · `Den příjezdu` · `Den odjezdu`. Selecting a free range prefills the form below. See [03-tech.md](03-tech.md) §3   **and the open question about where the feed comes from**. |
+| 1 | **Kalendář obsazenosti** | 12 months. Four states: `Volno` · `Obsazeno` · `Den příjezdu` · `Den odjezdu`. Selecting a free range prefills the form below. See [03-tech.md](03-tech.md) §3. |
 | 2 | **Ceník** | One table, seasons as rows, week and weekend columns. Not six cards. |
 | 3 | **Svátky** | Silvestr and Vánoce, from dated data that expires itself. Never another `23.-26.12.2024`. |
 | 4 | **Co se připočítává** | Electricity, water, recreation fee, deposit, sauna/hot tub. A table, not a paragraph. |

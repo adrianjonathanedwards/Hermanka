@@ -1,0 +1,4 @@
+# Copy to .dev.vars (gitignored) for `npm run dev`. In production this is a Worker
+# secret: `npx wrangler secret put E_CHALUPY_ICAL_URL`. The real URL has a token in
+# its path, so never commit it and never paste it into an issue or a chat log.
+E_CHALUPY_ICAL_URL=https://www.e-chalupy.cz/api/calendar/<property-id>/<token>/default.ics

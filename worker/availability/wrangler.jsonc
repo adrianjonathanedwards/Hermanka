@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hermanka-availability",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-17",
+
+  // Same origin as the site, so the page's `connect-src 'self'` covers it and no
+  // CSP change is needed. Check the zone before the first deploy.
+  "routes": [{ "pattern": "www.chalupahermanka.cz/api/availability", "zone_name": "chalupahermanka.cz" }],
+
+  // No `id`: Wrangler creates the namespace on the first `wrangler deploy` and
+  // simulates it locally under `wrangler dev`.
+  "kv_namespaces": [{ "binding": "AVAILABILITY_KV" }]
+
+  // Secret, not a var, because the feed URL carries a token:
+  //   npx wrangler secret put E_CHALUPY_ICAL_URL
+  // Local development reads it from .dev.vars (gitignored). See .dev.vars.example.
+}

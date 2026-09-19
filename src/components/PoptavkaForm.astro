@@ -23,6 +23,15 @@
  * `20.-27.9.` must not be rejected   Web3Forms passes the raw string straight
  * through to the email with no parsing at all.
  *
+ * A calendar picker sits on top of that, never instead of it. On /terminy-a-ceny
+ * the embedded calendar (KalendarSlot.astro) fills this form in; on the other two
+ * pages the <details> below opens the same widget in place. Choosing a range writes
+ * a readable string into `termin` and adds hidden `prijezd` / `odjezd` ISO dates,
+ * and only those structured dates are checked against the booked ranges on submit.
+ * Whatever a guest types by hand is passed through unvalidated, as before. The
+ * <details> is `hidden` until the script runs, so without JavaScript the form is
+ * exactly what it was, and the calendar code is not fetched until it is opened.
+ *
  * Submits to Web3Forms (POPTAVKA_ENDPOINT in src/data/site.ts), not the
  * Cloudflare Worker docs/03-tech.md §2 describes   see the comment on
  * POPTAVKA_ENDPOINT for why. Web3Forms performs the no-JS redirect itself via
@@ -51,7 +60,7 @@ const odkud = Astro.url.pathname;
 const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
 ---
 
-<form class:list={['form', className]} method="POST" action={POPTAVKA_ENDPOINT}>
+<form class:list={['form', className]} method="POST" action={POPTAVKA_ENDPOINT} data-poptavka>
   <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
   <input type="hidden" name="subject" value="Nová poptávka   Chalupa Heřmanka" />
   <input type="hidden" name="from_name" value="Formulář na webu Chalupa Heřmanka" />
@@ -123,6 +132,17 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
     </p>
   </div>
 
+  {/* Removed by the script when the page already has an embedded calendar. */}
+  <details class="picker field--wide" data-picker hidden>
+    <summary>
+      <Icon name="kalendar" class="picker-icon" />
+      <span>Vybrat termín v kalendáři</span>
+    </summary>
+    <div class="picker-body" data-avail-cal="picker">
+      <p class="hint" data-cal-status>Načítám obsazenost…</p>
+    </div>
+  </details>
+
   <div class="field">
     <label for="dospeli">Počet dospělých</label>
     <div class="control">
@@ -172,6 +192,24 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
     docs/01-content.md §9 item 14.
   */}
 </form>
+
+<script>
+  const picker = document.querySelector<HTMLDetailsElement>('details[data-picker]');
+  if (picker) {
+    if (document.querySelector('[data-avail-cal="embedded"]')) {
+      picker.remove();
+    } else {
+      picker.hidden = false;
+      picker.addEventListener('toggle', () => {
+        if (!picker.open || picker.dataset.mounted) return;
+        picker.dataset.mounted = '1';
+        void import('../scripts/availability-calendar').then(({ mountCalendar }) =>
+          mountCalendar(picker.querySelector<HTMLElement>('[data-avail-cal]')!, picker.closest('form')),
+        );
+      });
+    }
+  }
+</script>
 
 <style>
   /*
@@ -301,6 +339,54 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
     margin: 0;
     font-size: var(--text-caption);
     color: var(--color-kura);
+  }
+
+  /* ---- Calendar picker ------------------------------------------------
+   * No `display` on .picker: it is `hidden` until the script runs, and a display
+   * value here would override the attribute and show an empty box without JS.
+   */
+  .picker summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-mosaz-tmava);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .picker summary span {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+
+  .picker-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex: none;
+  }
+
+  .picker-body {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: var(--color-omitka);
+    border: 1px solid rgb(62 50 38 / 0.14);
+    border-radius: var(--radius-sm);
+  }
+
+  @media (width >= 40rem) {
+    .picker-body {
+      padding: 1.5rem;
+    }
+  }
+
+  @media (width >= 30rem) and (width < 40rem) {
+    .picker-body {
+      padding: 1rem;
+    }
   }
 
   /* ---- Checkbox --------------------------------------------------------

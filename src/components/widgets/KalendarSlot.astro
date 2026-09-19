@@ -1,40 +1,31 @@
-﻿---
+---
 /**
- * Availability calendar   THE RESERVED SLOT, NOT THE CALENDAR.
+ * Availability calendar   the booking rules, the legend, and the live calendar.
  *
  * ---------------------------------------------------------------------------
- * ⚠ DO NOT BUILD THE CALENDAR IN HERE.
+ * HOW THE CALENDAR ARRIVES
  *
- * It is deferred by decision. docs/03-tech.md §3 specifies it as a Cloudflare
- * Worker reading an iCal feed and caching it in KV, rendered server-side at build
- * time from the last known good data and refreshed on load   and docs/01-content.md
- * §9 item 15 lists "where availability data will come from" as still unanswered.
- * There is no feed, so there is nothing to render. A hand-built grid of coloured
- * squares filled with invented dates would be worse than no calendar, because it
- * would be believed.
- *
- * WHAT THIS DOES INSTEAD, AND WHY IT IS NOT A "COMING SOON" BOX
- *
- * Everything around the calendar that is real ships now:
+ * The grid is drawn in the browser by src/scripts/availability-calendar.ts from
+ * `GET /api/availability`, the Worker in worker/availability/ that reads the
+ * e-chalupy iCal feed and caches it in KV. Everything else on this page is real
+ * without it:
  *
  *   1. **The two booking rules.** Minimum two nights, and January/February and
  *      July/August are whole weeks only. docs/04-pages.md is explicit that both
  *      "must be visible next to the calendar"   somebody is about to try to book
- *      a weekend in July. These are the highest-value words on the page and they
- *      do not need a feed.
- *   2. **The legend.** The four states the widget being replaced used, carried
- *      over verbatim: Volno · Obsazeno · Den příjezdu · Den odjezdu. State is
- *      never carried by colour alone (docs/02-design-system.md §6)   each swatch
- *      also has its own glyph, and the glyph is what a colour-blind reader,
- *      Windows high contrast and a black-and-white printout all get.
- *   3. **A way to find out today.** Which is a phone number and the form, which
- *      is what the owner has always actually answered availability with.
+ *      a weekend in July.
+ *   2. **The legend.** The four states of the widget being replaced: Volno ·
+ *      Obsazeno · Den příjezdu · Den odjezdu. State is never carried by colour
+ *      alone (docs/02-design-system.md §6): every swatch has a pattern too, and
+ *      the same patterns are used on the days themselves (src/styles/calendar.css).
+ *   3. **The fallback.** `.kalendar-plocha` ships holding the words, the phone
+ *      number and the form link. The script replaces them only once the data has
+ *      arrived, so a guest is never shown a grid of "free" days that the Worker
+ *      has not vouched for. No JavaScript, or a Worker that is down, and this is
+ *      what they see   docs/03-tech.md §3 requires exactly that.
  *
- * WHEN THE FEED ARRIVES the grid goes in `.kalendar-plocha`, the legend and the
- * rules stay exactly as they are, and the fallback below becomes the no-JS /
- * feed-down state that docs/03-tech.md §3 already requires ("If the Worker is
- * down, the guest sees build-time availability and the form still works").
- * Nothing else on the page has to change.
+ * Choosing a free range fills the inquiry form's date field and adds `prijezd` and
+ * `odjezd` (ISO dates) to it; see PoptavkaForm.astro.
  */
 import IconLucide from '../IconLucide.astro';
 import { SITE } from '../../data/site';
@@ -48,15 +39,16 @@ interface Props {
 const { id = 'kalendar' } = Astro.props;
 
 /*
- * The four states of the widget being replaced. `glyph` is the redundant
- * non-colour cue; `popis` is what it means, because "Den odjezdu" alone does not
- * tell a first-time reader that the day is half free.
+ * The four states of the widget being replaced. `popis` is what each means,
+ * because "Den odjezdu" alone does not tell a first-time reader that the day is
+ * half free. The half-days are split diagonally: upper left is the morning, lower
+ * right the afternoon.
  */
 const STAVY = [
-  { stav: 'volno', nazev: 'Volno', glyph: '·', popis: 'Termín je k dispozici.' },
-  { stav: 'obsazeno', nazev: 'Obsazeno', glyph: '� ', popis: 'Chalupa je obsazená.' },
-  { stav: 'prijezd', nazev: 'Den příjezdu', glyph: '� �', popis: 'Odpoledne se nastěhujete.' },
-  { stav: 'odjezd', nazev: 'Den odjezdu', glyph: '� �', popis: 'Dopoledne se odjíždí.' },
+  { stav: 'volno', nazev: 'Volno', popis: 'Termín je k dispozici.' },
+  { stav: 'obsazeno', nazev: 'Obsazeno', popis: 'Chalupa je obsazená.' },
+  { stav: 'prijezd', nazev: 'Den příjezdu', popis: 'Odpoledne se nastěhujete.' },
+  { stav: 'odjezd', nazev: 'Den odjezdu', popis: 'Dopoledne se odjíždí.' },
 ] as const;
 ---
 
@@ -95,12 +87,8 @@ const STAVY = [
         {
           STAVY.map((s) => (
             <li>
-              {/*
-                The glyph is inside the swatch and `aria-hidden`: it is the
-                redundant cue for a sighted reader who cannot use the colour,
-                and the name next to it is what everybody else gets.
-              */}
-              <span class:list={['swatch', `swatch--${s.stav}`]} aria-hidden="true">{s.glyph}</span>
+              {/* Decorative: the name beside it says the same in words. */}
+              <span class:list={['swatch', `swatch--${s.stav}`]} aria-hidden="true" />
               <span class="legenda-nazev">{s.nazev}</span>
               <span class="legenda-popis">{s.popis}</span>
             </li>
@@ -109,26 +97,34 @@ const STAVY = [
       </ul>
 
       {/*
-        TODO(feed)   the grid goes here. See the header of this file. It is an
-        empty region with an accessible name so that when it is filled the
-        landmark and the heading above it are already correct.
+        The mount point. What is inside is the no-JS / Worker-down fallback and is
+        replaced wholesale by the script.
       */}
-      <div class="kalendar-plocha" role="region" aria-labelledby={`${id}-plocha-nadpis`}>
-        <p class="kalendar-plocha-nadpis" id={`${id}-plocha-nadpis`}>
-          Kalendář volných termínů připravujeme
-        </p>
-        <p class="kalendar-plocha-text">
-          Zatím vám aktuální obsazenost potvrdíme obratem telefonicky nebo e-mailem.
-          Napište termín do poptávky a ozveme se.
-        </p>
-        <p class="kalendar-plocha-akce">
-          <a href="#poptavka" class="btn btn-primary">Zeptat se na termín</a>
-          <a href={`tel:${SITE.telHref}`} class="btn btn-secondary">{SITE.telefon}</a>
-        </p>
+      <div class="kalendar-plocha" data-avail-cal="embedded" role="region" aria-label="Kalendář obsazenosti">
+        <div class="kalendar-nahradni">
+          <p class="kalendar-nahradni-nadpis">Aktuální obsazenost vám potvrdíme obratem</p>
+          <p class="kalendar-nahradni-text">
+            Kalendář se teď nepodařilo zobrazit. Napište termín do poptávky nebo zavolejte
+            a ozveme se.
+          </p>
+          <p class="kalendar-nahradni-akce">
+            <a href="#poptavka" class="btn btn-primary">Zeptat se na termín</a>
+            <a href={`tel:${SITE.telHref}`} class="btn btn-secondary">{SITE.telefon}</a>
+          </p>
+        </div>
       </div>
     </div>
   </div>
 </section>
+
+<script>
+  import { mountCalendar } from '../../scripts/availability-calendar';
+
+  const form = document.querySelector<HTMLFormElement>('form[data-poptavka]');
+  document
+    .querySelectorAll<HTMLElement>('[data-avail-cal="embedded"]')
+    .forEach((el) => void mountCalendar(el, form));
+</script>
 
 <style>
   .kalendar {
@@ -186,13 +182,20 @@ const STAVY = [
     color: var(--color-kura);
   }
 
-  /* ---- The panel the calendar will live in ------------------------------ */
+  /* ---- The panel the calendar lives in ---------------------------------- */
 
+  /* Tight on a phone on purpose: three nested paddings otherwise leave day cells 33px wide. */
   .kalendar-panel {
     margin-top: 2.5rem;
-    padding: 1.5rem;
+    padding: 1rem 0.75rem;
     background-color: var(--color-kamen);
     border-radius: var(--radius-sm);
+  }
+
+  @media (width >= 40rem) {
+    .kalendar-panel {
+      padding: 1.5rem;
+    }
   }
 
   @media (width >= 48rem) {
@@ -235,48 +238,45 @@ const STAVY = [
   }
 
   /*
-   * The swatch carries BOTH the colour and a glyph. docs/02-design-system.md §6:
-   * calendar state must never be conveyed by colour alone.
+   * The swatch is the day cell in miniature: the same fills AND the same patterns
+   * as src/styles/calendar.css, because state must never be colour alone. Keep the
+   * two in step. Upper left is the morning, lower right the afternoon.
    */
   .swatch {
-    display: grid;
-    place-content: center;
     width: 1.75rem;
     height: 1.75rem;
     border: 1px solid rgb(62 50 38 / 0.25);
     border-radius: var(--radius-sm);
-    font-size: var(--text-caption);
-    line-height: 1;
-    color: var(--color-les);
   }
 
-  /*
-   * Not the old widget's green and pink. `--omitka` for free and `--kura` for
-   * taken is the site's own light/dark pair, and the two half-days are the same
-   * two colours split   which is literally what the day is.
-   */
   .swatch--volno {
     background-color: var(--color-omitka);
   }
 
   .swatch--obsazeno {
     background-color: var(--color-kura);
-    color: var(--color-omitka);
-  }
-
-  .swatch--prijezd {
-    background-image: linear-gradient(
-      to bottom right,
-      var(--color-kura) 0 50%,
-      var(--color-omitka) 50% 100%
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0 4px,
+      rgb(251 250 248 / 0.2) 4px 6px
     );
   }
 
-  .swatch--odjezd {
+  /* Arrival: the morning is still free, the afternoon is taken. */
+  .swatch--prijezd {
     background-image: linear-gradient(
       to bottom right,
       var(--color-omitka) 0 50%,
       var(--color-kura) 50% 100%
+    );
+  }
+
+  /* Departure: the morning is still taken, the afternoon is free. */
+  .swatch--odjezd {
+    background-image: linear-gradient(
+      to bottom right,
+      var(--color-kura) 0 50%,
+      var(--color-omitka) 50% 100%
     );
   }
 
@@ -290,24 +290,59 @@ const STAVY = [
     color: var(--color-kura);
   }
 
-  /* ---- The reserved area ------------------------------------------------ */
+  /* ---- The calendar, or what stands in for it -------------------------- */
 
   .kalendar-plocha {
+    position: relative;
     margin-top: 1.5rem;
-    padding: 2rem 1.5rem;
+    padding: 0.75rem 0.5rem;
     background-color: var(--color-omitka);
-    /* Dashed, and the only dashed border on the site: it says "a thing goes
-       here" without pretending a thing is already here. */
+    border-radius: var(--radius-sm);
+  }
+
+  @media (width >= 40rem) {
+    .kalendar-plocha {
+      padding: 1.25rem;
+    }
+  }
+
+  @media (width >= 48rem) {
+    .kalendar-plocha {
+      padding: 1.75rem 2rem;
+    }
+  }
+
+  /* Waiting for the Worker: hold the space, say so, and show nothing that could be believed. */
+  .kalendar-plocha[aria-busy='true'] {
+    min-height: 16rem;
+  }
+
+  .kalendar-plocha[aria-busy='true'] .kalendar-nahradni {
+    visibility: hidden;
+  }
+
+  .kalendar-plocha[aria-busy='true']::after {
+    content: 'Načítám obsazenost…';
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    color: var(--color-kura);
+  }
+
+  /* Dashed: the one dashed border on the site. It says "the calendar is not here". */
+  .kalendar-nahradni {
+    padding: 2rem 1.5rem;
     border: 1px dashed rgb(140 99 24 / 0.45);
     border-radius: var(--radius-sm);
     text-align: center;
   }
 
-  .kalendar-plocha > * {
+  .kalendar-nahradni > * {
     margin-inline: auto;
   }
 
-  .kalendar-plocha-nadpis {
+  .kalendar-nahradni-nadpis {
     max-width: 30ch;
     font-family: var(--font-display);
     font-size: var(--text-title-s);
@@ -315,13 +350,13 @@ const STAVY = [
     color: var(--color-mosaz-tmava);
   }
 
-  .kalendar-plocha-text {
+  .kalendar-nahradni-text {
     margin-top: 0.75rem;
     max-width: 46ch;
     color: var(--color-kura);
   }
 
-  .kalendar-plocha-akce {
+  .kalendar-nahradni-akce {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -330,7 +365,7 @@ const STAVY = [
   }
 
   @media (width < 25rem) {
-    .kalendar-plocha-akce .btn {
+    .kalendar-nahradni-akce .btn {
       width: 100%;
     }
   }

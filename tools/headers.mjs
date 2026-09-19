@@ -74,7 +74,9 @@ function policy(scriptHashes) {
     "img-src 'self'",
     "font-src 'self'",
 
-    /* No fetch/XHR/WebSocket anywhere in src/scripts/motion.ts. */
+    /* The only fetch on the site is the availability calendar's GET /api/availability
+       (src/scripts/availability-calendar.ts), and that route is on this hostname.
+       If the Worker is ever served from another origin, that origin goes here. */
     "connect-src 'self'",
 
     /* The inquiry form POSTs to POPTAVKA_ENDPOINT (src/data/site.ts), which is

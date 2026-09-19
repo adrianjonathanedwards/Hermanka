@@ -32,18 +32,13 @@
  * BaseLayout.heroPreload so the browser can start the image download from
  * the <head> without waiting for the component to render.
  *
- * NO CLIENT JAVASCRIPT anywhere in this file or its components.
- *
- * TODO(feed)   docs/01-content.md §9 item 15 (LAUNCH-BLOCKING): the iCal
- * feed is unresolved. KalendarSlot is already wired for the grid   it ships
- * the real parts (booking rules, legend, CTA) and defers the grid to a
- * .kalendar-plocha region that will receive the calendar when the feed
- * arrives. Nothing on this page has to change when it does.
- *
- * TODO(feed)   docs/04-pages.md: dates prefilled in the form from the
- * calendar selection. That interaction depends on the feed. When the feed
- * and the calendar grid land, wire the Poptavka form's date field from the
- * selection   no structural change to this file required.
+ * CLIENT JAVASCRIPT, on purpose and only for the calendar: KalendarSlot loads
+ * src/scripts/availability-calendar.ts, which reads GET /api/availability (the Worker
+ * in worker/availability/) and draws the grid. Choosing a range fills the inquiry
+ * form's date field and adds hidden `prijezd` / `odjezd` dates, and the form refuses
+ * to send a range that overlaps a booking. Without JavaScript, or with the Worker
+ * down, the page shows the fallback in KalendarSlot and the form works as before.
+ * docs/03-tech.md §3.
  */
 import { getImage } from 'astro:assets';
 
@@ -85,11 +80,9 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
 
   {/*
     1. KalendarSlot   first, above the fold.
-    The component ships what is real now: the two booking rules and the four
-    legend states. The calendar grid is deferred until the iCal feed is
-    resolved (docs/01-content.md §9 item 15). The component's own header
-    comment explains what goes in .kalendar-plocha when the feed arrives.
-    Section band: --omitka (set by the component).
+    The two booking rules, the four-state legend and the live calendar, which
+    replaces the fallback once /api/availability has answered. See the
+    component's own header comment. Section band: --omitka (set by the component).
   */}
   <KalendarSlot id="kalendar" />
 
@@ -132,10 +125,8 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
     must be on a light band ✓. The lead references the price list the reader
     has just read.
 
-    TODO(feed): docs/04-pages.md wants the date fields prefilled from the
-    calendar selection. That wiring depends on the iCal feed (§9 item 15).
-    No structural change needed here when the feed arrives; the form's date
-    field already exists and accepts any free-text date string.
+    The date field is prefilled from the calendar selection (see the header of
+    this file) and still accepts any free-text date string.
   */}
   <Poptavka
     band="omitka"

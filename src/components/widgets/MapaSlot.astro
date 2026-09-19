@@ -17,18 +17,20 @@
  * navigation they already use, and a link that opens a real map in a real map
  * application. Both are here and both work with JavaScript off.
  *
- * WHAT IS STILL MISSING is the static image: a screenshot of the valley with the
- * cottage marked, exported once, shipped as a WebP, wrapped in the link that is
- * already below. TODO(client)   it needs to come from the client or from a
- * licensed map export; scraping a tile from Mapy.cz and shipping it is a
- * licensing problem, not a technical one. Until it arrives the panel is a real
- * panel with the real address, coordinates and link in it, not a grey rectangle
- * with "mapa" written on it.
+ * The static image below (img/mapa-nahled.webp) is a build-time export: OSM
+ * raster tiles (© OpenStreetMap contributors, ODbL) stitched into one plate
+ * with a pin drawn on top at `SITE.gps`, then shipped as an ordinary
+ * <Image>   no script, no cookie, no live connection to any map provider at
+ * request time. Scraping Mapy.cz tiles would still be a licensing problem;
+ * OSM's data is open and this is a one-off export, not a live embed. To
+ * regenerate it after the coordinate ever changes, rerun the export with the
+ * new `SITE.gps` values (see git history for the generation script).
  *
  * The coordinates are the ONLY copy of these numbers on the site   `SITE.gps` in
  * src/data/site.ts. Never retype them into a page.
  */
-import IconLucide from '../IconLucide.astro';
+import { Image } from 'astro:assets';
+import mapa from '@img/mapa-nahled.webp';
 import { SITE, mapyUrl } from '../../data/site';
 
 interface Props {
@@ -40,14 +42,17 @@ const { class: className } = Astro.props;
 ---
 
 <div class:list={['mapa card', className]}>
-  {/*
-    TODO(client): the static map export goes here, as
-    <a href={mapyUrl}><Image src={mapa} alt="…" …/></a>   a photograph of a map,
-    linked, with no script behind it. See the header of this file.
-  */}
-  <div class="mapa-plocha" aria-hidden="true">
-    <IconLucide name="map-pin" size={34} class="mapa-plocha-icon" />
-  </div>
+  <a href={mapyUrl} class="mapa-plocha" rel="noopener noreferrer" target="_blank" aria-hidden="true" tabindex="-1">
+    <Image
+      src={mapa}
+      alt=""
+      width={640}
+      height={400}
+      format="webp"
+      quality={78}
+      loading="lazy"
+    />
+  </a>
 
   <div class="mapa-udaje">
     <p class="mapa-adresa">
@@ -81,24 +86,19 @@ const { class: className } = Astro.props;
     overflow: hidden;
   }
 
-  /*
-   * The reserved area for the static export. It is deliberately NOT a grey box
-   * pretending to be a map: a stone panel with the site's own pin mark on it,
-   * which reads as a panel waiting for a picture rather than as a map that
-   * failed to load.
-   */
+  /* The static map plate. 16:10, matching the source export. */
   .mapa-plocha {
-    display: grid;
-    place-content: center;
-    /* 16:10   the shape the export will be, so nothing reflows when it lands. */
+    display: block;
     aspect-ratio: 16 / 10;
     background-color: var(--color-kamen);
     border-bottom: 1px solid rgb(62 50 38 / 0.14);
   }
 
-  .mapa-plocha-icon {
-    color: var(--color-mosaz);
-    opacity: 0.55;
+  .mapa-plocha :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .mapa-udaje {
