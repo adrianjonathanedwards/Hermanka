@@ -11,8 +11,7 @@
  * TODO(client): several inputs are still unconfirmed  
  *   - what `víkend` means (2 nights? Fri–Sun? 3 on a bank holiday?)
  *   - exact season boundaries; `půlka března` / `půlka září` are not dates
- *   - current electricity rate and municipal recreation fee
- * docs/01-content.md §9, items 5, 6 and 7.
+ * docs/01-content.md §9, items 5 and 6.
  */
 
 import type { LucideName } from '../components/IconLucide.astro';
@@ -143,6 +142,9 @@ export interface Pravidlo {
  * next to the calendar: minimum stay two nights, and January/February and
  * July/August are whole weeks only. Somebody is about to try to book a weekend
  * in July."
+ *
+ * January and February were dropped from the whole-weeks rule in the client's
+ * September 2026 brief; only July and August remain.
  */
 export const PRAVIDLA: Pravidlo[] = [
   {
@@ -152,8 +154,8 @@ export const PRAVIDLA: Pravidlo[] = [
   },
   {
     icon: 'calendar-days',
-    nazev: 'V lednu, únoru, červenci a srpnu jen celé týdny',
-    popis: `V těchto čtyřech měsících přijímáme objednávky pouze na celé týdny${NBSP}– víkend v${NBSP}nich rezervovat nejde.`,
+    nazev: 'V červenci a srpnu jen celé týdny',
+    popis: `V těchto dvou měsících přijímáme objednávky pouze na celé týdny${NBSP}– víkend v${NBSP}nich rezervovat nejde.`,
   },
 ];
 
@@ -203,7 +205,7 @@ export const SVATKY: Svatek[] = [
     klic: 'vanoce',
     nazev: 'Vánoce',
     cena: 18_000,
-    delka: null,
+    delka: `3${NBSP}noci`,
     od: null,
     do: null,
     text: 'Vánoce jsou obdobím radosti a pohody. Strávit svátky v příjemném prostředí, obklopeni přírodou, je to nejlepší, co Heřmanka nabízí.',
@@ -246,11 +248,8 @@ export const POPLATKY: Poplatek[] = [
   {
     icon: 'zap',
     nazev: 'Elektřina',
-    castka: `7${NBSP}Kč/kWh`,
+    castka: `6${NBSP}Kč/kWh`,
     popis: 'Podle skutečné spotřeby, odečteno na konci pobytu.',
-    // TODO(client)   docs/01-content.md §9 item 7. The rate is from 2019 and the
-    // word on the old site is `momentálně`, which is not a price.
-    nepotvrzeno: true,
   },
   {
     icon: 'droplets',
@@ -261,16 +260,13 @@ export const POPLATKY: Poplatek[] = [
   {
     icon: 'receipt',
     nazev: 'Rekreační poplatek obci',
-    castka: `4${NBSP}Kč za osobu a noc`,
+    castka: `20${NBSP}Kč za osobu a noc`,
     popis: 'Poplatek z pobytu, který odvádíme obci.',
-    // TODO(client)   docs/01-content.md §9 item 7. Set by local ordinance; 4 Kč
-    // is low for 2026 and needs confirming with the obec.
-    nepotvrzeno: true,
   },
   {
     icon: 'flame-kindling',
     nazev: 'Sauna a vířivka',
-    castka: `1 000${NBSP}Kč/den · 3 000${NBSP}Kč/týden`,
+    castka: `2${NBSP}000${NBSP}Kč/2${NBSP}noci · 3${NBSP}000${NBSP}Kč/týden`,
     popis: 'Volitelné. Bez objednání se neúčtují.',
   },
   {
@@ -291,56 +287,61 @@ export interface Podminka {
 }
 
 /**
- * The terms that ARE known. Everything the old site says about payment,
- * rewritten as steps instead of a wall of text   no facts changed.
- *
- * ⚠ `CHYBEJICI_PODMINKY` below is the other half of this, and it is the more
- * important half. Do not delete it because the page looks tidier without it.
+ * How a booking goes, in the client's own three steps (September 2026 brief).
+ * The brief dropped the old "Doplatek" step, and with it the small-group
+ * discount question (docs/01-content.md §9 item 8): the answer is "individual",
+ * so no number is stated.
  */
 export const PODMINKY: Podminka[] = [
   {
     icon: 'calendar-days',
     nazev: 'Rezervace',
-    popis:
-      'Termín potvrdíme e-mailem nebo telefonicky. Objekt je v provozu celoročně, mimo dobu údržbových prací.',
+    popis: `Výběr volného termínu v${NBSP}kalendáři dle preferencí, zaslání poptávky, dostupnost termínu potvrdíme.`,
   },
   {
     icon: 'credit-card',
-    nazev: 'Záloha 50 %',
-    popis:
-      'Převodem na účet nejpozději dva týdny před začátkem pobytu. Záloha je z ceny nájmu a vody.',
-  },
-  {
-    icon: 'banknote',
-    nazev: 'Doplatek',
-    popis: 'Převodem s připsáním nejpozději v den příjezdu, nebo osobně při předání objektu.',
+    nazev: 'Záloha',
+    popis: `Po obdržení 50${NBSP}% zálohy z${NBSP}ceny nájmu a${NBSP}poplatku za vodu na náš účet rezervaci potvrzujeme.`,
   },
   {
     icon: 'users',
     nazev: 'Menší skupina',
-    popis: 'Při obsazení pod 10 osob je možná sleva. Napište nám, kolik vás bude.',
-    // TODO(client)   docs/01-content.md §9 item 8. The old homepage promises a
-    // flat 10 %; the old price list says a discount "is possible". One of the
-    // two is wrong and only the client knows which, so neither number is here.
+    popis: `V${NBSP}případě malých skupin možnost individuální slevy.`,
   },
 ];
 
+/* ---- Additional information --------------------------------------------- */
+
+export interface Informace {
+  icon: LucideName;
+  nazev: string;
+  /** One sentence, or several lines when the answer has several cases. */
+  text: string | string[];
+}
+
 /**
- * What the terms do not say, and a guest will ask.
- *
- * ⚠ THIS LIST IS NOT DECORATION AND NOT A PLACEHOLDER. Every line is a real
- * question the old site answers nowhere (docs/01-content.md §6.4), and bed linen
- * in particular is "the single most-asked question for a Czech chalupa let".
- * They are shown as *ask us* rather than silently omitted, because a guest who
- * cannot find the answer writes to us   which is the entire job of this site  
- * whereas a guest who does not know the question was askable books elsewhere.
- *
- * TODO(client)   docs/01-content.md §9 items 9–12. Each answer received deletes
- * one line here and adds one to PODMINKY above.
+ * Check-in and check-out, cancellation and pets   questions the old site
+ * answered nowhere (docs/01-content.md §9 items 9, 10 and 12), answered by the
+ * client in the September 2026 brief.
  */
-export const CHYBEJICI_PODMINKY: string[] = [
-  'Čas příjezdu a odjezdu',
-  'Storno podmínky',
-  'Co je v ceně: povlečení, ručníky, dřevo, pelety',
-  'Domácí mazlíčci: za jakých podmínek',
+export const DOPLNUJICI_INFO: Informace[] = [
+  {
+    icon: 'clock',
+    nazev: 'Čas příjezdu a odjezdu',
+    text: `Příjezd nejdříve v${NBSP}15:00 a${NBSP}odjezd nejpozději v${NBSP}10:00, případně dle individuální domluvy.`,
+  },
+  {
+    icon: 'ban',
+    nazev: 'Storno podmínky',
+    text: [
+      `Při zrušení pobytu více než 30${NBSP}dní před jeho začátkem vracíme celou zálohu.`,
+      `Při zrušení pobytu více než 14${NBSP}dní před začátkem pobytu vracíme 50${NBSP}% zálohy.`,
+      `Při zrušení pobytu 14${NBSP}dní a${NBSP}méně před začátkem pobytu zálohu nevracíme.`,
+    ],
+  },
+  {
+    icon: 'dog',
+    nazev: 'Domácí mazlíčci',
+    text: 'Povoleni.',
+  },
 ];

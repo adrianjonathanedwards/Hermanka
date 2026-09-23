@@ -1,6 +1,6 @@
 ﻿---
 /**
- * Co se připočítává   fee schedule.
+ * K ceně nájmu výše se dále účtuje   fee schedule.
  *
  * docs/01-content.md §6.4 (REWRITE): the old site buried all of this in a
  * 120-word run of prose   the guest found out about the electricity meter after
@@ -17,24 +17,18 @@
  * The POPLATKY array in cenik.ts is the single source of truth for this section.
  * Nothing about money is typed into this file (docs/01-content.md §2).
  *
- * ⚠ Two entries carry `nepotvrzeno: true`. They must be shown as approximate
- * rather than as confirmed prices   a guest who bases a budget on an unconfirmed
- * rate and finds a different one on arrival loses trust in everything on the page.
- * The unconfirmed badge and the TODO comments below track exactly which items
- * are waiting on the client.
+ * An entry with `nepotvrzeno: true` renders with an "orientačně" badge, so an
+ * unconfirmed rate is never presented as a confirmed price. None carries it
+ * now: the client confirmed electricity and the municipal fee in the September
+ * 2026 brief (docs/01-content.md §9 item 7).
  *
  * Formatting note: POPLATKY.castka is already a pre-formatted string with hard
- * spaces from cenik.ts, e.g. `7 Kč/kWh` (U+00A0 between 7 and Kč). Render it
+ * spaces from cenik.ts, e.g. `6 Kč/kWh` (U+00A0 between 6 and Kč). Render it
  * directly; do not pass it through formatKc(), which expects a plain number.
  *
- * Section band: --omitka. Previous section (Svátky) is --les.
+ * No lead paragraph under the heading, by request (September 2026 brief).
  *
- * TODO(client)   docs/01-content.md §9 item 7:
- *   · Electricity rate ("7 Kč/kWh" is from 2019   the old site says
- *     "momentálně", which is not a price).
- *   · Municipal recreation fee (4 Kč/os/noc is low for 2026; must be confirmed
- *     with the obec).
- *   Both are marked `nepotvrzeno: true` in cenik.ts and shown as such here.
+ * Section band: --omitka. Previous section (Ceník) is --kamen.
  */
 import IconLucide from '../../IconLucide.astro';
 import { POPLATKY } from '../../../data/cenik';
@@ -42,7 +36,7 @@ import { POPLATKY } from '../../../data/cenik';
 /*
  * No `const NBSP` here, deliberately. Every string this section renders comes
  * out of POPLATKY in src/data/cenik.ts, and that module already binds its own
- * hard spaces   `7 Kč/kWh`, `2 000 Kč`. There is no free-typed numeral on this
+ * hard spaces   `6 Kč/kWh`, `2 000 Kč`. There is no free-typed numeral on this
  * page for one to go in, and an unused constant is an invitation to start
  * typing prices into the markup, which is the one thing this page must not do.
  */
@@ -52,11 +46,7 @@ import { POPLATKY } from '../../../data/cenik';
   <div class="wrap">
 
     <div class="poplatky-head" data-reveal>
-      <h2 id="poplatky-nadpis">Co se připočítává</h2>
-      <p class="lead">
-        K ceně za pronájem se připočítávají tyto položky. Elektřina a voda se
-        účtují podle skutečné spotřeby, ne paušálem.
-      </p>
+      <h2 id="poplatky-nadpis">K ceně nájmu výše se dále účtuje:</h2>
     </div>
 
     <ul class="poplatky-list" data-reveal data-reveal-delay="80" role="list">
@@ -121,12 +111,6 @@ import { POPLATKY } from '../../../data/cenik';
   h2 {
     /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
     color: var(--color-mosaz-tmava);
-  }
-
-  .lead {
-    margin-top: 1rem;
-    font-size: var(--text-lead);
-    color: var(--color-kura);
   }
 
   /* ---- Fee list --------------------------------------------------------

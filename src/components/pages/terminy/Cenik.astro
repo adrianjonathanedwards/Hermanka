@@ -132,11 +132,16 @@ const NBSP = ' ';
 <section class="section cenik" aria-labelledby="cenik-nadpis">
   <div class="wrap">
 
+    {/*
+      No visible "Ceník" heading, by request (September 2026 brief): the section
+      opens on this one sentence. The <h2> stays for screen readers so the
+      section keeps its name and the page outline has no gap.
+    */}
     <div class="cenik-head" data-reveal>
-      <h2 id="cenik-nadpis">Ceník</h2>
+      <h2 id="cenik-nadpis" class="sr-only">Ceník</h2>
       <p class="lead">
-        Ceny jsou za celou chalupu, ne za osobu. Počet hostů cenu nemění
-        chalupa je k dispozici jako celek.
+        Ceny jsou účtovány za celý objekt. V{NBSP}případě malých skupin možnost
+        individuální slevy.
       </p>
     </div>
 
@@ -276,8 +281,8 @@ const NBSP = ' ';
     color: var(--color-les);
   }
 
+  /* No top margin: the heading above it is screen-reader only. */
   .lead {
-    margin-top: 1rem;
     font-size: var(--text-lead);
     color: var(--color-kura);
   }

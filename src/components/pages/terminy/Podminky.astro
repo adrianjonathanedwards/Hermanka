@@ -1,52 +1,35 @@
-﻿---
+---
 /**
- * Podmínky   payment terms and the terms that are still missing.
+ * Průběh rezervace a platby   the booking steps, then the additional terms.
  *
- * Two parts, both required:
+ * Two parts:
  *
- * 1. PODMINKY   the terms that ARE known, rewritten from the old site's
- *    120-word paragraph into a list of named steps. Every fact matches the
- *    old text; only the structure changes (docs/01-content.md §6.4 REWRITE).
+ * 1. PODMINKY   the client's three booking steps (Rezervace, Záloha, Menší
+ *    skupina), worded as in the September 2026 brief.
  *
- * 2. CHYBEJICI_PODMINKY   the terms that are NOT known, rendered honestly as
- *    "na tohle se nás zeptejte". This is not a placeholder and must not be
- *    dropped because the page looks tidier without it. Bed linen is "the
- *    single most-asked question for a Czech chalupa let and this site answers
- *    it nowhere" (docs/01-content.md §6.4). A guest who cannot find the
- *    answer writes to us   which is the site's entire job   whereas a guest
- *    who does not know the question was askable books elsewhere.
+ * 2. DOPLNUJICI_INFO   check-in and check-out, cancellation terms and pets.
+ *    This panel used to be "Na tohle se nás zeptejte", a list of questions the
+ *    site could not yet answer (docs/01-content.md §9 items 9–12). The client
+ *    has answered 9, 10 and 12, so it now shows the answers. Item 11 (what the
+ *    price includes: bed linen, towels, firewood) is still unanswered and was
+ *    left out by the same brief.
  *
  * Section band: --kamen. Previous section (Poplatky) is --omitka.
  * Poptavka below passes band="omitka" because this section is stone.
- *
- * TODO(client)   docs/01-content.md §9 items 9–12. Each answer from the
- * client removes one line from CHYBEJICI_PODMINKY and adds one to PODMINKY:
- *   item 9:  check-in / check-out times
- *   item 10: cancellation terms
- *   item 11: what the price includes (bed linen, towels, firewood, pellets)
- *   item 12: pets   allowed, charged, how limited?
- *
- * TODO(client)   docs/01-content.md §9 item 8: the discount rule.
- * The old homepage promises a flat 10 % for under-occupancy; the old price
- * list says a discount "is possible". The PODMINKY entry for "Menší skupina"
- * deliberately states neither number   only the client knows which is correct.
  */
 import IconLucide from '../../IconLucide.astro';
-import { PODMINKY, CHYBEJICI_PODMINKY } from '../../../data/cenik';
+import { PODMINKY, DOPLNUJICI_INFO } from '../../../data/cenik';
 
-const NBSP = ' ';
+const NBSP = ' ';
 ---
 
 <section class="section podminky" aria-labelledby="podminky-nadpis">
   <div class="wrap">
 
-    {/* ---- Part 1: known terms ------------------------------------------- */}
+    {/* ---- Part 1: booking steps ----------------------------------------- */}
 
     <div class="podminky-head" data-reveal>
-      <h2 id="podminky-nadpis">Podmínky</h2>
-      <p class="lead">
-        Průběh rezervace a platby, přesně jak funguje.
-      </p>
+      <h2 id="podminky-nadpis">Průběh rezervace a{NBSP}platby</h2>
     </div>
 
     <ol class="kroky" data-reveal data-reveal-delay="60">
@@ -62,39 +45,31 @@ const NBSP = ' ';
       ))}
     </ol>
 
-    {/* ---- Part 2: missing terms ----------------------------------------- */}
+    {/* ---- Part 2: additional information -------------------------------- */}
 
-    {/*
-      ⚠ This section is not decoration and not a placeholder. It is the honest
-      answer to "what does this site not yet tell you?"   and each item on the
-      list is something a real guest will ask before booking a mountain cottage.
-      Bed linen is the canonical example: no Czech guest assumes it is provided,
-      and the old site is silent on the question. A guest who has to ask finds
-      our phone number. A guest who assumes and is wrong arrives unprepared.
+    <div class="info" data-reveal data-reveal-delay="120">
+      <h3 class="info-nadpis">Doplňující informace</h3>
 
-      Every item here is a docs/01-content.md §9 item. Each one removed from
-      this list should move to PODMINKY above.
-    */}
-    <div class="chybi" data-reveal data-reveal-delay="120">
-      <h3 class="chybi-nadpis">Na{NBSP}tohle se{NBSP}nás zeptejte</h3>
-      <p class="chybi-lead">
-        Odpovědi máme, jen je zatím nemáme na webu. Napište nám a ozveme
-        se obratem.
-      </p>
-
-      <ul class="chybi-list">
-        {CHYBEJICI_PODMINKY.map((nazev) => (
-          <li class="chybi-polozka">
-            <IconLucide name="info" size={18} class="chybi-ikona" />
-            <span>{nazev}</span>
+      <ul class="info-list">
+        {DOPLNUJICI_INFO.map((d) => (
+          <li class="info-polozka">
+            <IconLucide name={d.icon} size={18} class="info-ikona" />
+            <div class="info-text">
+              <span class="info-nazev">{d.nazev}</span>
+              {Array.isArray(d.text) ? (
+                <ul class="info-podbody">
+                  {d.text.map((radek) => <li>{radek}</li>)}
+                </ul>
+              ) : (
+                <p class="info-popis">{d.text}</p>
+              )}
+            </div>
           </li>
         ))}
       </ul>
 
-      <div class="chybi-cta">
-        <a href="#poptavka" class="btn btn-secondary">
-          Napsat se{NBSP}zeptat
-        </a>
+      <div class="info-cta">
+        <a href="#poptavka" class="btn btn-secondary">Poslat dotaz</a>
       </div>
     </div>
 
@@ -119,18 +94,16 @@ const NBSP = ' ';
     color: var(--color-les);
   }
 
-  .lead {
-    margin-top: 1rem;
-    font-size: var(--text-lead);
-    color: var(--color-kura);
-  }
-
   /* ---- Steps list ------------------------------------------------------ */
 
   /*
    * Ordered list   the numbers are semantic (step 1, step 2, ...) and the
    * visual counter next to the icon reinforces that. Using `list-style: none`
    * here because we render the number ourselves inside `.krok-cislo`.
+   *
+   * Three steps: one column, then straight to three at 56rem. Two columns in
+   * between would leave a lone card under a gap   the same 2+1 failure
+   * Cenik.astro's season grid avoids.
    */
   .kroky {
     display: grid;
@@ -141,9 +114,9 @@ const NBSP = ' ';
     counter-reset: krok;
   }
 
-  @media (width >= 48rem) {
+  @media (width >= 56rem) {
     .kroky {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.25rem;
     }
   }
@@ -209,17 +182,14 @@ const NBSP = ' ';
     line-height: 1.6;
   }
 
-  /* ---- Missing terms panel --------------------------------------------- */
+  /* ---- Additional information panel ------------------------------------- */
 
   /*
-   * A distinct panel, visually separated from the steps above.
-   * No border   a single-side brass accent used to mark it, the same device
-   * KalendarSlot's booking-rule cards used; both are gone now (a card with a
-   * different-coloured border on only one side reads as an error, not an
-   * accent). The colour shift alone   --omitka panel on this section's
-   * --kamen ground   is what marks the boundary here instead.
+   * No border: the colour shift alone   --omitka panel on this section's
+   * --kamen ground   marks the boundary ("no border, or a border on every
+   * side" is this page's rule; see Cenik.astro's header).
    */
-  .chybi {
+  .info {
     margin-top: 3rem;
     padding: 1.5rem;
     background-color: var(--color-omitka);
@@ -227,55 +197,71 @@ const NBSP = ' ';
   }
 
   @media (width >= 48rem) {
-    .chybi {
+    .info {
       padding: 2rem 2.5rem;
       max-width: 46rem;
     }
   }
 
-  .chybi-nadpis {
+  .info-nadpis {
     font-size: var(--text-title-s);
     /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
     color: var(--color-mosaz-tmava);
   }
 
-  .chybi-lead {
-    margin-top: 0.5rem;
-    font-size: var(--text-body);
-    color: var(--color-kura);
-    max-width: none;
-  }
-
-  /* ---- Missing-item list ----------------------------------------------- */
-
-  .chybi-list {
+  .info-list {
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    gap: 1rem;
     margin: 1.25rem 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .chybi-polozka {
+  .info-polozka {
     display: flex;
     align-items: flex-start;
     gap: 0.625rem;
     font-size: var(--text-body);
-    color: var(--color-les);
     line-height: 1.5;
   }
 
-  .chybi-ikona {
+  .info-ikona {
     flex: none;
     margin-top: 0.15rem;
     /* --mosaz-tmava on --omitka = 6.05:1 ✓ */
     color: var(--color-mosaz-tmava);
   }
 
+  .info-text {
+    min-width: 0;
+  }
+
+  .info-nazev {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-les);
+  }
+
+  .info-popis {
+    margin: 0.15rem 0 0;
+    max-width: none;
+    color: var(--color-kura);
+  }
+
+  .info-podbody {
+    margin: 0.25rem 0 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+    color: var(--color-kura);
+  }
+
+  .info-podbody li + li {
+    margin-top: 0.2rem;
+  }
+
   /* ---- CTA ------------------------------------------------------------- */
 
-  .chybi-cta {
+  .info-cta {
     margin-top: 1.5rem;
   }
 

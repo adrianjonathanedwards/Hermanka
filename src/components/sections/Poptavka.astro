@@ -26,6 +26,11 @@ interface Props {
   id?: string;
   /** Which band this sits on. Never the same as the section directly above. */
   band?: 'kamen' | 'omitka';
+  /**
+   * Keep the <h2> for screen readers only, so the lead opens the section.
+   * /terminy-a-ceny uses it: the client dropped the visible heading there.
+   */
+  skrytNadpis?: boolean;
 }
 
 const {
@@ -33,13 +38,14 @@ const {
   lead = 'Napište nám termín a počet osob a my se vám co nejdříve ozveme s dostupností a přesnou cenou. Nezávazně.',
   id = 'poptavka',
   band = 'kamen',
+  skrytNadpis = false,
 } = Astro.props;
 ---
 
 <section class:list={['section', 'poptavka', `poptavka--${band}`]} id={id} aria-labelledby={`${id}-nadpis`}>
   <div class="wrap">
     <div class="poptavka-head reveal">
-      <h2 id={`${id}-nadpis`}>{nadpis}</h2>
+      <h2 id={`${id}-nadpis`} class:list={[{ 'sr-only': skrytNadpis }]}>{nadpis}</h2>
       <p class="lead">{lead}</p>
     </div>
 
@@ -80,6 +86,11 @@ const {
   .lead {
     margin-top: 1rem;
     font-size: var(--text-lead);
+  }
+
+  /* No visible heading above it, so no gap to leave. */
+  .sr-only + .lead {
+    margin-top: 0;
   }
 
   @media (width >= 64rem) {

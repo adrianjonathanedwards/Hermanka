@@ -13,7 +13,8 @@
  *                       under them (Svatky.astro's own section is gone   see
  *                       Cenik.astro's header comment)
  *   3. Poplatky         fee schedule (electricity, water, sauna, deposit)
- *   4. Podmínky         known terms as steps + missing terms as "ask us"
+ *   4. Podmínky         booking steps + additional information (times,
+ *                       cancellation, pets)
  *   5. Poptavka         the inquiry form
  *
  * BAND ALTERNATION (from KalendarSlot's --omitka):
@@ -96,10 +97,7 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <Cenik />
 
   {/*
-    3. Poplatky   what is added to the rate.
-    Two entries are marked nepotvrzeno: true (electricity and municipal fee);
-    they render with an "orientačně" badge (§9 item 7).
-    Section band: --omitka.
+    3. Poplatky   what is added to the rate. Section band: --omitka.
   */}
   <Poplatky />
 
@@ -112,18 +110,15 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <RoofDivider />
 
   {/*
-    4. Podmínky   known terms as steps, missing terms as "ask us".
-    CHYBEJICI_PODMINKY is never dropped   it is the honest answer to "what
-    does this site not yet tell you?" and bed linen is the single most-asked
-    question for a Czech chalupa let. Section band: --kamen.
+    4. Podmínky   the booking steps, then check-in/out, cancellation and
+    pets. Section band: --kamen.
   */}
   <Podminky />
 
   {/*
     5. Poptavka   the inquiry form.
     band="omitka" because Podmínky above is --kamen (stone). The last section
-    must be on a light band ✓. The lead references the price list the reader
-    has just read.
+    must be on a light band ✓.
 
     The date field is prefilled from the calendar selection (see the header of
     this file) and still accepts any free-text date string.
@@ -131,7 +126,8 @@ const hero = await getImage(PAGE_HERO_PRELOAD_PROPS);
   <Poptavka
     band="omitka"
     nadpis="Napište si o termín"
-    lead="Přečetli jste ceny a podmínky – teď nám napište termín a kolik vás bude. Ozveme se s potvrzením dostupnosti co nejdříve."
+    skrytNadpis
+    lead="Napište nám Vámi vybraný termín a počet osob a my se Vám s potvrzením dostupnosti ozveme co nejdříve."
     id="poptavka"
   />
 

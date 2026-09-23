@@ -40,17 +40,8 @@ import IconLucide from '../../IconLucide.astro';
         kombinovat.
       </p>
 
-      {/*
-        The electricity is metered and billed by actual consumption, which is
-        the first thing anyone reading a heating section wants to know next.
-        A link, not a repeat of the rate   the rate lives in src/data/cenik.ts
-        and is printed on one page only.
-      */}
-      <p class="vytapeni-pozn">
-        <a href="/terminy-a-ceny" class="link-more link-on-dark">
-          <span>Elektřina se účtuje podle skutečné spotřeby</span>
-        </a>
-      </p>
+      {/* The "Elektřina se účtuje podle skutečné spotřeby" link that sat here was
+          removed by the client (September 2026); the rate is on /terminy-a-ceny. */}
     </div>
   </div>
 </section>
@@ -101,10 +92,5 @@ import IconLucide from '../../IconLucide.astro';
        for winter content (docs/02-design-system.md §1.3), and a heating
        section is the most tempting wrong place to reach for it. */
     color: var(--color-kamen);
-  }
-
-  .vytapeni-pozn {
-    margin-top: 2rem;
-    font-size: var(--text-body);
   }
 </style>

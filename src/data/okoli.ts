@@ -166,7 +166,7 @@ export const VYLETY: Vylet[] = [
   {
     nazev: 'Králický Sněžník',
     popis:
-      'Turistická značka se dá chytit přímo u chalupy a dovede vás až na vrchol, pod kterým vyvěrá pramen řeky Moravy.',
+      'Na turistickou stezku se napojíte přímo u chalupy a dovede vás až na vrchol, pod kterým vyvěrá pramen řeky Moravy.',
     // TODO(client)   docs/01-content.md §9 item 18: the old copy says 14 km, the
     // regional map says 17 km / 4 h 15 min. Naming either next to a map that
     // contradicts it is worse than naming neither.

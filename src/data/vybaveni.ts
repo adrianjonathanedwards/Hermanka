@@ -17,6 +17,10 @@
  *
  * The one substantive departure is `overit` on the accessibility entry, and it
  * is argued in place below.
+ *
+ * Client edits (September 2026): `domácí mazlíček povolen` removed from
+ * Obecně (pets are covered on /terminy-a-ceny), and the sauna and hot tub moved
+ * from Vnitřní to Venkovní vybavení, where they actually stand.
  * ---------------------------------------------------------------------------
  */
 import type { LucideName } from '../components/IconLucide.astro';
@@ -52,7 +56,6 @@ export const VYBAVENI: VybaveniSkupina[] = [
     nazev: 'Obecně',
     icon: 'info',
     polozky: [
-      { nazev: 'domácí mazlíček povolen' },
       { nazev: 'wifi, internet' },
       { nazev: 'nekuřácký objekt' },
       { nazev: 'společenská místnost' },
@@ -94,8 +97,6 @@ export const VYBAVENI: VybaveniSkupina[] = [
       { nazev: 'pračka' },
       { nazev: 'sprchový kout' },
       { nazev: 'vana' },
-      { nazev: 'sauna nebo infrasauna' },
-      { nazev: 'hot tube' },
     ],
   },
   {
@@ -108,6 +109,8 @@ export const VYBAVENI: VybaveniSkupina[] = [
       { nazev: 'zahradní nábytek' },
       { nazev: 'ohniště' },
       { nazev: 'gril' },
+      { nazev: 'sauna nebo infrasauna' },
+      { nazev: 'hot tube' },
     ],
   },
   {
