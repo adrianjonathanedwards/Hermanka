@@ -11,6 +11,7 @@ import { HTML_LANG, LIVE_LOCALES } from '../i18n/config';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Lightbox from '../components/Lightbox.astro';
+import VideoLightbox from '../components/VideoLightbox.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -241,6 +242,7 @@ const websiteSchema = {
     <SiteFooter />
 
     <Lightbox />
+    <VideoLightbox />
 
     <script>
       import '../scripts/motion.ts';

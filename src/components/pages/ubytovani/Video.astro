@@ -2,16 +2,23 @@
 /**
  * Video   the last content section of /ubytovani (#video).
  *
- * YouTube ID: -U_w_kwtzjI (Chalupa Heřmanka).
+ * YouTube ID: `VIDEO.aktualni` in src/data/site.ts, the September 2026 video.
+ * It replaced `-U_w_kwtzjI` here; the old one lives on in /galerie's video
+ * section, beside the new one.
  *
- * NO IFRAME   not on load, not on click.
- * Facade only: a poster image inside a link that opens YouTube in a new
- * window. Pattern from src/components/sections/GalerieTeaser.astro.
+ * The 360° walkthrough is linked under the lead, as a plain button to a new
+ * window. It sits in this section because it answers the same question the
+ * video does ("what is it actually like inside?"), and this is the page where
+ * a guest asks it. It stays a link, never an embed   see the header of
+ * VideoLightbox.astro for why the two are not the same decision.
  *
- * Why no iframe: one embed is roughly 500 kB and several third-party origins,
- * which is five times the entire page budget (docs/03-tech.md §5). Opening
- * YouTube in a new window also gives the full player   captions, quality
- * selection, full screen, "add to watch later"   instead of a clipped widget.
+ * NO IFRAME UNTIL CLICKED. The poster below is a plain image; with
+ * JavaScript, src/scripts/motion.ts intercepts the click and opens the video
+ * in the on-site overlay (src/components/VideoLightbox.astro) instead of
+ * following the link. Without it, the href is the real YouTube URL and the
+ * click leaves the site exactly as it always did   this is a progressive
+ * enhancement, not a replacement, and the fallback is not a worse copy of the
+ * real thing, it IS the real thing. Full argument in docs/03-tech.md "Video".
  *
  * ⚠ /video/ 301-redirects to /ubytovani#video (public/_redirects). The anchor
  * #video therefore MUST exist and MUST sit on a stable element.
@@ -26,8 +33,8 @@
 import { Image } from 'astro:assets';
 import virivka from '@img/DSC_4684-scaled-1.jpg';
 import Icon from '../../Icon.astro';
-
-const VIDEO_ID = '-U_w_kwtzjI';
+import IconLucide from '../../IconLucide.astro';
+import { VIDEO, videoUrl, PROHLIDKA_URL } from '../../../data/site';
 ---
 
 <section id="video" class="section video-sekce" aria-labelledby="video-nadpis">
@@ -41,19 +48,28 @@ const VIDEO_ID = '-U_w_kwtzjI';
           Prohlédněte si vybavení chalupy a&nbsp;veškeré možnosti vyžití,
           které vám nabízí.
         </p>
+        <p class="video-prohlidka">
+          <a class="btn btn-secondary" href={PROHLIDKA_URL} target="_blank" rel="noopener noreferrer">
+            <IconLucide name="rotate-3d" size={18} />
+            <span>Virtuální prohlídka 360°</span>
+            <span class="sr-only"> (otevře se v novém okně)</span>
+          </a>
+        </p>
       </div>
 
       {/*
-        A link, not a button. href is the canonical YouTube URL.
-        `target="_blank"` together with `rel="noopener noreferrer"`   the
-        security standard for new windows. The accessible description combines
-        the poster's alt text, the visible label, and the SR new-window warning.
+        A link, not a button   href is the canonical YouTube URL, and
+        `target="_blank"` + `rel="noopener noreferrer"` is the security
+        standard for new windows, which is what this stays without
+        JavaScript. `data-video-id` is what src/scripts/motion.ts looks for
+        to intercept the click and open the on-site overlay instead.
       */}
       <a
         class="video-frame photo-frame"
-        href={`https://www.youtube.com/watch?v=${VIDEO_ID}&autoplay=1`}
+        href={videoUrl(VIDEO.aktualni)}
         target="_blank"
         rel="noopener noreferrer"
+        data-video-id={VIDEO.aktualni}
         data-reveal
         data-reveal-delay="80"
       >
@@ -76,8 +92,15 @@ const VIDEO_ID = '-U_w_kwtzjI';
             <Icon name="prehrat" size={24} strokeWidth={1.5} />
           </span>
           <span>
-            Přehrát video
-            <span class="sr-only"> na YouTube (otevře se v novém okně)</span>
+            Přehrát
+            <span class="sr-only"> video na YouTube</span>
+            {/*
+              True only until src/scripts/motion.ts wires this trigger to the
+              overlay, at which point it clears this node's text   see the
+              note there. Kept as its own span, not appended inline, so the
+              script can find and empty exactly this part of the name.
+            */}
+            <span class="sr-only" data-video-novo-okno> (otevře se v novém okně)</span>
           </span>
         </span>
       </a>
@@ -115,6 +138,10 @@ const VIDEO_ID = '-U_w_kwtzjI';
     margin-top: 1rem;
     font-size: var(--text-lead);
     max-width: 36ch;
+  }
+
+  .video-prohlidka {
+    margin-top: 1.75rem;
   }
 
   /* ---- Video frame ------------------------------------------------------- */

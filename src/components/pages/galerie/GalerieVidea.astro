@@ -1,0 +1,368 @@
+---
+/**
+ * `Video a virtuální prohlídka`   the moving-picture section of /galerie,
+ * between the wellness photographs and `Okolí` (#videa).
+ *
+ * Five tiles: a two-by-two grid of the promo the rest of the site links, a
+ * second walkthrough, the 360° tour and the 2019 video, with a third
+ * September 2026 video (`treti`) as a wide strip underneath. The old video
+ * stays here on purpose, by request (September 2026); this is the only place
+ * on the site that links it.
+ *
+ * The 2x2 is an even grid, not a bento with one big tile: those four are
+ * peers (three from the same channel and month, one the site's long-standing
+ * original), and making one of them twice the size of the other would claim
+ * a ranking nobody made. `treti` breaks that evenness on its own row instead
+ * of forcing a fifth cell into the grid, which would either leave a hole or
+ * make one of the other four smaller to fill it.
+ *
+ * THE FOUR VIDEO TILES OPEN AN ON-SITE OVERLAY; THE TOUR TILE STAYS A LINK.
+ * Each video poster carries `data-video-id`, which src/scripts/motion.ts uses
+ * to intercept the click and play the video in the overlay from
+ * VideoLightbox.astro instead of following the link away. Without JavaScript
+ * every poster is still a real `<a href="https://www.youtube.com/watch?v=…">`,
+ * so a click leaves the site exactly as it did before the overlay existed.
+ * See the header of VideoLightbox.astro for why there is no <iframe> in the
+ * page until a trigger is actually clicked, and docs/03-tech.md "Video" for
+ * the full argument.
+ *
+ * The tour tile is NOT one of the four: PROHLIDKA_URL is a 33-panorama site
+ * of its own, not a video, and it stays a plain link to a new window   a
+ * panorama viewer wants the whole screen and its own full-screen control, not
+ * a box inside this one. It carries no `data-video-id` and this file's script
+ * wiring never touches it.
+ *
+ * Local photographs stay the posters, not YouTube's own thumbnails: the CSP
+ * in tools/headers.mjs still ships `img-src 'self'`, and the point of a
+ * poster is to be there instantly, not to wait on a third-party request that
+ * `frame-src` alone would not even permit.
+ *
+ * ⚠ THE ONE DARK BAND ON THE PAGE, AND IT HAS TO BE. The groups around it
+ * alternate `--kamen` and `--omitka`, and `Okolí` closes the page on the bare
+ * page ground (`--omitka`). Sitting between `Sauna a vířivka` (`--kamen`) and
+ * `Okolí`, a light band would merge with one neighbour or the other, whichever
+ * it matched. `--les` separates both, and a video poster reads better on dark
+ * than on stone anyway. Headings are `--omitka`, never brass: `--mosaz` on
+ * `--les` is 3.00:1 (docs/02-design-system.md §1.2).
+ *
+ * The nth-child banding in galerie.astro counts this section as a sibling, so
+ * it shifts `Okolí` from odd to even. That is harmless: `Okolí` is the last
+ * child and `:last-child` wins over `:nth-child(even)` there.
+ */
+import { Image } from 'astro:assets';
+import Icon from '../../Icon.astro';
+import IconLucide from '../../IconLucide.astro';
+import { VIDEO, videoUrl, PROHLIDKA_URL } from '../../../data/site';
+
+/* The new video opens on this room, so the poster is honest about it. */
+import obyvakCely from '@img/DSC02462.webp';
+/* `dalsi`'s own YouTube thumbnail is the house from the drone; this is the
+   same view, from the same shoot. */
+import chalupaLetecky from '@img/DJI_0018.webp';
+/* The poster /ubytovani showed for the old video for years. */
+import virivka from '@img/DSC_4684-scaled-1.jpg';
+/* The widest interior frame in the set: the walkthrough is about moving
+   through rooms, and this is the one photograph that shows a room's depth. */
+import velkaLoznice from '@img/DSC02415.webp';
+/* `treti` opens on this exact room   the mezonetová ložnice, ladder and
+   balcony door both in frame   already in the gallery's `interier` group as
+   `loznicePodkrovi`. */
+import loznicePodkrovi from '@img/DSC_4614.webp';
+
+const NOVE_OKNO = ' (otevře se v novém okně)';
+---
+
+<section id="videa" class="section videa" aria-labelledby="galerie-videa">
+  <div class="wrap">
+    <div class="videa-header" data-reveal="up">
+      <h2 id="galerie-videa">Video a&nbsp;virtuální prohlídka</h2>
+    </div>
+
+    <ul class="videa-grid" role="list" data-reveal-group="55">
+      {/*
+        Each accessible name is still distinct   two links both named "Přehrát
+        video" would be two entries a screen reader lists under one name   but
+        the distinguishing word now lives in its own sr-only span rather than
+        in the visible label, which reads "PŘEHRÁT" on all four tiles.
+      */}
+      <li class="videa-tile" data-reveal="scale">
+        <a
+          class="videa-item photo-frame"
+          href={videoUrl(VIDEO.aktualni)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-video-id={VIDEO.aktualni}
+        >
+          <Image
+            src={obyvakCely}
+            alt="Náhled videa o chalupě Heřmanka, obývací pokoj se zelenou sedačkou"
+            widths={[420, 640, 960, 1280]}
+            sizes="(min-width: 48rem) 47vw, 100vw"
+            width={1280}
+            height={720}
+            format="webp"
+            quality={64}
+            loading="lazy"
+          />
+          <span class="videa-overlay">
+            <span class="videa-ring">
+              <Icon name="prehrat" size={24} strokeWidth={1.5} />
+            </span>
+            <span>
+              Přehrát
+              <span class="sr-only"> hlavní video na YouTube</span>
+              <span class="sr-only" data-video-novo-okno>{NOVE_OKNO}</span>
+            </span>
+          </span>
+        </a>
+      </li>
+
+      <li class="videa-tile" data-reveal="scale">
+        <a
+          class="videa-item photo-frame"
+          href={videoUrl(VIDEO.dalsi)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-video-id={VIDEO.dalsi}
+        >
+          <Image
+            src={chalupaLetecky}
+            alt="Náhled dalšího videa o chalupě Heřmanka, chalupa v lese z dronu"
+            widths={[420, 640, 960, 1280]}
+            sizes="(min-width: 48rem) 47vw, 100vw"
+            width={1280}
+            height={720}
+            format="webp"
+            quality={64}
+            loading="lazy"
+          />
+          <span class="videa-overlay">
+            <span class="videa-ring">
+              <Icon name="prehrat" size={24} strokeWidth={1.5} />
+            </span>
+            <span>
+              Přehrát
+              <span class="sr-only"> další video na YouTube</span>
+              <span class="sr-only" data-video-novo-okno>{NOVE_OKNO}</span>
+            </span>
+          </span>
+        </a>
+      </li>
+
+      <li class="videa-tile" data-reveal="scale">
+        <a class="videa-item photo-frame" href={PROHLIDKA_URL} target="_blank" rel="noopener noreferrer">
+          <Image
+            src={velkaLoznice}
+            alt="Náhled virtuální prohlídky chalupy Heřmanka, velká podkrovní ložnice obložená dřevem"
+            widths={[420, 640, 960, 1280]}
+            sizes="(min-width: 48rem) 47vw, 100vw"
+            width={1280}
+            height={720}
+            format="webp"
+            quality={64}
+            loading="lazy"
+          />
+          <span class="videa-overlay">
+            <span class="videa-ring">
+              <IconLucide name="rotate-3d" size={26} />
+            </span>
+            <span>
+              Virtuální prohlídka 360°
+              <span class="sr-only">{NOVE_OKNO}</span>
+            </span>
+          </span>
+        </a>
+      </li>
+
+      <li class="videa-tile" data-reveal="scale">
+        <a
+          class="videa-item photo-frame"
+          href={videoUrl(VIDEO.puvodni)}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-video-id={VIDEO.puvodni}
+        >
+          <Image
+            src={virivka}
+            alt="Náhled původního videa o chalupě Heřmanka, dřevěná vířivka v lese"
+            widths={[420, 640, 960, 1280]}
+            sizes="(min-width: 48rem) 47vw, 100vw"
+            width={1280}
+            height={720}
+            format="webp"
+            quality={64}
+            loading="lazy"
+          />
+          <span class="videa-overlay">
+            <span class="videa-ring">
+              <Icon name="prehrat" size={24} strokeWidth={1.5} />
+            </span>
+            <span>
+              Přehrát
+              <span class="sr-only"> původní video na YouTube</span>
+              <span class="sr-only" data-video-novo-okno>{NOVE_OKNO}</span>
+            </span>
+          </span>
+        </a>
+      </li>
+    </ul>
+
+    {/*
+      A fifth video, and a fifth cell in a two-column grid is either an
+      orphan or a reason to shrink the other four. Its own wide strip, same
+      gap above as the grid's own row gap, says "one more" without pretending
+      it is a peer of the four above it in the same way they are peers of
+      each other.
+    */}
+    <a
+      class="videa-item videa-item--siroka photo-frame"
+      href={videoUrl(VIDEO.treti)}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-video-id={VIDEO.treti}
+      data-reveal="scale"
+    >
+      <Image
+        src={loznicePodkrovi}
+        alt="Náhled třetího videa o chalupě Heřmanka, mezonetová ložnice se žebříkem a dveřmi na terasu"
+        widths={[640, 960, 1280, 1600]}
+        sizes="100vw"
+        width={1600}
+        height={674}
+        format="webp"
+        quality={64}
+        loading="lazy"
+      />
+      <span class="videa-overlay">
+        <span class="videa-ring">
+          <Icon name="prehrat" size={24} strokeWidth={1.5} />
+        </span>
+        <span>
+          Přehrát
+          <span class="sr-only"> třetí video na YouTube</span>
+          <span class="sr-only" data-video-novo-okno>{NOVE_OKNO}</span>
+        </span>
+      </span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .videa {
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+  }
+
+  .videa-header {
+    margin-bottom: 3rem;
+  }
+
+  /* Same size as the photo groups' headings in galerie.astro, so the page
+     keeps one heading scale; only the colour changes for the dark ground.
+     --omitka on --les = 15.45:1. */
+  .videa-header h2 {
+    color: var(--color-omitka);
+    font-size: var(--text-title-l);
+    margin: 0;
+  }
+
+  /* One column on a phone, two by two from 48rem, at the photo groups' gaps. */
+  .videa-grid {
+    display: grid;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (width >= 48rem) {
+    .videa-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+  }
+
+  .videa-item {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--color-kura);
+    color: var(--color-omitka);
+    text-decoration: none;
+  }
+
+  /* The fifth tile: same gap above as the grid's own rows, wider than 16:9
+     so it reads as a strip rather than a stretched copy of the four tiles
+     above it. */
+  .videa-item--siroka {
+    aspect-ratio: 32 / 13.5;
+    margin-top: 0.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .videa-item--siroka {
+      margin-top: 0.75rem;
+    }
+  }
+
+  .videa-item :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* The play overlay from Video.astro, unchanged apart from the class names. */
+  .videa-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background-color: rgb(22 36 28 / 0.42);
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    transition: background-color 300ms var(--ease-out);
+  }
+
+  .videa-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.75rem;
+    height: 3.75rem;
+    border: 2px solid var(--color-omitka);
+    border-radius: var(--radius-pill);
+    transition:
+      transform 380ms var(--ease-spring),
+      background-color 300ms var(--ease-out),
+      border-color 300ms var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .videa-item:hover .videa-overlay {
+      background-color: rgb(22 36 28 / 0.26);
+    }
+
+    .videa-item:hover .videa-ring {
+      transform: scale(1.08);
+      background-color: var(--color-mosaz);
+      border-color: var(--color-mosaz);
+    }
+  }
+
+  .videa-item:focus-visible .videa-overlay {
+    background-color: rgb(22 36 28 / 0.26);
+  }
+
+  .videa-item:focus-visible .videa-ring {
+    background-color: var(--color-mosaz);
+    border-color: var(--color-mosaz);
+  }
+</style>

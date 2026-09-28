@@ -64,9 +64,11 @@ function connectSrc() {
 
 function policy(scriptHashes) {
   return [
-    /* Nothing loads from anywhere but this origin. There is no third-party
-       subresource on this site at all   the map and the video are links that
-       open a new tab, not embeds (docs/03-tech.md §5). */
+    /* Nothing loads from anywhere but this origin BY DEFAULT. The one
+       exception is `frame-src` below   a YouTube video, played in an on-site
+       overlay instead of a new tab (docs/03-tech.md "Video"). Nothing else on
+       the site embeds a third party; the map is still a link that opens a new
+       tab, not an embed. */
     "default-src 'self'",
 
     /* The bundled module is 'self'; the motion gate is named by hash. No
@@ -93,8 +95,22 @@ function policy(scriptHashes) {
        at a same-origin Worker instead, this can drop back to just 'self'. */
     "form-action 'self' https://api.web3forms.com",
 
-    /* Nothing is framed, and this site frames nothing. */
-    "frame-src 'none'",
+    /*
+     * Nothing frames this site (`frame-ancestors` below). This site frames
+     * exactly one thing: a YouTube video, in the on-site overlay built by
+     * src/components/VideoLightbox.astro and wired up in
+     * src/scripts/motion.ts, and only after a visitor clicks a "Přehrát"
+     * trigger   the <iframe> does not exist in the page until then, so this
+     * origin costs nothing for anyone who never plays a video.
+     *
+     * `-nocookie` is Google's own reduced-tracking embed domain: it does not
+     * set cookies until playback actually starts. It is a mitigation, not a
+     * guarantee   once someone presses play inside the frame, requests to
+     * Google's video CDN happen exactly as they would on youtube.com, outside
+     * this CSP's reach because they are inside a cross-origin document with
+     * its own headers.
+     */
+    "frame-src https://www.youtube-nocookie.com",
     "frame-ancestors 'none'",
     "object-src 'none'",
 
@@ -106,13 +122,21 @@ function policy(scriptHashes) {
   ].join('; ');
 }
 
+/*
+ * `autoplay` and `encrypted-media` below carry one extra origin, and only
+ * one: the video overlay's own iframe (VideoLightbox.astro). YouTube's player
+ * asks for both   `encrypted-media` is for DRM'd catalogue content, which
+ * none of these videos are, but the player requests it regardless and a
+ * blocked EncryptedMediaError is a worse failure than an unused grant. Every
+ * other feature stays denied outright, exactly as before.
+ */
 const SECURITY = (csp) => `  Content-Security-Policy: ${csp}
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Cross-Origin-Opener-Policy: same-origin
-  Permissions-Policy: accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()`;
+  Permissions-Policy: accelerometer=(), autoplay=(self "https://www.youtube-nocookie.com"), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(self "https://www.youtube-nocookie.com"), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), xr-spatial-tracking=()`;
 
 export default function headers() {
   return {

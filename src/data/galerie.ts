@@ -79,6 +79,29 @@
  * now joins the `okoli` group alongside the other three. Same usage-rights
  * caveat as `kralicky-sneznik.png` applies to all four.
  *
+ * UPDATE 7: a third batch, a professional shoot from September 2026 (the
+ * `DSC024xx`/`DSC025xx` camera files and four `DJI_` drone frames). Three
+ * things came out of it:
+ *
+ *   1. THE KITCHEN. `kuchyne` (`DSC02477-HDR.webp`) is the hole UPDATE 3 left
+ *      open, and it is closed now. Also new subjects nobody had photographed:
+ *      the ground floor shower room, the fire pit, the play tower, the upper
+ *      terrace's seating, and the whole plot from the air.
+ *
+ *   2. Six of the 2019 interior frames were REPLACED rather than kept beside
+ *      the new ones, because the new shoot covers the same room from the same
+ *      side with today's bedding and furniture: `DSC_4554` (a second angle of
+ *      the ground floor bedroom, captioned "v patře", which it is not),
+ *      `DSC_4556` (the sofa corner, now inside the wider `obyvakCely`),
+ *      `DSC_4600`, `DSC_4621`, `DSC_4638` and `DSC_4656`. The files stay in
+ *      img/; only the imports went.
+ *
+ *   3. THREE OF THOSE SIX HAD THE WRONG ALT TEXT. `DSC_4621` was described as
+ *      the bathroom with the tub, `DSC_4656` as the attic room with the round
+ *      table, and `DSC_4638` as the bed under the gable: a rotation by one. The
+ *      bathroom photograph was being read out to screen readers as a bedroom.
+ *      Their replacements below were each described against the frame itself.
+ *
  * What all this means for `/galerie`: every tile in the gallery is either a
  * real photograph or an explicitly labelled PLACEHOLDER saying which
  * photograph is still missing. The placeholders are listed in `PLACEHOLDERY`
@@ -119,14 +142,8 @@ import chalupaMeziStromy from '@img/DSC_5233.webp';
 import chalupaVecerSnih from '@img/IMG_20240113_163558.webp';
 import chalupaZimniRano from '@img/IMG_20240114_095211.webp';
 
-import obyvakZelenaSedacka from '@img/DSC_4556.webp';
 import loznice from '@img/DSC_4552.webp';
-import loznicePatro from '@img/DSC_4554.webp';
 import loznicePodkrovi from '@img/DSC_4614.webp';
-import loznicePodkroviStit from '@img/DSC_4638.webp';
-import podkrovniPokoj from '@img/DSC_4656.webp';
-import koupelna from '@img/DSC_4621.webp';
-import loznicePodkroviDvere from '@img/DSC_4600.webp';
 import sedaciKoutPodkrovi from '@img/DSC_4612.webp';
 
 import saunaZvenku from '@img/DSC_5151.webp';
@@ -141,6 +158,28 @@ import kralickySneznik from '@img/kralicky-sneznik.png';
 import skyBridge from '@img/sky-bridge-721.webp';
 import klasterHedec from '@img/klaster-hedec.webp';
 import vojenskeMuzeum from '@img/vojenske-muzeum-kraliky.webp';
+
+/* ---- Third batch (September 2026) --------------------------------------- */
+import chalupaLetecky from '@img/DJI_0018.webp';
+import chalupaVLese from '@img/DJI_0006.webp';
+import zahradaShora from '@img/DJI_0016.webp';
+import terasaStul from '@img/DSC02374.webp';
+import horniTerasa from '@img/DSC02395.webp';
+import ohniste from '@img/DSC02513.webp';
+import hriste from '@img/DSC02508.webp';
+
+import obyvakCely from '@img/DSC02462.webp';
+import kuchyne from '@img/DSC02477-HDR.webp';
+import krb from '@img/DSC02496.webp';
+import loznicePrizemi from '@img/DSC02457-HDR.webp';
+import lozniceTerasa from '@img/DSC02386.webp';
+import lozniceStit from '@img/DSC02408.webp';
+import velkaLoznice from '@img/DSC02415.webp';
+import velkaLozniceOkna from '@img/DSC02429-HDR.webp';
+import koupelnaVana from '@img/DSC02376.webp';
+import koupelnaSprcha from '@img/DSC02448.webp';
+
+import saunaShora from '@img/DJI_0014.webp';
 
 export type GalerieSkupina = 'chalupa' | 'interier' | 'wellness' | 'okoli';
 
@@ -277,16 +316,40 @@ export const FOTKY: Fotka[] = [
     popisek: 'Chalupa a zahrada',
   },
   {
+    src: chalupaLetecky,
+    alt: 'Letecký pohled na chalupu Heřmanka uprostřed lesa, se zahradou, dětskou věží se skluzavkou a saunou se zelenou střechou u jezírka',
+    skupina: 'chalupa',
+    popisek: 'Chalupa a zahrada z výšky',
+  },
+  {
     src: terasa,
     alt: 'Krytá terasa chalupy s venkovním zděným krbem, skleněným stolem a proutěnými křesly, v pozadí les',
     skupina: 'chalupa',
     popisek: 'Krytá terasa s krbem',
   },
   {
+    src: terasaStul,
+    alt: 'Dlouhý stůl s kyticí a proutěnými židlemi na kryté terase, za dřevěným zábradlím zahrada a les',
+    skupina: 'chalupa',
+    popisek: 'Stůl na kryté terase',
+  },
+  {
     src: houpacky,
     alt: 'Dřevěná houpačka se dvěma sedátky a zelenou skluzavkou na zatravněné zahradě',
     skupina: 'chalupa',
     popisek: 'Houpačky na zahradě',
+  },
+  {
+    src: hriste,
+    alt: 'Dřevěná dětská věž se zelenou skluzavkou, lezeckou stěnou a dvěma houpačkami na okraji lesa',
+    skupina: 'chalupa',
+    popisek: 'Dětská věž se skluzavkou',
+  },
+  {
+    src: ohniste,
+    alt: 'Kamenné ohniště obklopené dřevěnými lavicemi na štěrkové ploše pod lesem',
+    skupina: 'chalupa',
+    popisek: 'Ohniště s lavicemi',
   },
   {
     src: chalupaVZime,
@@ -307,10 +370,22 @@ export const FOTKY: Fotka[] = [
     popisek: 'Chalupa a horní terasa',
   },
   {
+    src: horniTerasa,
+    alt: 'Horní nekrytá terasa s proutěnou lavicí, dvěma křesly a skleněným stolkem, za zábradlím koruny stromů',
+    skupina: 'chalupa',
+    popisek: 'Posezení na horní terase',
+  },
+  {
     src: posezeniZahrada,
     alt: 'Dřevěný piknikový stůl s lavicemi na zatravněné zahradě, kolem vzrostlé stromy a kamenná cesta',
     skupina: 'chalupa',
     popisek: 'Posezení na zahradě',
+  },
+  {
+    src: zahradaShora,
+    alt: 'Zahrada chalupy shora: trávník, ohniště s lavicemi, piknikový stůl, skluzavka a dětská věž na okraji lesa',
+    skupina: 'chalupa',
+    popisek: 'Zahrada shora',
   },
   {
     src: chalupaSoumrak,
@@ -343,6 +418,12 @@ export const FOTKY: Fotka[] = [
     popisek: 'Chalupa mezi stromy',
   },
   {
+    src: chalupaVLese,
+    alt: 'Letecký pohled kolmo shora na střechu chalupy uprostřed souvislého lesa, pod ní silnice a vpravo louka',
+    skupina: 'chalupa',
+    popisek: 'Chalupa v lese shora',
+  },
+  {
     src: chalupaVecerSnih,
     alt: 'Chalupa Heřmanka a venkovní sauna za zimního večera se zasněženými střechami a zamrzlým jezírkem',
     skupina: 'chalupa',
@@ -361,16 +442,28 @@ export const FOTKY: Fotka[] = [
     popisek: 'Obývák s krbem',
   },
   {
+    src: obyvakCely,
+    alt: 'Obývací pokoj s rohovou zelenou koženou sedačkou, konferenčním stolkem, velkou televizí a jídelními stoly pod trámovým stropem',
+    skupina: 'interier',
+    popisek: 'Obývací pokoj',
+  },
+  {
+    src: krb,
+    alt: 'Zděný krb v obývacím pokoji s dřevěnými policemi po stranách a černým koženým křeslem',
+    skupina: 'interier',
+    popisek: 'Krb v obýváku',
+  },
+  {
+    src: kuchyne,
+    alt: 'Kuchyně s lednicí, myčkou, mikrovlnnou troubou a oknem do lesa, v popředí dřevěný jídelní stůl s kyticí',
+    skupina: 'interier',
+    popisek: 'Kuchyně',
+  },
+  {
     src: jidelna,
     alt: 'Jídelní stůl se sušenou kyticí, v pozadí zelená kožená sedačka a okna do zahrady',
     skupina: 'interier',
     popisek: 'Jídelní stůl',
-  },
-  {
-    src: obyvakZelenaSedacka,
-    alt: 'Obývací pokoj s velkou rohovou koženou sedačkou v zelené barvě, dřevěným trámovým stropem a okny do zahrady',
-    skupina: 'interier',
-    popisek: 'Obývací pokoj',
   },
   {
     src: loznice,
@@ -379,10 +472,10 @@ export const FOTKY: Fotka[] = [
     popisek: 'Ložnice',
   },
   {
-    src: loznicePatro,
-    alt: 'Ložnice se dvěma spojenými postelemi a velkou dřevěnou skříní se zásuvkami',
+    src: loznicePrizemi,
+    alt: 'Ložnice se dvěma spojenými postelemi, dřevěnou skříní a obložením za postelí, na nočních stolcích svítí lampy',
     skupina: 'interier',
-    popisek: 'Ložnice v patře',
+    popisek: 'Ložnice, druhý pohled',
   },
   {
     src: loznicePodkrovi,
@@ -391,34 +484,46 @@ export const FOTKY: Fotka[] = [
     popisek: 'Mezonetová ložnice',
   },
   {
-    src: loznicePodkroviStit,
-    alt: 'Podkrovní ložnice s postelí pod šikmým trámovým stropem ve tvaru štítu a oknem s výhledem do lesa',
+    src: lozniceTerasa,
+    alt: 'Ložnice s dvojlůžkem, dřevěným žebříkem do horního patra a prosklenými dveřmi na terasu',
+    skupina: 'interier',
+    popisek: 'Ložnice s dveřmi na terasu',
+  },
+  {
+    src: lozniceStit,
+    alt: 'Podkrovní ložnice přímo pod štítem, matrace pod šikmým dřevěným stropem, lampička a okno do lesa',
     skupina: 'interier',
     popisek: 'Ložnice ve štítu',
   },
   {
-    src: podkrovniPokoj,
-    alt: 'Podkrovní pokoj s manželskou postelí, kulatým jídelním stolem se židlemi a žebříkem do dalšího patra',
+    src: velkaLoznice,
+    alt: 'Velká podkrovní ložnice obložená dřevem, s několika postelemi, kulatým stolem se židlemi, skříní a žebříkem do horního patra',
     skupina: 'interier',
-    popisek: 'Podkrovní pokoj',
+    popisek: 'Velká mezonetová ložnice',
   },
   {
-    src: koupelna,
-    alt: 'Koupelna v podkroví s prostornou vanou, umyvadlem a dřevěnou stoličkou',
+    src: velkaLozniceOkna,
+    alt: 'Velká podkrovní ložnice u štítové stěny se dvěma okny do lesa, televizí, kulatým stolem se židlemi a postelemi po obou stranách',
     skupina: 'interier',
-    popisek: 'Koupelna s vanou',
-  },
-  {
-    src: loznicePodkroviDvere,
-    alt: 'Podkrovní ložnice od dveří, s patrovou postelí po žebříku a televizí',
-    skupina: 'interier',
-    popisek: 'Podkrovní ložnice od dveří',
+    popisek: 'Velká ložnice u štítu',
   },
   {
     src: sedaciKoutPodkrovi,
     alt: 'Sedací kout v podkroví s křesílky, komodou a žebříkem k patrové posteli',
     skupina: 'interier',
     popisek: 'Sedací kout v podkroví',
+  },
+  {
+    src: koupelnaVana,
+    alt: 'Koupelna v podkroví s prostornou vanou, umyvadlem, dřevěnou stoličkou a oknem pod šikmým stropem',
+    skupina: 'interier',
+    popisek: 'Koupelna s vanou',
+  },
+  {
+    src: koupelnaSprcha,
+    alt: 'Koupelna se sprchovým koutem obloženým velkými dlaždicemi v mramorovém vzoru, s umyvadlem, sušákem na ručníky a oknem',
+    skupina: 'interier',
+    popisek: 'Koupelna se sprchou',
   },
   {
     src: sauna,
@@ -437,6 +542,12 @@ export const FOTKY: Fotka[] = [
     alt: 'Venkovní finská sauna jako samostatný dřevěný domek u lesního jezírka, obklopený vzrostlými stromy',
     skupina: 'wellness',
     popisek: 'Sauna u jezírka',
+  },
+  {
+    src: saunaShora,
+    alt: 'Venkovní sauna se zelenou střechou shora, k ní vedou dřevěné schody kolem kvetoucí skalky',
+    skupina: 'wellness',
+    popisek: 'Sauna shora',
   },
   {
     src: virivkaShora,

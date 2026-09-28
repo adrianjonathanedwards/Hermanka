@@ -394,6 +394,10 @@ give each a distance or drop it.
 
 ### 5.10 Video
 
+> **Update, September 2026:** replaced by a new video, `iQHyvmK9ld0`. The original
+> below is kept on /galerie only, next to the new one. See `VIDEO` in
+> `src/data/site.ts`.
+
 YouTube `-U_w_kwtzjI`, titled `Chalupa Heřmanka`. **KEEP** the video, **REWRITE** the
 embed   facade pattern only. Note the old `/video/` route currently **404s** while
 still being linked from the main nav on every page.

@@ -381,6 +381,91 @@ function setUpLightbox(): void {
 }
 
 /* ==========================================================================
+   Video lightbox
+
+   Plays a YouTube video in the on-site overlay from VideoLightbox.astro
+   instead of letting the click navigate away. Every trigger is a real
+   <a href="https://www.youtube.com/watch?v=…" target="_blank">   this only
+   intercepts the click, and only once this file is actually running.
+   ========================================================================== */
+
+function setUpVideoLightbox(): void {
+  const dialog = document.querySelector<HTMLDialogElement>('#video-lightbox');
+  const triggers = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-video-id]'));
+  if (!dialog || triggers.length === 0 || typeof dialog.showModal !== 'function') return;
+
+  const frame = dialog.querySelector<HTMLDivElement>('.video-lightbox-frame');
+  if (!frame) return;
+
+  triggers.forEach((trigger) => {
+    const id = trigger.dataset.videoId;
+    if (!id) return;
+
+    /*
+     * The "opens in a new window" warning baked into the markup is only true
+     * for the no-JS fallback link. With this handler live, a click opens a
+     * modal in THIS window instead, so telling a screen reader otherwise
+     * would be wrong   the warning comes off here, not in the markup, so a
+     * failed chunk or scripting-off visitor still gets the accurate one.
+     */
+    const novoOkno = trigger.querySelector<HTMLElement>('[data-video-novo-okno]');
+    if (novoOkno) novoOkno.textContent = '';
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      /*
+       * YouTube's embed paints solid black until its own player has booted,
+       * which on a slow connection is not instant   the CSS spinner covers
+       * that gap. `load` is the only signal available for a cross-origin
+       * frame; it fires once the embed document itself is up, not once the
+       * video is actually buffered, but that is as close as this page is
+       * ever allowed to look. `aria-busy` carries the same state for anyone
+       * not looking at the spinner.
+       */
+      const spinner = document.createElement('div');
+      spinner.className = 'video-lightbox-spinner';
+      spinner.setAttribute('aria-hidden', 'true');
+
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+      iframe.title = trigger.querySelector('img')?.alt || 'Video';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture; clipboard-write; web-share';
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.addEventListener('load', () => {
+        spinner.remove();
+        dialog.removeAttribute('aria-busy');
+      });
+
+      /* Replaces whatever the previous trigger left behind, if any. */
+      frame.replaceChildren(spinner, iframe);
+      dialog.setAttribute('aria-busy', 'true');
+
+      dialog.showModal();
+    });
+  });
+
+  dialog.querySelector('.video-lightbox-close')?.addEventListener('click', () => dialog.close());
+
+  /* A click on the dialog box itself, i.e. outside the frame, is the backdrop. */
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  /*
+   * Removing the <iframe> rather than just hiding the dialog is the only way
+   * to actually stop playback   there is no API to pause a cross-origin
+   * embed from the parent page, and a video still playing behind a closed
+   * dialog would keep downloading and keep making sound.
+   */
+  dialog.addEventListener('close', () => {
+    frame.replaceChildren();
+    dialog.removeAttribute('aria-busy');
+  });
+}
+
+/* ==========================================================================
    Gallery filmstrips
 
    /galerie lays each group out as a native horizontal scroller with CSS scroll
@@ -648,6 +733,7 @@ function boot(): void {
 
   setUpMobileNav();
   setUpLightbox();
+  setUpVideoLightbox();
   /* Outside the reduced-motion branch for the same reason as the hero controls:
      the arrows must work either way, they simply do not glide. */
   setUpGalerieStrips();

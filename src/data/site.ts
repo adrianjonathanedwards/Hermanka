@@ -37,6 +37,40 @@ export const SITE = {
 export const mapyUrl = `https://mapy.com/zakladni?q=${SITE.gps.lat}%2C${SITE.gps.lon}`;
 
 /**
+ * The cottage on YouTube. Every "Přehrát video" on the site opens `aktualni`;
+ * `dalsi`, `treti` and `puvodni` are shown on /galerie only, beside it.
+ *
+ * LINKS, NEVER EMBEDS   same as the map above. tools/headers.mjs ships
+ * `frame-src 'none'`, so an iframe would not even render, and the reasons it
+ * is set that way are in docs/03-tech.md "Video".
+ */
+export const VIDEO = {
+  /** "Chalupa Heřmanka | Chalupa k pronájmu pod Kralickým Sněžníkem", September 2026. */
+  aktualni: 'iQHyvmK9ld0',
+  /** "Chalupa Heřmanka 🌲 Heřmanice u Králík, Orlické hory", September 2026,
+      same channel. A walk through the rooms rather than a captioned promo. */
+  dalsi: 'Pwx0PrVQfWI',
+  /** "Heřmanka", September 2026, same channel again   a third, shorter cut,
+      largely the same footage as `dalsi` (the mezonetová ložnice with its
+      ladder and balcony door recurs in both). Kept as its own tile rather
+      than folded into `dalsi`: the client supplied it separately and it is
+      not our call to decide one of the two is redundant. */
+  treti: '4H2-jrfoPjE',
+  /** "Chalupa Heřmanka", the 2019 site's video. */
+  puvodni: '-U_w_kwtzjI',
+} as const;
+
+export const videoUrl = (id: string) => `https://www.youtube.com/watch?v=${id}&autoplay=1`;
+
+/**
+ * The 360° walkthrough: a separate Pannellum site, 33 panoramas. Linked and
+ * opened in a new window, not framed   for the same `frame-src 'none'`, and
+ * because a panorama viewer wants the whole screen and its own full-screen
+ * button, not a box inside a section.
+ */
+export const PROHLIDKA_URL = 'https://prohlidka-hermanka.netlify.app/';
+
+/**
  * The inquiry form posts straight to Web3Forms   https://web3forms.com   rather
  * than the Cloudflare Worker described in worker/README.md and docs/03-tech.md
  * §2. Web3Forms accepts a plain `<form method="POST">` submission and performs

@@ -56,9 +56,40 @@
  */
 import { Image } from 'astro:assets';
 import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
+import koupelnaSprcha from '@img/DSC02448.webp';
+import koupelnaVana from '@img/DSC02376.webp';
 import IconLucide from '../../IconLucide.astro';
 import RoofDivider from '../../decor/RoofDivider.astro';
 import { SOCIALNI_ZARIZENI, VYBAVENI } from '../../../data/vybaveni';
+
+/*
+ * One photograph per bathroom card, in SOCIALNI_ZARIZENI's order (1. NP, then
+ * 2. NP), matched by index exactly as the shower/bath icons below are. Both
+ * came with the September 2026 shoot; until then the only bathroom photograph
+ * the site had was the 2019 tub, and the ground floor shower had none.
+ *
+ * `width`/`height` are each file's OWN ratio, so astro:assets resizes without
+ * cropping; the 4:3 crop is CSS (`.zarizeni-foto`). That split is on purpose:
+ * the shower frame is portrait, and the part worth keeping (window, basin,
+ * towel rail) sits above its middle. Astro's server-side crop only takes
+ * keyword positions, so `pozice` has to be an object-position instead.
+ */
+const ZARIZENI_FOTKY = [
+  {
+    src: koupelnaSprcha,
+    alt: 'Koupelna se sprchovým koutem obloženým velkými dlaždicemi v mramorovém vzoru, s umyvadlem, žebříkovým topením a oknem',
+    width: 450,
+    height: 800,
+    pozice: 'center 40%',
+  },
+  {
+    src: koupelnaVana,
+    alt: 'Koupelna v podkroví s prostornou vanou, umyvadlem, dřevěnou stoličkou a oknem pod šikmým stropem',
+    width: 800,
+    height: 450,
+    pozice: '80% center',
+  },
+];
 ---
 
 <section id="vybaveni" class="vybaveni" aria-labelledby="vybaveni-nadpis">
@@ -126,6 +157,19 @@ import { SOCIALNI_ZARIZENI, VYBAVENI } from '../../../data/vybaveni';
       {
         SOCIALNI_ZARIZENI.map((z, i) => (
           <li class="card zarizeni-karta">
+            <Image
+              src={ZARIZENI_FOTKY[i].src}
+              alt={ZARIZENI_FOTKY[i].alt}
+              widths={[400, 600, 800]}
+              sizes="(min-width: 40rem) 24rem, 100vw"
+              width={ZARIZENI_FOTKY[i].width}
+              height={ZARIZENI_FOTKY[i].height}
+              format="webp"
+              quality={62}
+              loading="lazy"
+              class="zarizeni-foto"
+              style={`object-position: ${ZARIZENI_FOTKY[i].pozice}`}
+            />
             <p class="zarizeni-patro">
               <IconLucide
                 name={i === 0 ? 'shower-head' : 'bath'}
@@ -333,6 +377,22 @@ import { SOCIALNI_ZARIZENI, VYBAVENI } from '../../../data/vybaveni';
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.5rem;
     }
+  }
+
+  /*
+   * Full bleed to the card's own edge: the negative margins cancel `.card`'s
+   * 1.5rem / 1.25rem padding (global.css), and the top corners follow its
+   * radius so the photograph does not poke square corners out of a rounded box.
+   */
+  .zarizeni-foto {
+    display: block;
+    width: calc(100% + 2.5rem);
+    max-width: none;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    margin: -1.5rem -1.25rem 1.25rem;
+    object-fit: cover;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   }
 
   .zarizeni-patro {

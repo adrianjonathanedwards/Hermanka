@@ -1133,6 +1133,122 @@
   .lightbox-next {
     right: 0.75rem;
   }
+
+  /* ------------------------------------------------------------------------
+     Video lightbox
+
+     Same primitive, same open/close animation as the photo lightbox above
+     (`lightbox-in`, `fade-in`), for one screen: a 16:9 frame with nothing in
+     it until src/scripts/motion.ts builds the <iframe>. See
+     src/components/VideoLightbox.astro for why there is no <iframe> here.
+     ------------------------------------------------------------------------ */
+  .video-lightbox {
+    /*
+     * The third length in this min() is the width at which a 16:9 box is
+     * exactly 92vh tall (height = width × 9⁄16, solved for width). Without
+     * it, a short landscape viewport would have nothing to shrink the frame
+     * by   the frame's height follows its width via `aspect-ratio` alone   and
+     * the dialog would run off the top and bottom of the screen instead of
+     * shrinking to fit, the one thing docs/02-design-system.md's "never let
+     * content get stuck" rule cares about for a dialog too.
+     */
+    width: min(92vw, 64rem, calc(92vh * 16 / 9));
+    max-width: none;
+    /* Explicit, not inherited from the UA sheet   see the same note on
+       .lightbox above. Without it this pins to the top-left corner instead of
+       centring, which was caught in review by a backdrop click that could no
+       longer reach the backdrop: the dialog WAS the backdrop's whole area. */
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-lg);
+    background-color: #0d1611;
+    overflow: hidden;
+  }
+
+  .video-lightbox::backdrop {
+    background-color: rgb(22 36 28 / 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .video-lightbox[open] {
+      animation-name: lightbox-in;
+      animation-duration: 280ms;
+      animation-timing-function: var(--ease-emphasized);
+    }
+
+    .video-lightbox[open]::backdrop {
+      animation-name: fade-in;
+      animation-duration: 280ms;
+      animation-timing-function: var(--ease-out);
+    }
+  }
+
+  .video-lightbox-frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+  }
+
+  .video-lightbox-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /*
+   * Covers the frame while YouTube's own embed boots   it paints solid black
+   * until then, which on a slow connection is indistinguishable from a
+   * broken video. src/scripts/motion.ts removes this node once the <iframe>
+   * fires `load`; it is a sibling of the <iframe>, not a child, so it stays
+   * on top without a z-index fight   an unpositioned, in-flow <iframe> always
+   * paints under a positioned sibling regardless of which one is later in
+   * the document.
+   */
+  .video-lightbox-spinner {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  .video-lightbox-spinner::after {
+    content: '';
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 3px solid rgb(251 250 248 / 0.2);
+    /* Brass, not stone   the one moving mark on the page should read as
+       "working", and brass is this site's only accent colour (§1.2). */
+    border-top-color: var(--color-mosaz-svetla);
+    border-radius: var(--radius-pill);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .video-lightbox-spinner::after {
+      animation: video-spin 0.85s linear infinite;
+    }
+  }
+
+  @keyframes video-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .video-lightbox-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 2;
+    width: 2.75rem;
+    height: 2.75rem;
+    background-color: rgb(22 36 28 / 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 
 /*

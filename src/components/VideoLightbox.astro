@@ -1,0 +1,42 @@
+---
+/**
+ * Video lightbox: plays a YouTube video in an on-site overlay instead of
+ * sending the guest to youtube.com.
+ *
+ * Same primitive as Lightbox.astro, for the same reasons: a native <dialog>
+ * gives the top layer, the focus trap, the inert background, Escape-to-close
+ * and the `::backdrop` for free, so this file only has to wire the trigger.
+ *
+ * ⚠ NO <iframe> UNTIL SOMEONE ASKS FOR ONE. `.video-lightbox-frame` starts
+ * empty; src/scripts/motion.ts builds the <iframe> only inside the click
+ * handler on a "Přehrát" trigger, and empties the container again on close.
+ * That is what keeps this a zero-cost addition for the visitor who never
+ * plays a video: nothing YouTube-shaped exists in the DOM at load, so
+ * Lighthouse never sees it and "Third-party bytes above the fold: 0"
+ * (docs/03-tech.md §5) still holds. Removing the <iframe> on close, rather
+ * than just hiding it, is also the only way to actually stop playback   a
+ * cross-origin embed cannot be paused from the parent page.
+ *
+ * A YouTube embed paints solid black until its own player has booted, and on
+ * a slow connection that gap is long enough to look broken rather than
+ * loading. motion.ts drops a spinner into the frame alongside the <iframe>
+ * and removes it again once the <iframe> fires `load`   the only signal a
+ * cross-origin frame gives the parent page. See `.video-lightbox-spinner` in
+ * global.css.
+ *
+ * Every trigger this opens is still a real <a href="https://www.youtube.com/
+ * watch?v=…" target="_blank">, so with JavaScript off a click still leaves
+ * the site and opens the real YouTube page. See docs/03-tech.md "Video" for
+ * the full argument and what changed.
+ */
+import Icon from './Icon.astro';
+---
+
+<dialog id="video-lightbox" class="video-lightbox" aria-label="Přehrávač videa">
+  <button type="button" class="icon-btn video-lightbox-close" aria-label="Zavřít">
+    <Icon name="zavrit" size={20} strokeWidth={1.7} />
+  </button>
+
+  {/* Filled with an <iframe> by src/scripts/motion.ts; see the note above. */}
+  <div class="video-lightbox-frame"></div>
+</dialog>

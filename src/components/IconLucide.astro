@@ -114,6 +114,10 @@ import circleAlert from 'lucide-static/icons/circle-alert.svg?raw';
 import shieldCheck from 'lucide-static/icons/shield-check.svg?raw';
 import thermometerSun from 'lucide-static/icons/thermometer-sun.svg?raw';
 import ruler from 'lucide-static/icons/ruler.svg?raw';
+/* The 360° walkthrough (PROHLIDKA_URL in src/data/site.ts): a cube with an
+   arrow orbiting it, which is the one mark people already read as "look
+   around", where a play triangle would promise a video. */
+import rotate3d from 'lucide-static/icons/rotate-3d.svg?raw';
 
 export type LucideName =
   // The homepage facts strip.
@@ -172,6 +176,8 @@ export type LucideName =
   | 'ban'
   | 'key'
   | 'ruler'
+  // Media.
+  | 'rotate-3d'
   // Interface.
   | 'info'
   | 'circle-check'
@@ -230,6 +236,7 @@ const SOURCES: Record<LucideName, string> = {
   ban,
   key,
   ruler,
+  'rotate-3d': rotate3d,
   info,
   'circle-check': circleCheck,
   'circle-alert': circleAlert,

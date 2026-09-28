@@ -32,6 +32,7 @@ import { Image, getImage } from 'astro:assets';
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+import GalerieVidea from '../components/pages/galerie/GalerieVidea.astro';
 import { SKUPINY, fotkySkupiny, placeholderySkupiny } from '../data/galerie';
 
 /*
@@ -88,7 +89,13 @@ function getVelkaFotka(fotka: any): string {
       const placeholdery = placeholderySkupiny(skupina.klic);
       const isBento = skupina.rozvrzeni === 'bento';
 
+      /*
+       * The videos and the walkthrough go after the last group about the
+       * cottage itself and before `Okolí`, which is about everything else.
+       * Why that band is dark is in GalerieVidea.astro's header.
+       */
       return (
+        <>
         <section
           class="section galerie"
           aria-labelledby={`galerie-${skupina.klic}`}
@@ -193,6 +200,8 @@ function getVelkaFotka(fotka: any): string {
             )}
           </div>
         </section>
+        {skupina.klic === 'wellness' && <GalerieVidea />}
+        </>
       );
     })
   }

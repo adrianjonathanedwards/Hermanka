@@ -2,13 +2,13 @@
 /**
  * Gallery teaser + video.
  *
- * NO YouTube iframe anywhere   not on load and not on click. The poster is a
- * plain image inside a link that opens the video on YouTube in a new tab. A
- * single embed is roughly 500 kB and several third-party connections, five times
- * this page's whole budget, for a video most visitors never play
- * (docs/03-tech.md §5). Opening YouTube properly also gives the guest the real
- * player   captions, quality, full screen, watch later   instead of a stripped
- * one bolted into a section that is not about video.
+ * NO YouTube iframe on load, and none until the video is actually clicked.
+ * The poster is a plain image inside a link to the real YouTube URL; with
+ * JavaScript, src/scripts/motion.ts intercepts the click and opens the video
+ * in the on-site overlay (src/components/VideoLightbox.astro) instead of
+ * following it. Without JavaScript, the link is the fallback, not a
+ * consolation prize   it goes to the real YouTube page exactly as before.
+ * Full argument in docs/03-tech.md "Video".
  *
  * The bento: the flat strip of six squares became a grid with a 2 �  2 opener, so
  * the room the cottage is actually let for gets the tile it deserves rather than
@@ -20,11 +20,13 @@ import { Image, getImage } from 'astro:assets';
 import obyvak from '@img/DSC_4579-scaled-1-1.jpg';
 import jidelna from '@img/DSC_5123-scaled-1-1.jpg';
 import virivka from '@img/DSC_4684-scaled-1.jpg';
-import houpacky from '@img/DSC_5166-scaled-1-1.jpg';
+import chalupaLetecky from '@img/DJI_0018.webp';
 import sauna from '@img/DSC_5204.webp';
 import terasa from '@img/DSC_5192.webp';
+import obyvakCely from '@img/DSC02462.webp';
 
 import Icon from '../Icon.astro';
+import { VIDEO, videoUrl } from '../../data/site';
 
 /**
  * UPDATE: a second batch of photographs arrived (see src/data/galerie.ts), so
@@ -33,12 +35,17 @@ import Icon from '../Icon.astro';
  * curious guest on to `/galerie` for the rest is the point of a teaser, not a
  * limitation of the asset set any more. `terasa` is the new, much larger
  * DSC_5192.webp; the old zastrwsena-veranda-krb-14e3-.jpeg is retired.
+ *
+ * UPDATE (September 2026 shoot): the swing set (`DSC_5166`, the darkest and
+ * least legible of the six) gave its tile to the drone's three-quarter view
+ * of the whole plot. Until then the teaser had rooms, a terrace, a sauna and
+ * a hot tub, and no picture of the house they belong to.
  */
 const fotky = [
   { src: obyvak, alt: 'Obývací pokoj s krbem a dlouhým jídelním stolem pod dřevěným trámovým stropem' },
   { src: jidelna, alt: 'Jídelní stůl se sušenou kyticí, v pozadí zelená kožená sedačka a okna do zahrady' },
   { src: virivka, alt: 'Dřevěná vířivka na terase obklopená lesem' },
-  { src: houpacky, alt: 'Dřevěná houpačka se dvěma sedátky a zelenou skluzavkou na zatravněné zahradě' },
+  { src: chalupaLetecky, alt: 'Letecký pohled na chalupu Heřmanka uprostřed lesa, se zahradou, dětskou věží se skluzavkou a saunou se zelenou střechou' },
   { src: sauna, alt: 'Otevřené dveře do venkovní finské sauny s dřevěnými lavicemi' },
   { src: terasa, alt: 'Krytá terasa s venkovním zděným krbem a skleněným stolem pro celou skupinu' },
 ];
@@ -59,8 +66,6 @@ const velke = await Promise.all(
     getImage({ src: f.src, width: 1600, format: 'webp', quality: 72, layout: 'none' }),
   ),
 );
-
-const VIDEO_ID = '-U_w_kwtzjI';
 ---
 
 <section class="section galerie" aria-labelledby="galerie-nadpis">
@@ -123,31 +128,31 @@ const VIDEO_ID = '-U_w_kwtzjI';
       </div>
 
       {/*
-        No iframe   not on load, and no longer on click either. The poster is a
-        plain lazy image inside a link that opens the video on YouTube in a new
-        tab, which is what the client asked for and is strictly better here: the
-        third-party weight stays at zero (an embed is ~500 kB and several extra
-        connections, five times this whole page's budget   docs/03-tech.md §5),
-        and it needs no JavaScript, so it works with scripting off.
+        No iframe on load; `data-video-id` is what src/scripts/motion.ts looks
+        for to open the on-site overlay on click instead of following the
+        link. Without JavaScript the href is the real YouTube URL and the
+        click leaves the site exactly as it always did.
 
-        The link's accessible name is the poster's alt plus the visible label,
-        with the new-window warning appended for screen readers.
+        The link's accessible name is the poster's alt plus the visible label.
       */}
       <a
         class="video-frame photo-frame"
-        href={`https://www.youtube.com/watch?v=${VIDEO_ID}&autoplay=1`}
+        href={videoUrl(VIDEO.aktualni)}
         target="_blank"
         rel="noopener noreferrer"
+        data-video-id={VIDEO.aktualni}
         data-reveal="up"
         data-reveal-delay="80"
       >
+        {/* Poster: the living room the new video opens on, and not the same
+            frame as the bento's opener a few centimetres above it. */}
         <Image
-          src={obyvak}
+          src={obyvakCely}
           alt="Náhled videa o chalupě Heřmanka"
           widths={[420, 640, 900]}
           sizes="(min-width: 64rem) 42vw, 100vw"
           width={1920}
-          height={1282}
+          height={1080}
           format="webp"
           layout="none"
           quality={70}
@@ -158,8 +163,9 @@ const VIDEO_ID = '-U_w_kwtzjI';
             <Icon name="prehrat" size={24} strokeWidth={1.5} />
           </span>
           <span>
-            Přehrát video
-            <span class="sr-only"> na YouTube (otevře se v novém okně)</span>
+            Přehrát
+            <span class="sr-only"> video na YouTube</span>
+            <span class="sr-only" data-video-novo-okno> (otevře se v novém okně)</span>
           </span>
         </span>
       </a>

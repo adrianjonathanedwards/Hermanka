@@ -259,27 +259,78 @@ map, not a review widget, not a chat bubble.
 
 ### Video
 
-**No YouTube iframe at all**   not on page load, and not injected on click
-either. A single embed is roughly 500 kB and several third-party connections,
-five times the entire page budget, for a video most visitors will not play.
+**No YouTube iframe on load, ever.** A poster image (WebP, lazy, correct
+dimensions) inside an `<a href="https://www.youtube.com/watch?v=…&autoplay=1"
+target="_blank" rel="noopener noreferrer">` with a play button drawn over it,
+same as always. Third-party weight stays at zero for every visitor who never
+clicks it, and it needs no JavaScript, so with scripting off the click leaves
+the site and opens the real YouTube page   full player, captions, quality,
+full screen. That fallback is load-bearing, not a consolation prize: it is
+what makes the enhancement below safe to ship.
 
-**Link out instead.** A poster image (WebP, lazy, correct dimensions) inside an
-`<a href="https://www.youtube.com/watch?v=…&autoplay=1" target="_blank"
-rel="noopener noreferrer">` with a play button drawn over it. Third-party weight
-stays at zero, it needs no JavaScript so it works with scripting off, and the
-guest gets the real player   captions, quality, full screen   rather than a
-stripped one bolted into a section that is not about video.
+> **Update, September 2026.** An earlier pass here read "No YouTube iframe at
+> all — not on page load, and not injected on click either," and rejected the
+> click-to-embed facade outright: "If a future page genuinely needs inline
+> playback, that is the point to revisit it — not before." The client asked
+> for exactly that, on a page with five things to watch, and this is that
+> revisit.
 
-The facade pattern (inject the iframe on click) was built and then removed: it
-carried the embed's full cost the moment anyone pressed play, needed JavaScript
-to work at all, and gave a worse player than the one a tap already opens on a
-phone. If a future page genuinely needs inline playback, that is the point to
-revisit it   not before.
+**With JavaScript, the click opens the video in an on-site overlay instead of
+leaving the page.** `data-video-id` on the trigger is what
+`src/scripts/motion.ts` (`setUpVideoLightbox`) looks for; the `<iframe>` is
+built only inside the click handler, pointed at `www.youtube-nocookie.com`,
+and the `<dialog>` it renders into
+([`VideoLightbox.astro`](../src/components/VideoLightbox.astro)) starts empty
+and stays that way for anyone who never plays anything. Closing the dialog
+removes the `<iframe>` rather than hiding it   the only way to actually stop
+playback, since a cross-origin embed cannot be paused from the parent page.
 
-Accessibility: the link's name must carry both the poster's `alt` and the visible
-label, with the new-window warning appended for screen readers.
+This needed two changes to `tools/headers.mjs`'s CSP: `frame-src` now names
+`https://www.youtube-nocookie.com` instead of `'none'`, and
+`Permissions-Policy`'s `autoplay` and `encrypted-media` carry that same one
+origin instead of being denied outright. Everything else in both policies is
+unchanged, and every other page still ships zero third-party bytes.
 
-Video `-U_w_kwtzjI`; see [01-content.md](01-content.md) §5.10.
+**What this costs, honestly:**
+
+- **Performance.** Zero, until someone presses play. The `<iframe>` does not
+  exist in the DOM at load, so Lighthouse never measures it and "Third-party
+  bytes above the fold: 0" (§5) still holds exactly as before. The embed's own
+  weight (still roughly 500 kB, several requests to Google's video CDN) lands
+  only on the person who just asked to watch a video   the same person who,
+  under the old design, was about to spend far more than that loading YouTube
+  itself in a new tab. A courteous best-effort touch, `rel="preconnect"` to
+  the nocookie origin, was considered and left out: it would run on every page
+  load for a feature most visitors never use, which is the exact trade this
+  design otherwise refuses to make.
+- **SEO.** No measured downside. Core Web Vitals   what search ranking actually
+  reads   are unaffected for the same reason performance is unaffected: nothing
+  loads until a click. If the client ever wants video rich results in search,
+  that needs `VideoObject` structured data pointing at the YouTube URLs, which
+  is independent of whether the video is embedded or linked and is not done
+  here.
+- **Privacy.** The real cost. `-nocookie` delays Google's tracking until
+  playback starts, it does not remove it   pressing play inside the overlay
+  reaches Google's video CDN exactly as visiting youtube.com would. The old
+  link-out design kept that entirely off this origin's own compliance surface;
+  this design puts a "play" button that starts it on our own page. If the
+  client's Czech-market cookie-consent posture (already a live question for
+  GTM, §5's warning above) tightens, an embed that fires before consent is the
+  first thing to reconsider   not performance, which is fine.
+
+Accessibility: the link's accessible name carries the poster's `alt`, the
+visible label, and a distinguishing word for pages with more than one video
+trigger (see /galerie below). The "opens in a new window" warning is only true
+for the no-JS fallback, so it lives in its own `[data-video-novo-okno]` span
+that `setUpVideoLightbox` empties once the overlay is actually wired   telling
+a screen reader a modal is a new window would be wrong.
+
+Video IDs live in `VIDEO` in `src/data/site.ts`: `iQHyvmK9ld0` (September 2026)
+everywhere, and two further 2026 videos (`Pwx0PrVQfWI`, `4H2-jrfoPjE`) plus the
+original `-U_w_kwtzjI` only beside it in /galerie's video section. The 360°
+walkthrough (`PROHLIDKA_URL`, same file) is NOT one of these: it is a
+33-panorama site of its own, not a video, and stays a plain link to a new
+window   a panorama viewer wants the whole screen, not a box inside this one.
 
 ---
 
