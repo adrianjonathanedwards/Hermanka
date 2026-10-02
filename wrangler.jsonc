@@ -3,6 +3,10 @@
   "compatibility_date": "2026-09-17",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    // Workers assets default to "auto-trailing-slash": /ubytovani -> /ubytovani/.
+    // public/_redirects (written for Pages) sends /ubytovani/ back to /ubytovani,
+    // so every subpage looped. The site is trailingSlash: 'never'; match it.
+    "html_handling": "drop-trailing-slash"
   }
 }
