@@ -4,12 +4,14 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-09-17",
 
-  // Also served from its own workers.dev address, which is what the GitHub Pages
-  // preview calls (PUBLIC_AVAILABILITY_URL). The route below makes production call
-  // the site's own hostname, so the CSP's connect-src 'self' needs no change.
-  // Needs this Worker and the chalupahermanka.cz zone in the SAME Cloudflare
-  // account, or `wrangler deploy` fails on the route.
-  "routes": [{ "pattern": "www.chalupahermanka.cz/api/availability", "zone_name": "chalupahermanka.cz" }],
+  // Served from its own workers.dev address. Both the GitHub Pages preview and
+  // production call it there cross-origin (PUBLIC_AVAILABILITY_URL, set as a build
+  // variable on the site; the Worker sends CORS *, and tools/headers.mjs adds the
+  // origin to the CSP's connect-src).
+  //
+  // Do NOT add a `routes` entry for www.chalupahermanka.cz/api/availability unless
+  // this Worker is deployed in the same Cloudflare account as that zone. It is not:
+  // `wrangler deploy` here would fail on the route.
 
   // No `id`: Wrangler creates the namespace on the first `wrangler deploy` and
   // simulates it locally under `wrangler dev`.

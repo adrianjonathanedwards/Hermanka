@@ -122,6 +122,17 @@ inquiry Worker is not, because the form posts to Web3Forms for now. Secrets
 (`E_CHALUPY_ICAL_URL`; and `RESEND_API_KEY`, `INQUIRY_TO`, `INQUIRY_FROM` if the inquiry
 Worker is ever built) are set with `wrangler secret put` and never committed.
 
+**Production calendar:** the availability Worker lives in a different Cloudflare account
+than the chalupahermanka.cz zone, so it cannot be routed onto the site's own hostname.
+Production calls it at its workers.dev address instead, exactly like the preview. This
+needs one **build variable** on the `hermanka` Worker (Workers & Pages → hermanka →
+Settings → Build → Variables and secrets):
+
+`PUBLIC_AVAILABILITY_URL` = `https://hermanka-availability.squareshare.workers.dev/api/availability`
+
+It is public, not a secret. [`tools/headers.mjs`](tools/headers.mjs) reads it to allow
+that origin in the CSP, so without it the calendar shows no booked dates.
+
 `npm test` runs the unit tests for the availability rules and the Worker.
 
 ---

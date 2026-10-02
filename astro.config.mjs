@@ -97,10 +97,10 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     /*
-     * Dev server only: in production `/api/availability` is a route on the same
-     * hostname handled by the Worker in worker/availability/ (same origin, so the
-     * CSP's `connect-src 'self'` covers it). Locally, run `npm run dev` in that
-     * directory and this forwards to it.
+     * Dev server only. Production and the preview call the Worker in
+     * worker/availability/ at its workers.dev address via PUBLIC_AVAILABILITY_URL
+     * (see README). Locally, run `npm run dev` in that directory and this forwards
+     * `/api` to it.
      */
     server: {
       proxy: { '/api': process.env.AVAILABILITY_DEV_ORIGIN || 'http://127.0.0.1:8787' },
