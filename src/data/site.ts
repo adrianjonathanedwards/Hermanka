@@ -88,7 +88,7 @@ export const POPTAVKA_ENDPOINT = 'https://api.web3forms.com/submit';
  * only authorises a form to submit, not to read anything back), so it is safe
  * here alongside the other public site constants.
  */
-export const WEB3FORMS_ACCESS_KEY = 'a9d14851-597f-4e30-82fa-57f01dff3801';
+export const WEB3FORMS_ACCESS_KEY = '2b09e556-3852-47d9-861e-62f1719b728d';
 
 /** Primary navigation. Used by both the header and the footer. */
 export const NAV = [
