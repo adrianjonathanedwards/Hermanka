@@ -24,7 +24,7 @@ export const SITE = {
   telefon: '+420 603 285 524',
   telHref: '+420603285524',
 
-  email: 'nemeh@seznam.cz' as string | null,
+  email: 'info@chalupahermanka.cz' as string | null,
 
   gps: {
     label: '50.13088N, 16.75827E',
