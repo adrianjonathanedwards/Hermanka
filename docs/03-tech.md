@@ -257,6 +257,32 @@ map, not a review widget, not a chat bubble.
 > plus Google Analytics on a Czech site brings a cookie-consent obligation the
 > current site does not appear to honour.
 
+> **Decision, November 2026: GTM stays.** The client asked for the container
+> back, in `<head>` and `<body>` as Google ships it, to measure paid traffic.
+> It now loads on every page of production builds (`GTM_ID` in
+> `src/data/site.ts`, emitted by `BaseLayout.astro`), and never in `npm run dev`
+> or the GitHub Pages preview. As configured in GTM at the time, the container
+> runs GA4 (`G-VDZR5DT9HY`), the Meta Pixel and Smartlook session recording.
+>
+> What that changes here:
+>
+> - **The budget above no longer holds for third parties.** "Third-party bytes
+>   above the fold: 0" and "JavaScript on static pages: 0 kB" describe the
+>   site's own code, which is unchanged. GTM and its tags add several hundred
+>   kB of third-party JavaScript on top, loaded async, so they do not block
+>   first paint. Measure Lighthouse with that in mind; a regression from the
+>   tags is the client's trade, not a bug in the site.
+> - **The CSP has a second mode.** The Pixel and Smartlook are Custom HTML tags,
+>   which GTM injects as inline scripts, so while GTM is on `script-src` carries
+>   `'unsafe-inline'` instead of hashes, plus an allowlist of tag vendors.
+>   `tools/headers.mjs` explains why, and `TAG_VENDORS` there is the list. **A tag
+>   for a new vendor will be blocked until its origins are added there.**
+> - **Consent is still open.** Nothing on the site asks for cookie consent yet,
+>   and GA4, the Pixel and Smartlook all need it from Czech visitors. The usual
+>   fix is a consent-management tag inside GTM plus Google Consent Mode. That is
+>   for the client to decide, and if the CMP loads its own script, its origins
+>   go in `TAG_VENDORS` too.
+
 ### Video
 
 **No YouTube iframe on load, ever.** A poster image (WebP, lazy, correct

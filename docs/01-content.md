@@ -673,7 +673,9 @@ Collected from the sections above. Nothing here is optional.
 21. Distances for the swimming and skiing lists (§7.2, §7.3)
 22. Nav CTA and submit-button wording (§3.1, §8.2)
 23. IČO and business identification for the footer (§3.3)
-24. Whether to keep Google Tag Manager at all (see [03-tech.md](03-tech.md))
+24. ~~Whether to keep Google Tag Manager at all~~ **Answered, November 2026:
+    keep it.** Installed; cookie consent is still open (see
+    [03-tech.md](03-tech.md) §5)
 
 ---
 

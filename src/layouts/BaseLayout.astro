@@ -8,6 +8,7 @@
 import { getLocaleFromUrl, localePath, stripLocale } from '../i18n/utils';
 import { useTranslations } from '../i18n/ui';
 import { HTML_LANG, LIVE_LOCALES } from '../i18n/config';
+import { GTM_ID } from '../data/site';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Lightbox from '../components/Lightbox.astro';
@@ -90,6 +91,25 @@ const websiteSchema = {
   inLanguage: HTML_LANG[locale],
   publisher: { '@id': new URL('/ubytovani', Astro.site).href },
 };
+
+/*
+ * Google Tag Manager (src/data/site.ts GTM_ID). Production builds at the
+ * domain root only: never `npm run dev`, never the GitHub Pages preview
+ * (BASE_PATH set), so neither one pollutes the client's analytics with our
+ * own page views.
+ *
+ * The snippet is Google's standard container snippet, byte for byte apart from
+ * the ID. tools/headers.mjs finds it in the built HTML and switches the CSP to
+ * the policy GTM's tags need. See TAG_VENDORS there.
+ */
+const gtmId = import.meta.env.PROD && import.meta.env.BASE_URL === '/' ? GTM_ID : null;
+const gtmSnippet =
+  gtmId &&
+  `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer',${JSON.stringify(gtmId)});`;
 ---
 
 <!doctype html>
@@ -97,6 +117,13 @@ const websiteSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/*
+      Google Tag Manager, as high in <head> as it can go, per Google. It does not
+      delay the font preloads below: the snippet only queues an async request,
+      and the preload scanner has already seen those <link>s by the time it runs.
+    */}
+    {gtmSnippet && <script is:inline set:html={gtmSnippet} />}
 
     {/*
       Fonts are preloaded before anything else in <head> so the request starts on
@@ -231,6 +258,20 @@ const websiteSchema = {
   </head>
 
   <body>
+    {/* GTM's no-JavaScript fallback, immediately after <body> opens, per Google. */}
+    {
+      gtmId && (
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+          />
+        </noscript>
+      )
+    }
+
     <a href="#obsah" class="skip-link">{t('nav.skipToContent')}</a>
 
     <SiteHeader solid={headerSolid} />

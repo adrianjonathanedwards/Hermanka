@@ -135,6 +135,20 @@ that origin in the CSP, so without it the calendar shows no booked dates.
 
 `npm test` runs the unit tests for the availability rules and the Worker.
 
+### Google Tag Manager
+
+The client's GTM container (`GTM-KN4B4K4`, `GTM_ID` in
+[`src/data/site.ts`](src/data/site.ts)) loads on every page of production builds,
+and never in `npm run dev` or the GitHub Pages preview. GA4, the Meta Pixel and
+Smartlook are configured inside GTM, not in this repo.
+
+**GTM can only load what the CSP allows.** If the client's marketing adds a tag
+for a vendor the site has not used before, it fails silently until that vendor's
+origins are added to `TAG_VENDORS` in [`tools/headers.mjs`](tools/headers.mjs).
+GTM's Preview mode (Tag Assistant) lists the blocks under "Page issues". See
+[docs/03-tech.md](docs/03-tech.md) §5 for what GTM changed, including the open
+cookie-consent question.
+
 ---
 
 ## Directory conventions

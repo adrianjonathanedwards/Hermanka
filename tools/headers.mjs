@@ -15,6 +15,22 @@
  * So the hashes are read back out of the built HTML. They cannot drift, because
  * they are computed from the same bytes Cloudflare will serve.
  *
+ * ⚠ EXCEPT WHILE GOOGLE TAG MANAGER IS ON (src/data/site.ts GTM_ID).
+ * The client's container runs Custom HTML tags (the Meta Pixel, Smartlook), and
+ * GTM injects a Custom HTML tag as an inline <script> at runtime. No hash can
+ * name those: the client's marketing edits them in GTM, never in this repo. They
+ * need 'unsafe-inline', and a browser IGNORES 'unsafe-inline' whenever a hash is
+ * also listed. So while the GTM snippet is in the built HTML, script-src is
+ * 'unsafe-inline' plus an allowlist of tag vendors (TAG_VENDORS below), and no
+ * hashes. Take GTM out and the strict hash policy comes back on its own, because
+ * the switch is read from the built HTML too.
+ *
+ * What still holds in that mode: external scripts load only from the listed
+ * origins, and data can be sent only to the listed origins. What is gone: a
+ * guarantee that no inline script runs that we did not write. That is the
+ * nature of a tag manager, and this site has no user-generated content for an
+ * injection to ride in on, but it is the trade, and it is the client's call.
+ *
  * Cloudflare Pages reads dist/_headers at deploy time; it is not served.
  * Rules apply top to bottom and later matches win for a repeated header name,
  * which is what lets `/_a/*` below override the Cache-Control set on `/*`.
@@ -53,42 +69,145 @@ function inlineScriptHashes(dist) {
   return [...hashes].sort();
 }
 
-function connectSrc() {
+/** Whether any built page loads the Google Tag Manager container. */
+function hasGtm(dist) {
+  return htmlFiles(dist).some((file) =>
+    readFileSync(file, 'utf8').includes('https://www.googletagmanager.com/gtm.js'),
+  );
+}
+
+/*
+ * Every origin Google Tag Manager's tags need, by vendor. Allowed ONLY while
+ * GTM is on (see the note at the top of this file).
+ *
+ * ⚠ GTM IS A DOOR THE CLIENT'S MARKETING CAN OPEN WITHOUT US. A tag for a
+ * vendor that is not listed here fails silently: the container fires, the CSP
+ * blocks the vendor's script or beacon, and nothing shows up in their
+ * dashboard. Adding a vendor in GTM means adding a row here. To find what a new
+ * tag needs, open the site with GTM's Preview mode (Tag Assistant lists CSP
+ * blocks under "Page issues"), or look for "Content Security Policy" errors in
+ * the browser console.
+ *
+ * Google's own lists: https://developers.google.com/tag-platform/security/guides/csp
+ */
+const GOOGLE_TLDS = ['cz', 'sk', 'de', 'at', 'pl'].map((tld) => `https://*.google.${tld}`);
+
+const TAG_VENDORS = {
+  /* GTM itself, and its Preview mode (Tag Assistant), which a marketer opens
+     to debug the container on the live site. */
+  gtm: {
+    script: ['https://www.googletagmanager.com', 'https://tagmanager.google.com'],
+    style: [
+      'https://www.googletagmanager.com',
+      'https://tagmanager.google.com',
+      'https://fonts.googleapis.com',
+    ],
+    img: ['https://www.googletagmanager.com', 'https://ssl.gstatic.com', 'https://www.gstatic.com'],
+    font: ['https://fonts.gstatic.com', 'data:'],
+    connect: ['https://www.googletagmanager.com'],
+    /* The <noscript> fallback in BaseLayout.astro is an iframe on this origin. */
+    frame: ['https://www.googletagmanager.com'],
+  },
+
+  /* GA4 (G-VDZR5DT9HY in the container) with Google signals, plus Google Ads
+     conversions and remarketing, which the same Google tag reaches for as soon
+     as an Ads account is linked. `google.<TLD>` cannot be wildcarded: a visitor
+     gets the Google domain of their own country, so this names the countries
+     the guests come from. Anyone else loses an Ads audience ping, not their
+     page view. */
+  google: {
+    script: ['https://www.googleadservices.com', 'https://www.google.com'],
+    img: [
+      'https://*.google-analytics.com',
+      'https://*.g.doubleclick.net',
+      'https://www.googleadservices.com',
+      'https://pagead2.googlesyndication.com',
+      'https://*.google.com',
+      ...GOOGLE_TLDS,
+    ],
+    connect: [
+      'https://*.google-analytics.com',
+      'https://*.g.doubleclick.net',
+      'https://ad.doubleclick.net',
+      'https://www.googleadservices.com',
+      'https://pagead2.googlesyndication.com',
+      'https://*.google.com',
+      ...GOOGLE_TLDS,
+    ],
+  },
+
+  /* Meta Pixel (a Custom HTML tag in the container). fbevents.js and the
+     pixel's config both load from connect.facebook.net; events go to
+     www.facebook.com/tr as an image or a beacon. */
+  meta: {
+    script: ['https://connect.facebook.net'],
+    img: ['https://www.facebook.com'],
+    connect: ['https://www.facebook.com', 'https://connect.facebook.net'],
+  },
+
+  /* Smartlook session recording (a Custom HTML tag, region "eu"). The recorder
+     and its chunks load from web-sdk.smartlook.com; it sets up through
+     manager.eu.smartlook.cloud, which hands back the upload hosts at runtime,
+     hence the wildcard. */
+  smartlook: {
+    script: ['https://web-sdk.smartlook.com'],
+    connect: ['https://*.smartlook.cloud', 'https://*.smartlook.com'],
+  },
+};
+
+/** Every vendor's origins for one directive, deduplicated. Empty when GTM is off. */
+function tagOrigins(tags, directive) {
+  if (!tags) return [];
+  return [...new Set(Object.values(TAG_VENDORS).flatMap((v) => v[directive] ?? []))];
+}
+
+function availabilityOrigin() {
   try {
     const url = process.env.PUBLIC_AVAILABILITY_URL;
-    return url ? `connect-src 'self' ${new URL(url).origin}` : "connect-src 'self'";
+    return url ? [new URL(url).origin] : [];
   } catch {
-    return "connect-src 'self'";
+    return [];
   }
 }
 
-function policy(scriptHashes) {
+/** One directive: its own sources, then the tag vendors' for it, if GTM is on. */
+const directive = (name, sources, tags, vendorKey = name.replace(/-src$/, '')) =>
+  [name, ...sources, ...tagOrigins(tags, vendorKey)].join(' ');
+
+function policy(scriptHashes, tags) {
   return [
-    /* Nothing loads from anywhere but this origin BY DEFAULT. The one
-       exception is `frame-src` below   a YouTube video, played in an on-site
-       overlay instead of a new tab (docs/03-tech.md "Video"). Nothing else on
-       the site embeds a third party; the map is still a link that opens a new
-       tab, not an embed. */
+    /* Nothing loads from anywhere but this origin BY DEFAULT. The exceptions
+       are `frame-src` below (a YouTube video, played in an on-site overlay
+       instead of a new tab, docs/03-tech.md "Video") and, while GTM is on, the
+       tag vendors in TAG_VENDORS. The map is still a link that opens a new tab,
+       not an embed. */
     "default-src 'self'",
 
-    /* The bundled module is 'self'; the motion gate is named by hash. No
-       'unsafe-inline', no 'unsafe-eval', no CDN. */
-    `script-src 'self' ${scriptHashes.join(' ')}`,
+    /* Without GTM: the bundled module is 'self'; the motion gate is named by
+       hash. No 'unsafe-inline', no 'unsafe-eval', no CDN.
+       With GTM: 'unsafe-inline' and the vendors' origins, and NO hashes, which
+       would switch 'unsafe-inline' off. Still no 'unsafe-eval', which only GTM's
+       Custom JavaScript variables need; they evaluate to undefined without it.
+       See the note at the top of this file. */
+    tags
+      ? directive('script-src', ["'self'", "'unsafe-inline'"], tags)
+      : `script-src 'self' ${scriptHashes.join(' ')}`,
 
     /* Astro emits component styles as real stylesheets, so 'self' covers them.
        'unsafe-inline' is here for the ~36 `style="object-position:..."`
        attributes art-directing photo crops   an inline STYLE cannot execute
        anything, and hashing per-element attributes needs 'unsafe-hashes', which
        is a bigger loosening than this. Revisit if those move into classes. */
-    "style-src 'self' 'unsafe-inline'",
+    directive('style-src', ["'self'", "'unsafe-inline'"], tags),
 
-    "img-src 'self'",
-    "font-src 'self'",
+    directive('img-src', ["'self'"], tags),
+    directive('font-src', ["'self'"], tags),
 
-    /* The only fetch on the site is the availability calendar's GET /api/availability
+    /* The site's own one fetch is the availability calendar's GET /api/availability
        (src/scripts/availability-calendar.ts), on this hostname unless the build sets
-       PUBLIC_AVAILABILITY_URL, in which case that Worker's origin is allowed too. */
-    connectSrc(),
+       PUBLIC_AVAILABILITY_URL, in which case that Worker's origin is allowed too.
+       Everything else here is GTM's tags sending what they measured. */
+    directive('connect-src', ["'self'", ...availabilityOrigin()], tags),
 
     /* The inquiry form POSTs to POPTAVKA_ENDPOINT (src/data/site.ts), which is
        Web3Forms   https://api.web3forms.com/submit. If that is ever repointed
@@ -109,8 +228,11 @@ function policy(scriptHashes) {
      * Google's video CDN happen exactly as they would on youtube.com, outside
      * this CSP's reach because they are inside a cross-origin document with
      * its own headers.
+     *
+     * While GTM is on, TAG_VENDORS adds the GTM <noscript> iframe's origin
+     * (it only ever loads with JavaScript off) and Preview mode's.
      */
-    "frame-src https://www.youtube-nocookie.com",
+    directive('frame-src', ['https://www.youtube-nocookie.com'], tags),
     "frame-ancestors 'none'",
     "object-src 'none'",
 
@@ -145,7 +267,8 @@ export default function headers() {
       'astro:build:done': ({ dir, logger }) => {
         const dist = fileURLToPath(dir);
         const hashes = inlineScriptHashes(dist);
-        const csp = policy(hashes);
+        const tags = hasGtm(dist);
+        const csp = policy(hashes, tags);
 
         const file = `# GENERATED by tools/headers.mjs on every build. Do not edit by hand
 # and do not move to public/ — the CSP script hashes are read back out of the
@@ -187,7 +310,11 @@ ${SECURITY(csp)}
 `;
 
         writeFileSync(path.join(dist, '_headers'), file);
-        logger.info(`_headers written (${hashes.length} inline script hash(es) pinned)`);
+        logger.info(
+          tags
+            ? `_headers written (Google Tag Manager found: tag-vendor policy, ${Object.keys(TAG_VENDORS).join(', ')})`
+            : `_headers written (${hashes.length} inline script hash(es) pinned)`,
+        );
       },
     },
   };

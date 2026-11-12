@@ -90,6 +90,22 @@ export const POPTAVKA_ENDPOINT = 'https://api.web3forms.com/submit';
  */
 export const WEB3FORMS_ACCESS_KEY = '2b09e556-3852-47d9-861e-62f1719b728d';
 
+/**
+ * The client's Google Tag Manager container, the same one the 2019 site loaded.
+ * Everything measured on the site (GA4, the Meta Pixel, Smartlook, and whatever
+ * the client's marketing adds next) is configured inside it, in GTM, not here.
+ *
+ * Emitted only by production builds at the domain root: BaseLayout.astro
+ * leaves it out of `npm run dev` and the GitHub Pages preview, so neither
+ * sends hits to the client's analytics.
+ *
+ * ⚠ GTM can only load what the CSP allows. A tag for a vendor the site has not
+ * seen before fails silently until its origins are added to TAG_VENDORS in
+ * tools/headers.mjs. Set this to null and the site goes back to the strict,
+ * hash-pinned policy on its own.
+ */
+export const GTM_ID: string | null = 'GTM-KN4B4K4';
+
 /** Primary navigation. Used by both the header and the footer. */
 export const NAV = [
   { href: '/ubytovani', label: 'Ubytování' },
