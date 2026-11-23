@@ -138,9 +138,13 @@ that origin in the CSP, so without it the calendar shows no booked dates.
 ### Google Tag Manager
 
 The client's GTM container (`GTM-KN4B4K4`, `GTM_ID` in
-[`src/data/site.ts`](src/data/site.ts)) loads on every page of production builds,
-and never in `npm run dev` or the GitHub Pages preview. GA4, the Meta Pixel and
-Smartlook are configured inside GTM, not in this repo.
+[`src/data/site.ts`](src/data/site.ts)) loads in production builds only, and
+**only after the visitor consents** in the cookie banner
+([`CookieBanner.astro`](src/components/CookieBanner.astro)). Never in
+`npm run dev` or the GitHub Pages preview. GA4, the Meta Pixel and Smartlook are
+configured inside GTM, not in this repo. A new tag there needs a consent check
+and a line on the privacy page (`/ochrana-osobnich-udaju`); see `SOUHLAS` in
+`src/data/site.ts`.
 
 **GTM can only load what the CSP allows.** If the client's marketing adds a tag
 for a vendor the site has not used before, it fails silently until that vendor's

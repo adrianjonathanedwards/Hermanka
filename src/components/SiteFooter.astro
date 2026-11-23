@@ -6,7 +6,7 @@
  * `© 2019`, which is the clearest signal a visitor gets that nobody is minding it.
  */
 import { Image } from 'astro:assets';
-import { NAV, SITE, mapyUrl } from '../data/site';
+import { GTM_ID, NAV, SITE, mapyUrl } from '../data/site';
 import Treeline from './decor/Treeline.astro';
 import Icon from './Icon.astro';
 import logo from '@img/logo3-inv.png';
@@ -99,6 +99,16 @@ const rok = new Date().getFullYear();
 
   <div class="wrap footer-legal">
     <p>© {rok} Chalupa Heřmanka</p>
+    <p class="footer-legal-odkazy">
+      <a href="/ochrana-osobnich-udaju">Ochrana osobních údajů</a>
+      {/* Reopens the cookie banner (CookieBanner.astro). Withdrawing consent
+          has to be as easy as giving it, so this is on every page. */}
+      {GTM_ID && (
+        <button type="button" class="footer-cookies" data-cookie-nastaveni>
+          Nastavení cookies
+        </button>
+      )}
+    </p>
   </div>
 </footer>
 
@@ -263,5 +273,38 @@ const rok = new Date().getFullYear();
 
   .footer-legal p {
     margin: 0;
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .footer-legal-odkazy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .footer-legal a,
+  .footer-cookies {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .footer-cookies {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .footer-legal a:hover,
+  .footer-cookies:hover {
+    color: var(--color-omitka);
   }
 </style>

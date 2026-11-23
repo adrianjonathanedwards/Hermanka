@@ -1,0 +1,229 @@
+---
+/**
+ * /ochrana-osobnich-udaju   Privacy policy (GDPR Art. 13).
+ *
+ * Written to be short and literally true. Every claim here is something the
+ * site actually does; nothing is promised that the owner would have to
+ * remember to do beyond answering e-mail and deleting old inquiries.
+ *
+ * ⚠ KEEP IN STEP WITH THE CODE. If a tag is added to GTM, the form endpoint
+ * changes, or a vendor is dropped, this page changes in the same commit:
+ *   - consent categories and vendors: SOUHLAS in src/data/site.ts and
+ *     src/components/CookieBanner.astro
+ *   - the form processor: POPTAVKA_ENDPOINT in src/data/site.ts
+ *   - the controller's identity: SPRAVCE in src/data/site.ts (TODO(client))
+ *
+ * The dark intro band is there so the transparent site header has a dark
+ * ground to sit on, same as every page with a hero.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE, SPRAVCE } from '../data/site';
+
+const ucinnost = '23. 11. 2026';
+---
+
+<BaseLayout
+  title="Ochrana osobních údajů"
+  description="Jaké osobní údaje Chalupa Heřmanka zpracovává, proč, jak dlouho a jaká máte práva. Měření návštěvnosti a reklam spouštíme jen s vaším souhlasem."
+>
+  <section class="oou-uvod" aria-labelledby="oou-nadpis">
+    <div class="wrap oou-sloupec">
+      <h1 id="oou-nadpis">Ochrana osobních údajů</h1>
+      <p class="oou-lead">
+        Sbíráme jen to, co potřebujeme k vyřízení vaší poptávky. Měření návštěvnosti a
+        reklam spouštíme jen tehdy, když s ním souhlasíte. Vaše údaje nikomu neprodáváme.
+      </p>
+    </div>
+  </section>
+
+  <article class="oou">
+    <div class="wrap oou-sloupec">
+      <h2>Kdo vaše údaje zpracovává</h2>
+      <p>
+        Správcem osobních údajů je provozovatel ubytování Chalupa Heřmanka
+        {SPRAVCE.jmeno && <>, {SPRAVCE.jmeno}</>}
+        {SPRAVCE.ico && <>, IČO {SPRAVCE.ico}</>}
+        {SPRAVCE.adresa ? <>, {SPRAVCE.adresa}</> : <>, {SITE.obec}</>}.
+      </p>
+      <p>
+        S čímkoli, co se týká vašich údajů, nám napište na{' '}
+        <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a> nebo zavolejte na{' '}
+        <a href={`tel:${SITE.telHref}`} class="link">{SITE.telefon}</a>.
+      </p>
+
+      <h2>Poptávka, e-mail a telefon</h2>
+      <p>
+        <strong>Co:</strong> jméno, e-mail, telefon, termín, počet osob a text zprávy, tedy
+        to, co nám sami napíšete do formuláře, e-mailu nebo řeknete do telefonu.
+      </p>
+      <p>
+        <strong>Proč:</strong> abychom vám odpověděli a domluvili pobyt. Právním základem je
+        jednání o smlouvě na vaši žádost (čl. 6 odst. 1 písm. b) GDPR). Pokud se u nás
+        ubytujete, údaje potřebné k pobytu a k zákonné evidenci hostů zpracováváme proto,
+        že nám to ukládá zákon.
+      </p>
+      <p>
+        <strong>Jak dlouho:</strong> po dobu vyřizování poptávky. Pokud z ní pobyt nebude,
+        smažeme ji nejpozději do 2 let.
+      </p>
+      <p>
+        <strong>Kdo k nim má přístup:</strong> jen my. Formulář technicky odesílá služba
+        Web3Forms (web3forms.com), která zprávu doručí do naší e-mailové schránky.
+      </p>
+
+      <h2>Cookies a měření návštěvnosti</h2>
+      <p>
+        Bez vašeho souhlasu web neukládá žádné cookies a nic neměří. Při první návštěvě se
+        vás zeptáme a volbu můžete kdykoli změnit nebo odvolat přes odkaz{' '}
+        <button type="button" class="oou-tlacitko link" data-cookie-nastaveni>
+          Nastavení cookies
+        </button>{' '}
+        v patičce každé stránky.
+      </p>
+
+      <h3>Nezbytné</h3>
+      <p>
+        Do vašeho prohlížeče (localStorage) uložíme jen to, jak jste se rozhodli, a kdy, aby
+        se vás web neptal pořád dokola. Neobsahuje nic, co by vás identifikovalo. Platí rok,
+        pak se zeptáme znovu.
+      </p>
+
+      <h3>Analytické (jen se souhlasem)</h3>
+      <p>
+        <strong>Google Analytics</strong> (Google Ireland Limited) a{' '}
+        <strong>Smartlook</strong> (Smartlook.com, s.r.o.). Vidíme v nich, kolik lidí web
+        navštíví, odkud přišli, jaké stránky čtou, kde klikají a jak se po stránce
+        pohybují. Používáme to jen k jednomu: abychom věděli, které části webu fungují a
+        které je potřeba přepsat. Smartlook pořizuje záznam pohybu po stránce. Pole
+        poptávkového formuláře jsou v něm skrytá, takže to, co do nich píšete, se
+        nenahrává.
+      </p>
+
+      <h3>Marketingové (jen se souhlasem)</h3>
+      <p>
+        <strong>Meta Pixel</strong> (Meta Platforms Ireland Limited). Ukazuje nám, zda lidé
+        přišli z naší reklamy na Facebooku nebo Instagramu a jestli pak například odeslali
+        poptávku. Meta tyto údaje může propojit s vaším účtem u ní; za tuto část zpracování
+        odpovídáme společně s Metou.
+      </p>
+
+      <p>
+        <strong>Právní základ</strong> obou kategorií je váš souhlas (čl. 6 odst. 1 písm. a)
+        GDPR a § 89 odst. 3 zákona č. 127/2005 Sb.). <strong>Jak dlouho:</strong> cookies v
+        prohlížeči nejdéle 2 roky, nebo dokud je nesmažete či souhlas neodvoláte; data u
+        poskytovatelů nejdéle 14 měsíců. Google a Meta mohou údaje přenášet do USA, kde jsou
+        certifikováni podle rámce EU–USA pro ochranu osobních údajů (Data Privacy
+        Framework).
+      </p>
+
+      <h2>Provoz webu</h2>
+      <p>
+        Web běží na službě Cloudflare. Ta při každé návštěvě technicky zpracuje vaši IP
+        adresu a údaje o prohlížeči, aby vám mohla stránku doručit a chránit ji před útoky.
+        Je to náš oprávněný zájem (čl. 6 odst. 1 písm. f) GDPR). Kalendář obsazenosti
+        načítá jen obsazené termíny a nic o vás neukládá.
+      </p>
+      <p>
+        Videa z YouTube se načtou až po kliknutí na „Přehrát“. Od té chvíle zpracovává
+        údaje o přehrávání Google podle svých pravidel.
+      </p>
+
+      <h2>Vaše práva</h2>
+      <p>Máte právo:</p>
+      <ul>
+        <li>vědět, jaké údaje o vás máme, a dostat jejich kopii,</li>
+        <li>nechat je opravit nebo smazat,</li>
+        <li>omezit jejich zpracování nebo proti němu vznést námitku,</li>
+        <li>dostat je ve strojově čitelné podobě,</li>
+        <li>kdykoli odvolat souhlas, aniž by to ovlivnilo, co proběhlo předtím,</li>
+        <li>
+          podat stížnost u Úřadu pro ochranu osobních údajů, Pplk. Sochora 27, 170 00
+          Praha 7,{' '}
+          <a href="https://uoou.gov.cz" class="link" rel="noopener noreferrer">uoou.gov.cz</a>.
+        </li>
+      </ul>
+      <p>
+        Stačí napsat na{' '}
+        <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>. Odpovíme nejpozději
+        do měsíce.
+      </p>
+
+      <p class="oou-ucinnost">Platné od {ucinnost}.</p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .oou-uvod {
+    padding-block: 7.5rem 3rem;
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+  }
+
+  .oou-uvod h1 {
+    margin: 0;
+    color: var(--color-omitka);
+  }
+
+  /* --kamen on --les = 12.91:1, as on the other dark intros. */
+  .oou-lead {
+    margin: 1rem 0 0;
+    max-width: 40ch;
+    font-size: var(--text-lead);
+    line-height: var(--text-lead--line-height);
+    color: var(--color-kamen);
+  }
+
+  .oou-sloupec {
+    max-width: 44rem;
+  }
+
+  .oou {
+    padding-block: 3rem 6rem;
+  }
+
+  .oou h2 {
+    margin: 2.5rem 0 0.75rem;
+    font-size: var(--text-title-s);
+    line-height: var(--text-title-s--line-height);
+  }
+
+  .oou h2:first-child {
+    margin-top: 0;
+  }
+
+  .oou h3 {
+    margin: 1.5rem 0 0.5rem;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .oou p,
+  .oou ul {
+    margin: 0 0 1rem;
+    max-width: 68ch;
+  }
+
+  .oou ul {
+    padding-left: 1.25rem;
+  }
+
+  .oou li + li {
+    margin-top: 0.25rem;
+  }
+
+  .oou-tlacitko {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .oou-ucinnost {
+    margin-top: 2.5rem;
+    font-size: var(--text-caption);
+    color: var(--color-kura);
+  }
+</style>

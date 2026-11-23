@@ -1,0 +1,384 @@
+---
+/**
+ * Cookie consent banner. GDPR + § 89 odst. 3 zákona č. 127/2005 Sb.
+ *
+ * What makes it compliant, so nobody "simplifies" it away:
+ *   - Nothing that needs consent runs before consent. GTM is only ever loaded by
+ *     `window.hkMereni`, defined in BaseLayout.astro's <head>.
+ *   - "Odmítnout vše" is on the first layer and looks exactly like "Přijmout
+ *     vše". Equal weight is the point; do not restyle one of them.
+ *   - Categories are separate and start unticked.
+ *   - No cookie wall: the page stays fully usable with the banner open.
+ *   - Withdrawing is as easy as agreeing: "Nastavení cookies" in the footer
+ *     (any `[data-cookie-nastaveni]` element) reopens this with the details open.
+ *     Lowering consent deletes the tracking cookies and reloads, because tags
+ *     that already ran cannot be unloaded from a page.
+ *   - The choice is stored in localStorage (not a cookie) with a timestamp and
+ *     a version, and asked again after SOUHLAS.platnostMs.
+ *
+ * Without JavaScript the banner stays hidden: nothing can track without
+ * JavaScript, so there is nothing to ask about.
+ */
+import { SOUHLAS } from '../data/site';
+---
+
+<section
+  class="cookie-banner"
+  data-cookie-banner
+  role="dialog"
+  aria-modal="false"
+  aria-labelledby="cookie-nadpis"
+  aria-describedby="cookie-text"
+  data-klic={SOUHLAS.klic}
+  data-verze={SOUHLAS.verze}
+  data-platnost={SOUHLAS.platnostMs}
+  data-ga4={SOUHLAS.ga4Id}
+  hidden
+>
+  <h2 id="cookie-nadpis" class="cookie-nadpis">Cookies a měření návštěvnosti</h2>
+  <p id="cookie-text" class="cookie-text">
+    Se souhlasem měříme, které části webu lidé čtou a kde klikají, abychom věděli, co
+    vylepšit, a jak fungují naše reklamy. Bez souhlasu nic z toho nespouštíme.{' '}
+    <a href="/ochrana-osobnich-udaju" class="cookie-odkaz">Více o ochraně údajů</a>
+  </p>
+
+  <div class="cookie-detail" data-cookie-detail hidden>
+    <label class="cookie-volba">
+      <input type="checkbox" checked disabled />
+      <span>
+        <strong>Nezbytné</strong>
+        Uloží jen vaši volbu v tomto prohlížeči. Bez nich web nefunguje, a proto
+        nejdou vypnout.
+      </span>
+    </label>
+    <label class="cookie-volba">
+      <input type="checkbox" name="analytika" data-cookie-kategorie="analytika" />
+      <span>
+        <strong>Analytické</strong>
+        Google Analytics a Smartlook: kolik lidí web navštíví, co čtou a kde klikají.
+      </span>
+    </label>
+    <label class="cookie-volba">
+      <input type="checkbox" name="marketing" data-cookie-kategorie="marketing" />
+      <span>
+        <strong>Marketingové</strong>
+        Meta Pixel: zda lidé přišli z naší reklamy na Facebooku nebo Instagramu.
+      </span>
+    </label>
+  </div>
+
+  <div class="cookie-akce">
+    <button type="button" class="btn btn-primary" data-cookie-akce="vse">Přijmout vše</button>
+    <button type="button" class="btn btn-primary" data-cookie-akce="nic">Odmítnout vše</button>
+    <button type="button" class="cookie-nastaveni" data-cookie-akce="nastaveni" aria-expanded="false">
+      Nastavení
+    </button>
+    <button type="button" class="btn btn-ghost" data-cookie-akce="ulozit" hidden>Uložit volbu</button>
+  </div>
+</section>
+
+<script>
+  type Volba = { v: number; ts: number; analytika: boolean; marketing: boolean };
+  type Okno = Window & { hkMereni?: (c: Volba) => void; hkMereniBezi?: boolean };
+
+  const banner = document.querySelector<HTMLElement>('[data-cookie-banner]');
+
+  if (banner) {
+    const w = window as Okno;
+    const klic = banner.dataset.klic!;
+    const verze = Number(banner.dataset.verze);
+    const platnost = Number(banner.dataset.platnost);
+    const detail = banner.querySelector<HTMLElement>('[data-cookie-detail]')!;
+    const tlacitko = (a: string) => banner.querySelector<HTMLButtonElement>(`[data-cookie-akce="${a}"]`)!;
+    const kategorie = (k: string) =>
+      banner.querySelector<HTMLInputElement>(`[data-cookie-kategorie="${k}"]`)!;
+
+    const nacti = (): Volba | null => {
+      try {
+        const c = JSON.parse(localStorage.getItem(klic) ?? 'null') as Volba | null;
+        return c && c.v === verze && Date.now() - c.ts < platnost ? c : null;
+      } catch {
+        return null;
+      }
+    };
+    let ulozena = nacti();
+
+    const otevri = (sDetailem: boolean) => {
+      const c = ulozena;
+      kategorie('analytika').checked = !!c?.analytika;
+      kategorie('marketing').checked = !!c?.marketing;
+      ukazDetail(sDetailem);
+      banner.hidden = false;
+    };
+    const ukazDetail = (ano: boolean) => {
+      detail.hidden = !ano;
+      tlacitko('ulozit').hidden = !ano;
+      tlacitko('nastaveni').hidden = ano;
+      tlacitko('nastaveni').setAttribute('aria-expanded', String(ano));
+    };
+
+    /* Every cookie this origin can see, on this host and the parent domain.
+       The site sets none of its own, so everything here came from a tag. */
+    const smazCookies = () => {
+      const host = location.hostname;
+      const domeny = ['', host, '.' + host.replace(/^www\./, '')];
+      for (const par of document.cookie.split(';')) {
+        const jmeno = par.split('=')[0].trim();
+        if (!jmeno) continue;
+        for (const d of domeny) {
+          document.cookie = `${jmeno}=; Max-Age=0; path=/${d ? '; domain=' + d : ''}`;
+        }
+      }
+      try {
+        for (const k of Object.keys(localStorage)) if (/^(SL_|smartlook|_ga|_fb)/i.test(k)) localStorage.removeItem(k);
+      } catch {}
+    };
+
+    /* Consent just went down while tags are running on this page. The reload
+       below would make them send their page-leave beacons on the way out, after
+       the visitor said no. So first tell them (Consent Mode, GA's opt-out flag,
+       the Pixel's revoke), then cut this page off from every other origin:
+       beacons, fetch, XHR and tracking images. The reload follows at once. */
+    const zastavMereni = () => {
+      const g = w as unknown as Record<string, unknown> & { dataLayer?: unknown[]; fbq?: (...a: unknown[]) => void };
+      const ven = (u: unknown) => {
+        try {
+          return new URL(String(u), location.href).origin !== location.origin;
+        } catch {
+          return true;
+        }
+      };
+      try {
+        (function (..._a: unknown[]) {
+          (g.dataLayer ??= []).push(arguments);
+        })('consent', 'update', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+        });
+        g[`ga-disable-${banner.dataset.ga4}`] = true;
+        g.fbq?.('consent', 'revoke');
+      } catch {}
+      const beacon = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = (u, d) => (ven(u) ? true : beacon(u, d));
+      const fetchPuvodni = window.fetch.bind(window);
+      window.fetch = (i, o) =>
+        ven(i instanceof Request ? i.url : i)
+          ? Promise.reject(new TypeError('Souhlas odvolán'))
+          : fetchPuvodni(i, o);
+      const open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (this: XMLHttpRequest, m: string, u: string | URL, ...r: unknown[]) {
+        return (open as (...a: unknown[]) => void).call(this, m, ven(u) ? 'about:blank' : u, ...r);
+      } as typeof open;
+      const src = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src')!;
+      Object.defineProperty(HTMLImageElement.prototype, 'src', {
+        configurable: true,
+        get() {
+          return src.get!.call(this);
+        },
+        set(v: string) {
+          if (!ven(v)) src.set!.call(this, v);
+        },
+      });
+    };
+
+    const uloz = (analytika: boolean, marketing: boolean) => {
+      const predtim = ulozena;
+      const nova: Volba = { v: verze, ts: Date.now(), analytika, marketing };
+      try {
+        localStorage.setItem(klic, JSON.stringify(nova));
+      } catch {}
+      ulozena = nova;
+      banner.hidden = true;
+
+      const ubrano =
+        (predtim?.analytika && !analytika) || (predtim?.marketing && !marketing);
+      if (ubrano) {
+        if (w.hkMereniBezi) zastavMereni();
+        smazCookies();
+      }
+      /* Tags that already ran, or no-op stubs set for a refused category,
+         cannot be swapped out in place. Any change after GTM loaded reloads. */
+      if (w.hkMereniBezi && (predtim?.analytika !== analytika || predtim?.marketing !== marketing)) {
+        location.reload();
+        return;
+      }
+      w.hkMereni?.(nova);
+    };
+
+    /*
+     * ONE capture listener on window, not a listener per button. The Meta Pixel
+     * reports button clicks on its own ("SubscribedButtonClick") from a listener
+     * on document, which hears a click before the button does. Without this, the
+     * click that WITHDRAWS consent was itself sent to Meta. A capture listener on
+     * window runs before anything on document, and stopping propagation there
+     * keeps every consent click away from every tag.
+     */
+    window.addEventListener(
+      'click',
+      (e) => {
+        const cil = e.target as Element | null;
+        const spoustec = cil?.closest('[data-cookie-nastaveni]');
+        if (!spoustec && !cil?.closest('[data-cookie-banner]')) return;
+        e.stopPropagation();
+        if (spoustec) {
+          e.preventDefault();
+          otevri(true);
+          kategorie('analytika').focus();
+          return;
+        }
+        switch (cil?.closest<HTMLElement>('[data-cookie-akce]')?.dataset.cookieAkce) {
+          case 'vse':
+            return uloz(true, true);
+          case 'nic':
+            return uloz(false, false);
+          case 'nastaveni':
+            ukazDetail(true);
+            return kategorie('analytika').focus();
+          case 'ulozit':
+            return uloz(kategorie('analytika').checked, kategorie('marketing').checked);
+        }
+      },
+      true,
+    );
+
+    if (!ulozena) otevri(false);
+  }
+</script>
+
+<style>
+  .cookie-banner {
+    position: fixed;
+    z-index: 90;
+    inset-inline: 1rem;
+    bottom: 1rem;
+    max-width: 34rem;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding: 1.25rem 1.25rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-les);
+    color: var(--color-omitka);
+    box-shadow: var(--shadow-float);
+    font-size: var(--text-caption);
+    line-height: var(--text-caption--line-height);
+  }
+
+  .cookie-banner[hidden] {
+    display: none;
+  }
+
+  @media (min-width: 40rem) {
+    .cookie-banner {
+      inset-inline: 1.5rem auto;
+      bottom: 1.5rem;
+      padding: 1.5rem;
+    }
+  }
+
+  .cookie-nadpis {
+    margin: 0 0 0.5rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-normal);
+    line-height: 1.25;
+  }
+
+  .cookie-text {
+    margin: 0;
+  }
+
+  .cookie-odkaz,
+  .cookie-nastaveni {
+    color: var(--color-omitka);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .cookie-odkaz:hover,
+  .cookie-nastaveni:hover {
+    color: var(--color-mosaz-svetla);
+  }
+
+  .cookie-detail {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(251 250 248 / 0.2);
+  }
+
+  .cookie-detail[hidden] {
+    display: none;
+  }
+
+  .cookie-volba {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: start;
+    cursor: pointer;
+  }
+
+  .cookie-volba input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 0.15rem;
+    accent-color: var(--color-mosaz);
+  }
+
+  .cookie-volba input:disabled {
+    cursor: not-allowed;
+  }
+
+  .cookie-volba strong {
+    display: block;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  /* The two choices share one row in two equal columns: equal weight, by
+     design, at every width. "Nastavení" / "Uložit volbu" take the row below. */
+  .cookie-akce {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  /* Tighter tracking than the site's buttons so both labels fit one line on a
+     360px phone: a wrapped label would make one button taller. */
+  .cookie-akce .btn {
+    padding-inline: 0.25rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .cookie-akce [data-cookie-akce='ulozit'],
+  .cookie-akce [data-cookie-akce='nastaveni'] {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .cookie-akce [data-cookie-akce='ulozit'] {
+    justify-self: stretch;
+  }
+
+  .cookie-akce [hidden] {
+    display: none;
+  }
+
+  .cookie-nastaveni {
+    background: none;
+    border: 0;
+    padding: 0.5rem 0;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .cookie-banner :focus-visible {
+    outline: 2px solid var(--color-mosaz-svetla);
+    outline-offset: 2px;
+  }
+</style>

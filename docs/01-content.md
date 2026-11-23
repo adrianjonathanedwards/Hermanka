@@ -657,7 +657,9 @@ Collected from the sections above. Nothing here is optional.
 11. What the price includes   bed linen, towels, firewood, pellets (§6.4)
 12. Pets   allowed, charged, limited? Amenity list and terms disagree (§5.9, §6.4)
 13. Public email address (§8.1)
-14. GDPR line and privacy link for the form (§8.2)
+14. ~~GDPR line and privacy link for the form (§8.2)~~ **Done, November 2026**,
+    with the privacy page at `/ochrana-osobnich-udaju`. It still needs the
+    owner's name, address and IČO (item 23, `SPRAVCE` in `src/data/site.ts`)
 15. ~~Where availability data will come from~~   **resolved**: the e-chalupy iCal export
     ([03-tech.md](03-tech.md) §3). Still to do: put the real feed URL in the Worker as a
     secret and deploy it (`worker/availability/README.md`).
@@ -674,7 +676,7 @@ Collected from the sections above. Nothing here is optional.
 22. Nav CTA and submit-button wording (§3.1, §8.2)
 23. IČO and business identification for the footer (§3.3)
 24. ~~Whether to keep Google Tag Manager at all~~ **Answered, November 2026:
-    keep it.** Installed; cookie consent is still open (see
+    keep it.** Installed behind a cookie-consent banner (see
     [03-tech.md](03-tech.md) §5)
 
 ---

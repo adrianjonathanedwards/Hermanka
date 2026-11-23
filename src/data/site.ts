@@ -106,6 +106,47 @@ export const WEB3FORMS_ACCESS_KEY = '2b09e556-3852-47d9-861e-62f1719b728d';
  */
 export const GTM_ID: string | null = 'GTM-KN4B4K4';
 
+/**
+ * Cookie consent. NOTHING in GTM loads until a visitor says yes: see
+ * src/components/CookieBanner.astro and the loader in BaseLayout.astro.
+ *
+ * The client's GTM tags have no consent checks of their own, so the site
+ * enforces the choice itself:
+ *   - analytics refused → GA4 is switched off with Google's `ga-disable-<id>`
+ *     flag, and `window.smartlook` is pre-defined as a no-op, which the
+ *     Smartlook tag reads as "already loaded" and skips;
+ *   - marketing refused → `window.fbq` is pre-defined as a no-op, which the
+ *     Meta Pixel tag reads the same way;
+ *   - both refused → GTM itself never loads.
+ *
+ * ⚠ A NEW TAG IN GTM IS NOT COVERED BY THIS. Whoever adds one must either give
+ * it a consent check in GTM (Consent Mode is set below the banner) or have it
+ * added here and to the privacy page (src/pages/ochrana-osobnich-udaju.astro).
+ */
+export const SOUHLAS = {
+  /** localStorage key. The choice itself is not a cookie. */
+  klic: 'hk-souhlas',
+  /** Bump when the categories or the vendors in them change: everyone is asked again. */
+  verze: 1,
+  /** Ask again after a year. */
+  platnostMs: 365 * 24 * 60 * 60 * 1000,
+  /** The GA4 property inside the container, for `ga-disable-<id>`. */
+  ga4Id: 'G-VDZR5DT9HY',
+} as const;
+
+/**
+ * The data controller, for the privacy page.
+ *
+ * TODO(client): the owner's full name (or company), postal address and IČO
+ * are not known (docs/01-content.md §9 item 23). GDPR Art. 13 wants the
+ * controller identified; the page shows these the moment they are filled in.
+ */
+export const SPRAVCE = {
+  jmeno: null as string | null,
+  adresa: null as string | null,
+  ico: null as string | null,
+};
+
 /** Primary navigation. Used by both the header and the footer. */
 export const NAV = [
   { href: '/ubytovani', label: 'Ubytování' },

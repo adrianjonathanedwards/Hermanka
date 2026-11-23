@@ -56,7 +56,15 @@ const odkud = Astro.url.pathname;
 const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
 ---
 
-<form class:list={['form', className]} method="POST" action={POPTAVKA_ENDPOINT} data-poptavka>
+{/* `smartlook-hide` + `data-recording-sensitive`: Smartlook's two documented
+    masks. Whatever a guest types here never appears in a session recording. */}
+<form
+  class:list={['form', 'smartlook-hide', className]}
+  method="POST"
+  action={POPTAVKA_ENDPOINT}
+  data-poptavka
+  data-recording-sensitive
+>
   <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
   <input type="hidden" name="subject" value="Nová poptávka   Chalupa Heřmanka" />
   <input type="hidden" name="from_name" value="Formulář na webu Chalupa Heřmanka" />
@@ -182,11 +190,13 @@ const dekujeme = new URL('/kontakt/dekujeme', Astro.site).href;
     </p>
   </div>
 
-  {/*
-    TODO(client)   LAUNCH-BLOCKING: this form emails personal data to the
-    owner and needs a GDPR line plus a link to how the data is handled.
-    docs/01-content.md §9 item 14.
-  */}
+  {/* The GDPR line (docs/01-content.md §9 item 14). An information notice, not
+      a consent checkbox: answering an inquiry is "steps prior to a contract"
+      (GDPR Art. 6(1)(b)), which needs no consent. */}
+  <p class="hint field--wide">
+    Údaje z formuláře použijeme jen k vyřízení vaší poptávky.{' '}
+    <a href="/ochrana-osobnich-udaju" class="link">Jak s nimi zacházíme</a>.
+  </p>
 </form>
 
 <script>

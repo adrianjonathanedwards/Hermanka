@@ -8,7 +8,8 @@
 import { getLocaleFromUrl, localePath, stripLocale } from '../i18n/utils';
 import { useTranslations } from '../i18n/ui';
 import { HTML_LANG, LIVE_LOCALES } from '../i18n/config';
-import { GTM_ID } from '../data/site';
+import { GTM_ID, SOUHLAS } from '../data/site';
+import CookieBanner from '../components/CookieBanner.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Lightbox from '../components/Lightbox.astro';
@@ -98,18 +99,34 @@ const websiteSchema = {
  * (BASE_PATH set), so neither one pollutes the client's analytics with our
  * own page views.
  *
- * The snippet is Google's standard container snippet, byte for byte apart from
- * the ID. tools/headers.mjs finds it in the built HTML and switches the CSP to
- * the policy GTM's tags need. See TAG_VENDORS there.
+ * CONSENT FIRST. GTM does not load until the visitor has agreed to at least
+ * one category in the cookie banner (CookieBanner.astro). `hkMereni(choice)`
+ * below is the only thing that ever loads it: on page load if a stored choice
+ * is still valid, or from the banner the moment someone says yes. What a
+ * refusal switches off, and how, is documented on SOUHLAS in src/data/site.ts.
+ *
+ * Inside it is Google's standard container snippet, unchanged apart from the
+ * ID. tools/headers.mjs finds the gtm.js URL in the built HTML and switches the
+ * CSP to the policy GTM's tags need. See TAG_VENDORS there.
  */
 const gtmId = import.meta.env.PROD && import.meta.env.BASE_URL === '/' ? GTM_ID : null;
-const gtmSnippet =
+const gtmLoader =
   gtmId &&
-  `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  `(function(){var w=window,S=${JSON.stringify({ k: SOUHLAS.klic, v: SOUHLAS.verze, ms: SOUHLAS.platnostMs })};
+w.hkMereni=function(c){
+if(w.hkMereniBezi||!c||!(c.analytika||c.marketing))return;w.hkMereniBezi=true;
+w.dataLayer=w.dataLayer||[];function g(){w.dataLayer.push(arguments);}
+var a=c.analytika?'granted':'denied',m=c.marketing?'granted':'denied';
+g('consent','default',{analytics_storage:a,ad_storage:m,ad_user_data:m,ad_personalization:m,functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
+if(!c.analytika){w[${JSON.stringify('ga-disable-' + SOUHLAS.ga4Id)}]=true;w.smartlook=function(){};}
+if(!c.marketing){w.fbq=w._fbq=function(){};}
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer',${JSON.stringify(gtmId)});`;
+})(w,document,'script','dataLayer',${JSON.stringify(gtmId)});};
+var c;try{c=JSON.parse(localStorage.getItem(S.k));}catch(e){}
+if(c&&c.v===S.v&&Date.now()-c.ts<S.ms)w.hkMereni(c);})();`;
 ---
 
 <!doctype html>
@@ -119,11 +136,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     {/*
-      Google Tag Manager, as high in <head> as it can go, per Google. It does not
-      delay the font preloads below: the snippet only queues an async request,
-      and the preload scanner has already seen those <link>s by the time it runs.
+      Google Tag Manager's consent-gated loader, as high in <head> as it can go,
+      per Google. With no stored consent it defines one function and returns.
     */}
-    {gtmSnippet && <script is:inline set:html={gtmSnippet} />}
+    {gtmLoader && <script is:inline set:html={gtmLoader} />}
 
     {/*
       Fonts are preloaded before anything else in <head> so the request starts on
@@ -258,21 +274,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   </head>
 
   <body>
-    {/* GTM's no-JavaScript fallback, immediately after <body> opens, per Google. */}
-    {
-      gtmId && (
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-            height="0"
-            width="0"
-            style="display:none;visibility:hidden"
-          />
-        </noscript>
-      )
-    }
-
+    {/*
+      No GTM <noscript> iframe, deliberately. Without JavaScript nobody can give
+      consent, so it would be a tracking request without consent.
+    */}
     <a href="#obsah" class="skip-link">{t('nav.skipToContent')}</a>
+
+    {GTM_ID && <CookieBanner />}
 
     <SiteHeader solid={headerSolid} />
 

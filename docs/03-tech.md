@@ -277,11 +277,15 @@ map, not a review widget, not a chat bubble.
 >   `'unsafe-inline'` instead of hashes, plus an allowlist of tag vendors.
 >   `tools/headers.mjs` explains why, and `TAG_VENDORS` there is the list. **A tag
 >   for a new vendor will be blocked until its origins are added there.**
-> - **Consent is still open.** Nothing on the site asks for cookie consent yet,
->   and GA4, the Pixel and Smartlook all need it from Czech visitors. The usual
->   fix is a consent-management tag inside GTM plus Google Consent Mode. That is
->   for the client to decide, and if the CMP loads its own script, its origins
->   go in `TAG_VENDORS` too.
+> - **Consent (added November 2026).** GTM does not load until a visitor agrees
+>   in the cookie banner (`src/components/CookieBanner.astro`). Two categories:
+>   analytics (GA4, Smartlook) and marketing (Meta Pixel). The container's tags
+>   have no consent checks of their own, so the site enforces the choice: a
+>   refused category gets GA's `ga-disable-<id>` flag or a no-op `smartlook` /
+>   `fbq` stub that the GTM tag reads as "already loaded" (`SOUHLAS` in
+>   `src/data/site.ts` has the details). The privacy policy is at
+>   `/ochrana-osobnich-udaju`. **A new tag in GTM needs either a consent check
+>   in GTM or an entry in that mechanism, plus a line on the privacy page.**
 
 ### Video
 
